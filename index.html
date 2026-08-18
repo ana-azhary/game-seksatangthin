@@ -29,11 +29,27 @@
         .tab-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; background: #f1f5f9; color: #334155; }
         .tab-btn.active { background: #065f46; color: white; }
         .tab-btn:active { transform: scale(0.96); }
-        .level-btn { padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.95rem; border: 2px solid transparent; background: #f1f5f9; color: #1e293b; cursor: pointer; transition: 0.2s; }
-        .level-btn:active { transform: scale(0.95); }
-        .level-btn.passed { background: #dcfce7; border-color: #16a34a; color: #14532d; }
-        .level-btn.active-level { background: #dbeafe; border-color: #3b82f6; }
-        .level-btn.locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
+        
+        /* Level & Dan buttons */
+        .level-section { margin-bottom: 8px; }
+        .level-label { font-weight: 700; color: #065f46; font-size: 0.9rem; margin-right: 8px; }
+        .dan-btn {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 2px solid #d1d5db;
+            background: #f9fafb;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 2px;
+        }
+        .dan-btn:active { transform: scale(0.95); }
+        .dan-btn.passed { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+        .dan-btn.active-dan { background: #dbeafe; border-color: #3b82f6; }
+        .dan-btn.locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
+
         .ustadh-bubble { background: #064e3b; color: #fef3c7; padding: 12px 20px; border-radius: 20px 20px 20px 6px; display: inline-block; max-width: 94%; font-size: 1rem; line-height: 1.6; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .timer-bar { height: 8px; background: #e5e7eb; border-radius: 20px; overflow: hidden; }
         .timer-fill { height: 100%; background: #0d9488; border-radius: 20px; transition: width 1s linear; }
@@ -45,6 +61,7 @@
             .option-btn { font-size: 1rem; padding: 12px 14px; }
             .btn-primary { padding: 14px 24px; font-size: 1rem; }
             .tab-btn { padding: 8px 14px; font-size: 0.9rem; }
+            .dan-btn { padding: 4px 10px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -84,7 +101,9 @@
         <section id="gameTab" class="tab-content">
             <div class="card p-5 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2"><span>🗺️</span> เลือกด่าน</h2>
-                <div id="levelList" class="flex flex-wrap gap-2"></div>
+                <div id="levelList" class="flex flex-wrap gap-3">
+                    <!-- JS จะสร้างปุ่ม Level และ Dan -->
+                </div>
                 <p id="levelStatus" class="text-sm text-gray-500 mt-2"></p>
             </div>
 
@@ -186,7 +205,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT - ใช้ PATH-BASED ROUTING + DEBUG -->
+    <!-- JAVASCRIPT - ปรับปรุงรองรับระบบ Level/Dan อัตโนมัติ -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -203,8 +222,8 @@
         // ==============================================================
         //  STATE
         // ==============================================================
-        let allQuestions = [], allVocab = [], levels = [], userProgress = {};
-        let currentLevel = 0, currentRound = [], currentIndex = 0;
+        let allQuestions = [], allVocab = [], levelData = [], userProgress = {};
+        let currentLevel = 0, currentDan = 0, currentRound = [], currentIndex = 0;
         let score = 0, streak = 0, stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
         let mistakes = [], timerInterval = null, timeLeft = CONFIG.TIME_LIMIT;
         let isAnswered = false, gameEnded = false;
@@ -309,7 +328,6 @@
                 document.getElementById('loginButton').style.display = 'none';
                 document.getElementById('logoutBtn').classList.remove('hidden');
 
-                // เรียก /login ด้วย POST
                 callAPI('login', 'POST', { email: userEmail, displayName: userName })
                     .then((res) => {
                         debugLog('API', `✅ ลงทะเบียนสำเร็จ (newUser: ${res.newUser})`);
@@ -349,13 +367,13 @@
             document.getElementById('gameNotStarted').classList.remove('hidden');
             document.getElementById('gameArea').classList.add('hidden');
 
-            allQuestions = []; allVocab = []; levels = []; userProgress = {};
+            allQuestions = []; allVocab = []; levelData = []; userProgress = {};
             renderLevels(); renderVocab(); renderLeaderboard();
             debugLog('GSI', '✅ ออกจากระบบสำเร็จ');
         });
 
         // ==============================================================
-        //  ✅ API HELPER - PATH-BASED ROUTING
+        //  API HELPER
         // ==============================================================
         async function callAPI(action, method = 'GET', body = null, query = {}) {
             const url = new URL(CONFIG.WORKER_URL);
@@ -397,20 +415,23 @@
 
                 allQuestions = q.data || [];
                 allVocab = v.data || [];
-                levels = l.data || [];
+                levelData = l.data || [];
                 userProgress = p.data || {};
 
-                debugLog('DATA', `📚 โหลดสำเร็จ: ${allQuestions.length} คำถาม, ${allVocab.length} คำศัพท์, ${levels.length} ด่าน`);
+                debugLog('DATA', `📚 โหลดสำเร็จ: ${allQuestions.length} คำถาม, ${allVocab.length} คำศัพท์, ${levelData.length} Level`);
                 setStatus(`📚 โหลดข้อมูลสำเร็จ`, '#065f46');
 
                 renderLevels();
                 renderVocab();
                 renderLeaderboard();
 
-                const firstUnlocked = levels.find(l => !userProgress[l] || userProgress[l] < CONFIG.PASSING_SCORE);
-                if (firstUnlocked) loadLevel(firstUnlocked);
-                else if (levels.length) loadLevel(levels[0]);
-                else {
+                // เล่นด่านแรกที่ยังไม่ผ่าน
+                const firstDan = findFirstUnlockedDan();
+                if (firstDan) {
+                    loadDan(firstDan.level, firstDan.dan);
+                } else if (levelData.length > 0 && levelData[0].dans.length > 0) {
+                    loadDan(levelData[0].level, levelData[0].dans[0]);
+                } else {
                     document.getElementById('gameNotStarted').classList.remove('hidden');
                     document.getElementById('gameArea').classList.add('hidden');
                 }
@@ -422,44 +443,131 @@
         }
 
         // ==============================================================
-        //  RENDER LEVELS
+        //  FIND FIRST UNLOCKED DAN
+        // ==============================================================
+        function findFirstUnlockedDan() {
+            for (let li = 0; li < levelData.length; li++) {
+                const level = levelData[li];
+                for (let di = 0; di < level.dans.length; di++) {
+                    const dan = level.dans[di];
+                    const key = `${level.level}_${dan}`;
+                    const progress = userProgress[key] || 0;
+                    if (progress < CONFIG.PASSING_SCORE) {
+                        // ตรวจสอบว่า ด่านก่อนหน้าใน Level นี้ผ่านแล้วหรือยัง
+                        if (di === 0) {
+                            // ด่านแรกของ Level นี้ ตรวจสอบว่า Level ก่อนหน้าผ่านหมดหรือยัง
+                            if (li === 0) {
+                                return { level: level.level, dan: dan };
+                            } else {
+                                // ตรวจสอบว่า Level ก่อนหน้าผ่านหมดหรือยัง
+                                const prevLevel = levelData[li - 1];
+                                const allPrevPassed = prevLevel.dans.every(d => {
+                                    const k = `${prevLevel.level}_${d}`;
+                                    return (userProgress[k] || 0) >= CONFIG.PASSING_SCORE;
+                                });
+                                if (allPrevPassed) {
+                                    return { level: level.level, dan: dan };
+                                }
+                            }
+                        } else {
+                            // ตรวจสอบว่า Dan ก่อนหน้าใน Level นี้ผ่านแล้ว
+                            const prevDan = level.dans[di - 1];
+                            const prevKey = `${level.level}_${prevDan}`;
+                            if ((userProgress[prevKey] || 0) >= CONFIG.PASSING_SCORE) {
+                                return { level: level.level, dan: dan };
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        // ==============================================================
+        //  RENDER LEVELS & DANS
         // ==============================================================
         function renderLevels() {
             const container = document.getElementById('levelList');
             container.innerHTML = '';
-            if (!levels.length) {
+            if (!levelData.length) {
                 container.innerHTML = '<span class="text-gray-400">ยังไม่มีด่าน</span>';
                 return;
             }
-            levels.forEach(level => {
-                const progress = userProgress[level] || 0;
-                const isUnlocked = (level === levels[0]) || (userProgress[level - 1] >= CONFIG.PASSING_SCORE);
-                const isPassed = progress >= CONFIG.PASSING_SCORE;
 
-                const btn = document.createElement('button');
-                btn.className = 'level-btn';
-                if (isPassed) btn.classList.add('passed');
-                if (!isUnlocked) btn.classList.add('locked');
-                if (currentLevel === level) btn.classList.add('active-level');
+            levelData.forEach(level => {
+                const section = document.createElement('div');
+                section.className = 'level-section w-full';
 
-                let label = `ด่าน ${level}`;
-                if (isPassed) label += ' ✅';
-                else if (!isUnlocked) label += ' 🔒';
-                else if (progress > 0) label += ` (${progress}%)`;
+                const label = document.createElement('div');
+                label.className = 'level-label';
+                label.textContent = `🏰 Level ${level.level}`;
+                section.appendChild(label);
 
-                btn.textContent = label;
-                if (isUnlocked) btn.onclick = () => loadLevel(level);
-                container.appendChild(btn);
+                const danContainer = document.createElement('div');
+                danContainer.className = 'flex flex-wrap gap-1';
+
+                level.dans.forEach(dan => {
+                    const key = `${level.level}_${dan}`;
+                    const progress = userProgress[key] || 0;
+                    const isPassed = progress >= CONFIG.PASSING_SCORE;
+
+                    // ตรวจสอบว่าปลดล็อกหรือยัง
+                    let isUnlocked = false;
+                    const danIndex = level.dans.indexOf(dan);
+                    if (danIndex === 0) {
+                        // ด่านแรกของ Level นี้
+                        const levelIndex = levelData.indexOf(level);
+                        if (levelIndex === 0) {
+                            isUnlocked = true;
+                        } else {
+                            const prevLevel = levelData[levelIndex - 1];
+                            const allPrevPassed = prevLevel.dans.every(d => {
+                                const k = `${prevLevel.level}_${d}`;
+                                return (userProgress[k] || 0) >= CONFIG.PASSING_SCORE;
+                            });
+                            isUnlocked = allPrevPassed;
+                        }
+                    } else {
+                        const prevDan = level.dans[danIndex - 1];
+                        const prevKey = `${level.level}_${prevDan}`;
+                        isUnlocked = (userProgress[prevKey] || 0) >= CONFIG.PASSING_SCORE;
+                    }
+
+                    const btn = document.createElement('button');
+                    btn.className = 'dan-btn';
+                    if (isPassed) btn.classList.add('passed');
+                    if (!isUnlocked) btn.classList.add('locked');
+                    if (currentLevel === level.level && currentDan === dan) btn.classList.add('active-dan');
+
+                    let labelText = `ด่าน ${dan}`;
+                    if (isPassed) labelText += ' ✅';
+                    else if (!isUnlocked) labelText += ' 🔒';
+                    else if (progress > 0) labelText += ` (${progress}%)`;
+
+                    btn.textContent = labelText;
+                    if (isUnlocked) {
+                        btn.onclick = () => loadDan(level.level, dan);
+                    }
+                    danContainer.appendChild(btn);
+                });
+
+                section.appendChild(danContainer);
+                container.appendChild(section);
             });
         }
 
         // ==============================================================
-        //  GAME
+        //  LOAD DAN
         // ==============================================================
-        function loadLevel(level) {
+        function loadDan(level, dan) {
             currentLevel = level;
-            const questions = allQuestions.filter(q => (q.ระดับความยาก || 1) == level);
-            if (!questions.length) { alert('ไม่มีข้อสอบในด่านนี้'); return; }
+            currentDan = dan;
+
+            const questions = allQuestions.filter(q => q.dan == dan && q.level == level);
+            if (!questions.length) {
+                alert(`ไม่มีข้อสอบใน Level ${level} ด่าน ${dan}`);
+                return;
+            }
 
             const shuffled = [...questions].sort(() => Math.random() - 0.5);
             currentRound = shuffled.slice(0, Math.min(CONFIG.QUESTIONS_PER_GAME, shuffled.length));
@@ -479,6 +587,9 @@
             renderQuestion();
         }
 
+        // ==============================================================
+        //  GAME FUNCTIONS (เหมือนเดิม)
+        // ==============================================================
         function renderQuestion() {
             if (currentIndex >= currentRound.length) { endGame(); return; }
 
@@ -589,17 +700,18 @@
             const maxScore = total * 10;
             const percent = Math.round((score / maxScore) * 100);
             document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalLevel').textContent = `ด่าน ${currentLevel}`;
+            document.getElementById('finalLevel').textContent = `Level ${currentLevel} • ด่าน ${currentDan}`;
             document.getElementById('finalMessage').textContent =
                 percent >= CONFIG.PASSING_SCORE ?
                 `🎉 ผ่าน! (${percent}%) อุสตะเฮงภูมิใจในตัวคุณ` :
                 `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${CONFIG.PASSING_SCORE}% ขึ้นไป`;
 
             if (isLoggedIn) {
+                const key = `${currentLevel}_${currentDan}`;
                 callAPI('scores', 'POST', {
                     email: userEmail,
                     displayName: userName,
-                    level: currentLevel,
+                    level: key,
                     score: score,
                     time: Math.round((CONFIG.TIME_LIMIT * currentRound.length - timeLeft) || 0)
                 }).then(() => callAPI('progress', 'GET', null, { email: userEmail }))
@@ -780,11 +892,11 @@
         });
 
         document.getElementById('resetGameBtn').addEventListener('click', () => {
-            if (confirm('เริ่มเกมใหม่?')) loadLevel(currentLevel);
+            if (confirm('เริ่มเกมใหม่?')) loadDan(currentLevel, currentDan);
         });
 
         document.getElementById('playAgainBtn').addEventListener('click', () => {
-            loadLevel(currentLevel);
+            loadDan(currentLevel, currentDan);
         });
 
         // ==============================================================
@@ -797,7 +909,7 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v2.3)`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v2.6)`);
         debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
     </script>
 

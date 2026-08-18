@@ -192,7 +192,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT - ใช้ PATH-BASED ROUTING -->
+    <!-- JAVASCRIPT - ใช้ PATH-BASED ROUTING + DEBUG -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -315,7 +315,7 @@
                 document.getElementById('loginButton').style.display = 'none';
                 document.getElementById('logoutBtn').classList.remove('hidden');
 
-                // ✅ ใช้ PATH-BASED: /login
+                // เรียก /login ด้วย POST
                 callAPI('login', 'POST', { email: userEmail, displayName: userName })
                     .then((res) => {
                         debugLog('API', `✅ ลงทะเบียนสำเร็จ (newUser: ${res.newUser})`);
@@ -361,7 +361,7 @@
         });
 
         // ==============================================================
-        //  ✅ API HELPER - PATH-BASED ROUTING (แก้ไขแล้ว!)
+        //  ✅ API HELPER - PATH-BASED ROUTING (แก้ไขแล้ว)
         // ==============================================================
         async function callAPI(action, method = 'GET', body = null, query = {}) {
             const url = new URL(CONFIG.WORKER_URL);
@@ -381,9 +381,12 @@
             const token = localStorage.getItem('id_token');
             if (token) options.headers['Authorization'] = 'Bearer ' + token;
 
+            debugLog('API', `📡 ${method} ${url.toString()}`);
             const res = await fetch(url.toString(), options);
             if (!res.ok) throw new Error(`API error ${res.status}`);
-            return res.json();
+            const data = await res.json();
+            debugLog('API', `📥 Response:`, data);
+            return data;
         }
 
         // ==============================================================
@@ -393,12 +396,11 @@
             try {
                 setStatus('⏳ กำลังโหลดข้อมูล...', '#6b7280');
 
-                const [q, v, l, p] = await Promise.all([
-                    callAPI('questions', 'GET'),
-                    callAPI('vocab', 'GET'),
-                    callAPI('levels', 'GET'),
-                    callAPI('progress', 'GET', null, { email: userEmail }),
-                ]);
+                // ทดสอบเรียก API ทีละตัว
+                const q = await callAPI('questions', 'GET');
+                const v = await callAPI('vocab', 'GET');
+                const l = await callAPI('levels', 'GET');
+                const p = await callAPI('progress', 'GET', null, { email: userEmail });
 
                 allQuestions = q.data || [];
                 allVocab = v.data || [];
@@ -693,7 +695,7 @@
         }
 
         // ==============================================================
-        //  LEADERBOARD (ใช้ PATH-BASED)
+        //  LEADERBOARD
         // ==============================================================
         async function renderLeaderboard() {
             try {
@@ -802,7 +804,7 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v2.2)`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v2.3)`);
         debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
     </script>
 

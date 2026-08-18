@@ -1,796 +1,600 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
-    <title>ศึกษา ต่างถิ่น • เกมภาษาอาหรับ</title>
-    <!-- Tailwind + Google Fonts -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet" />
-    <style>
-        * { font-family: 'Noto Sans Thai', sans-serif; }
-        .arabic { font-family: 'Noto Naskh Arabic', serif; font-size: 1.5rem; line-height: 2.2rem; }
+// ================================================================
+// CLOUDFLARE WORKER - ระบบเกม "ศึกษา ต่างถิ่น"
+// VERSION 2.4 - Debug + Test Endpoint
+// ================================================================
 
-        /* Smooth card & transitions */
-        .card {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(4px);
-            border-radius: 24px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-        }
-        .btn-primary {
-            background: #065f46;
-            color: white;
-            font-weight: 600;
-            padding: 12px 28px;
-            border-radius: 40px;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
-            font-size: 1.05rem;
-        }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-secondary {
-            background: #f0fdf4;
-            color: #065f46;
-            border: 2px solid #065f46;
-            font-weight: 600;
-            padding: 10px 24px;
-            border-radius: 40px;
-            transition: 0.2s;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .btn-secondary:active { background: #dcfce7; }
+const VERSION = "2.4";
 
-        .option-btn {
-            border: 2px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 14px 16px;
-            background: white;
-            transition: all 0.15s;
-            text-align: right;
-            font-size: 1.15rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-        .option-btn:active { transform: scale(0.97); }
-        .option-btn.correct { border-color: #16a34a; background: #dcfce7; }
-        .option-btn.wrong { border-color: #dc2626; background: #fee2e2; }
-        .option-btn.disabled { opacity: 0.6; pointer-events: none; }
-
-        .tab-btn {
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 1rem;
-            border: none;
-            cursor: pointer;
-            transition: 0.2s;
-            background: #f1f5f9;
-            color: #334155;
-        }
-        .tab-btn.active {
-            background: #065f46;
-            color: white;
-        }
-        .tab-btn:active { transform: scale(0.96); }
-
-        .level-btn {
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            border: 2px solid transparent;
-            background: #f1f5f9;
-            color: #1e293b;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .level-btn:active { transform: scale(0.95); }
-        .level-btn.passed { background: #dcfce7; border-color: #16a34a; color: #14532d; }
-        .level-btn.active-level { background: #dbeafe; border-color: #3b82f6; }
-        .level-btn.locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
-
-        .ustadh-bubble {
-            background: #064e3b;
-            color: #fef3c7;
-            padding: 12px 20px;
-            border-radius: 20px 20px 20px 6px;
-            display: inline-block;
-            max-width: 94%;
-            font-size: 1rem;
-            line-height: 1.6;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .timer-bar {
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        .timer-fill {
-            height: 100%;
-            background: #0d9488;
-            border-radius: 20px;
-            transition: width 1s linear;
-        }
-
-        /* ปรับขนาดข้อความและระยะห่างสำหรับมือถือ */
-        @media (max-width: 480px) {
-            .arabic { font-size: 1.3rem; line-height: 1.9rem; }
-            .option-btn { font-size: 1rem; padding: 12px 14px; }
-            .btn-primary { padding: 14px 24px; font-size: 1rem; }
-            .tab-btn { padding: 8px 14px; font-size: 0.9rem; }
-        }
-    </style>
-</head>
-<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 p-4 md:p-6">
-
-    <div id="app" class="max-w-4xl mx-auto">
-
-        <!-- ===== HEADER ===== -->
-        <header class="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <div class="flex items-center gap-3">
-                <span class="text-3xl md:text-4xl">📚</span>
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-emerald-900 leading-tight">ศึกษา ต่างถิ่น</h1>
-                    <span class="text-sm text-amber-700 font-medium">أُسْتَاذ</span>
-                </div>
-            </div>
-            <div id="userArea" class="flex items-center gap-3">
-                <div id="userInfo" class="hidden flex items-center gap-2 bg-white/80 px-3 py-1.5 rounded-full shadow-sm">
-                    <img id="avatarImg" class="w-8 h-8 rounded-full border-2 border-emerald-200" src="" alt="avatar" />
-                    <span id="userName" class="text-sm font-medium text-gray-800"></span>
-                </div>
-                <div id="loginButton" class="g_id_signin" data-type="standard" data-size="medium" data-theme="outline" data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
-                <button id="logoutBtn" class="hidden text-xs text-red-600 hover:text-red-800 font-medium underline-offset-2 underline">ออก</button>
-            </div>
-        </header>
-
-        <!-- ===== TABS ===== -->
-        <nav class="flex flex-wrap gap-2 mb-6">
-            <button class="tab-btn active" data-tab="gameTab">🎮 เกม</button>
-            <button class="tab-btn" data-tab="vocabTab">📖 คำศัพท์</button>
-            <button class="tab-btn" data-tab="leaderboardTab">🏆 ลีดเดอร์</button>
-        </nav>
-
-        <!-- ============================================================ -->
-        <!-- TAB: GAME -->
-        <!-- ============================================================ -->
-        <section id="gameTab" class="tab-content">
-
-            <!-- เลือกด่าน -->
-            <div class="card p-5 md:p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <span>🗺️</span> เลือกด่าน
-                </h2>
-                <div id="levelList" class="flex flex-wrap gap-2">
-                    <!-- JS จะสร้างปุ่มด่าน -->
-                </div>
-                <p id="levelStatus" class="text-sm text-gray-500 mt-2"></p>
-            </div>
-
-            <!-- เกม -->
-            <div id="gameArea" class="card p-5 md:p-7 hidden">
-                <!-- อุสตะเฮง -->
-                <div class="flex items-start gap-3 mb-5">
-                    <div class="w-11 h-11 rounded-full bg-emerald-900 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">อ</div>
-                    <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">
-                        สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ
-                    </div>
-                </div>
-
-                <!-- ความคืบหน้า + เวลา -->
-                <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mb-2">
-                    <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
-                    <span id="timerText" class="bg-gray-100 px-4 py-1.5 rounded-full">⏳ 20 วินาที</span>
-                </div>
-                <div class="timer-bar mb-5"><div id="timerFill" class="timer-fill" style="width:100%"></div></div>
-
-                <!-- คำถาม -->
-                <div id="questionArea">
-                    <div class="text-center mb-4">
-                        <span id="qCategory" class="inline-block text-xs text-gray-400 bg-gray-50 px-4 py-1 rounded-full">หมวด</span>
-                        <h2 id="questionText" class="text-xl md:text-2xl font-bold text-emerald-900 mt-2">โหลดคำถาม...</h2>
-                    </div>
-                    <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-
-                    <div class="flex flex-wrap justify-center gap-3 mt-6">
-                        <button id="hintBtn" class="btn-secondary text-sm py-2 px-5" disabled>💡 ใบ้ (⭐2)</button>
-                        <button id="skipBtn" class="btn-secondary text-sm py-2 px-5" disabled>⏭️ ข้าม (⭐3)</button>
-                        <button id="resetGameBtn" class="text-sm text-emerald-700 hover:text-emerald-900 font-medium underline-offset-2 underline">🔄 เริ่มใหม่</button>
-                    </div>
-                </div>
-
-                <!-- ผลลัพธ์ -->
-                <div id="resultArea" class="hidden text-center py-6">
-                    <div class="text-6xl mb-2">🏆</div>
-                    <h3 class="text-2xl font-bold text-emerald-900">จบเกม!</h3>
-                    <p class="text-gray-600 mt-1">คะแนน <span id="finalScore" class="font-bold text-4xl text-amber-700">0</span></p>
-                    <p id="finalLevel" class="text-lg text-emerald-800 font-medium"></p>
-                    <p id="finalMessage" class="mt-2 p-4 bg-emerald-50 rounded-2xl text-emerald-800 text-sm"></p>
-                    <button id="playAgainBtn" class="btn-primary mt-5">🔄 เล่นอีกครั้ง</button>
-                    <div id="mistakeReview" class="mt-5 text-left bg-gray-50 p-4 rounded-2xl max-h-52 overflow-y-auto text-sm">
-                        <p class="font-bold text-gray-700 mb-2">📝 คำที่ตอบผิด</p>
-                        <ul id="mistakeList" class="list-disc list-inside text-gray-600 space-y-1"></ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- สถานะเริ่มต้น -->
-            <div id="gameNotStarted" class="card p-8 text-center text-gray-500">
-                <span class="text-5xl block mb-3">🌍</span>
-                <p class="text-lg font-medium">กรุณาเข้าสู่ระบบและเลือกด่าน</p>
-                <p class="text-sm mt-1">อุสตะเฮงรอคุณอยู่</p>
-            </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- TAB: VOCAB -->
-        <!-- ============================================================ -->
-        <section id="vocabTab" class="tab-content hidden">
-            <div class="card p-5 md:p-6">
-                <div class="flex flex-wrap justify-between items-center mb-5">
-                    <h2 class="text-xl font-bold text-gray-800">📖 คลังคำศัพท์ <span id="vocabCount" class="text-emerald-700">0</span> คำ</h2>
-                    <div class="flex gap-2">
-                        <button id="exportCSV" class="btn-secondary text-sm py-1.5 px-4">⬇ CSV</button>
-                        <button id="exportPDF" class="btn-secondary text-sm py-1.5 px-4">⬇ PDF</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-gray-200">
-                    <table id="vocabTable" class="w-full text-sm">
-                        <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="p-2 text-left">#</th>
-                                <th class="p-2 text-left">ไทย</th>
-                                <th class="p-2 text-left">อาหรับ</th>
-                                <th class="p-2 text-left">อดีต</th>
-                                <th class="p-2 text-left">ปัจจุบัน</th>
-                                <th class="p-2 text-left">คำสั่ง</th>
-                                <th class="p-2 text-left">เอกพจน์</th>
-                                <th class="p-2 text-left">พหูพจน์</th>
-                                <th class="p-2 text-left">หมวด</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vocabBody" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- TAB: LEADERBOARD -->
-        <!-- ============================================================ -->
-        <section id="leaderboardTab" class="tab-content hidden">
-            <div class="card p-5 md:p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">🏆 ลีดเดอร์บอร์ด</h2>
-                <div class="overflow-x-auto rounded-xl border border-gray-200">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="p-2 text-left">อันดับ</th>
-                                <th class="p-2 text-left">ชื่อ</th>
-                                <th class="p-2 text-left">ด่าน</th>
-                                <th class="p-2 text-left">คะแนน</th>
-                                <th class="p-2 text-left">%</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardBody" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-    </div>
-
-    <!-- ============================================================== -->
-    <!-- JAVASCRIPT ครบถ้วน -->
-    <!-- ============================================================== -->
-    <script>
-        // ==============================================================
-        //  CONFIG
-        // ==============================================================
-        const CONFIG = {
-            WORKER_URL: 'https://your-worker.workers.dev',      // เปลี่ยนเป็น URL ของคุณ
-            GOOGLE_CLIENT_ID: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
-            PASSING_SCORE: 60,
-            QUESTIONS_PER_GAME: 10,
-            TIME_LIMIT: 20,
-        };
-
-        // ==============================================================
-        //  STATE
-        // ==============================================================
-        let allQuestions = [], allVocab = [], levels = [], userProgress = {};
-        let currentLevel = 0, currentRound = [], currentIndex = 0;
-        let score = 0, streak = 0, stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
-        let mistakes = [], timerInterval = null, timeLeft = CONFIG.TIME_LIMIT;
-        let isAnswered = false, gameEnded = false;
-        let userEmail = null, userName = null, userAvatar = null, isLoggedIn = false;
-
-        const $ = id => document.getElementById(id);
-
-        // ==============================================================
-        //  GOOGLE LOGIN
-        // ==============================================================
-        function initGoogleLogin() {
-            window.onGoogleLibraryLoad = () => {
-                google.accounts.id.initialize({
-                    client_id: CONFIG.GOOGLE_CLIENT_ID,
-                    callback: handleCredentialResponse,
-                    cancel_on_tap_outside: false,
-                });
-                google.accounts.id.renderButton(
-                    document.querySelector('.g_id_signin'),
-                    { theme: 'outline', size: 'medium', shape: 'pill' }
-                );
-                google.accounts.id.prompt();
-            };
-        }
-
-        function handleCredentialResponse(response) {
-            const payload = decodeJwtResponse(response.credential);
-            userEmail = payload.email;
-            userName = payload.name || payload.email.split('@')[0];
-            userAvatar = payload.picture;
-            isLoggedIn = true;
-
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('avatarImg').src = userAvatar;
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('loginButton').style.display = 'none';
-            document.getElementById('logoutBtn').classList.remove('hidden');
-
-            // ลงทะเบียนผ่าน API
-            callAPI('login', 'POST', { email: userEmail, displayName: userName })
-                .then(() => loadAllData())
-                .catch(() => loadAllData());
-        }
-
-        function decodeJwtResponse(token) {
-            const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-            const json = decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-            return JSON.parse(json);
-        }
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            google.accounts.id.disableAutoSelect();
-            isLoggedIn = false;
-            document.getElementById('userInfo').classList.add('hidden');
-            document.getElementById('loginButton').style.display = 'block';
-            document.getElementById('logoutBtn').classList.add('hidden');
-            document.getElementById('gameNotStarted').classList.remove('hidden');
-            document.getElementById('gameArea').classList.add('hidden');
-            location.reload();
-        });
-
-        // ==============================================================
-        //  API HELPER
-        // ==============================================================
-        async function callAPI(action, method = 'GET', body = null) {
-            const url = new URL(CONFIG.WORKER_URL);
-            url.searchParams.set('action', action);
-            const options = { method, headers: { 'Content-Type': 'application/json' } };
-            if (body) options.body = JSON.stringify(body);
-            const token = localStorage.getItem('id_token');
-            if (token) options.headers['Authorization'] = 'Bearer ' + token;
-
-            const res = await fetch(url.toString(), options);
-            if (!res.ok) throw new Error(`API error ${res.status}`);
-            return res.json();
-        }
-
-        // ==============================================================
-        //  LOAD DATA
-        // ==============================================================
-        async function loadAllData() {
-            try {
-                const [q, v, l, p] = await Promise.all([
-                    callAPI('getQuestions'),
-                    callAPI('getVocab'),
-                    callAPI('getLevels'),
-                    callAPI('getUserProgress', 'GET', null, { email: userEmail }),
-                ]);
-                allQuestions = q.data || [];
-                allVocab = v.data || [];
-                levels = l.data || [];
-                userProgress = p.data || {};
-
-                renderLevels();
-                renderVocab();
-                renderLeaderboard();
-
-                // เล่นด่านแรกที่ยังไม่ผ่าน หรือด่านแรก
-                const firstUnlocked = levels.find(l => !userProgress[l] || userProgress[l] < CONFIG.PASSING_SCORE);
-                if (firstUnlocked) loadLevel(firstUnlocked);
-                else if (levels.length) loadLevel(levels[0]);
-                else {
-                    document.getElementById('gameNotStarted').classList.remove('hidden');
-                    document.getElementById('gameArea').classList.add('hidden');
+export default {
+    async fetch(request, env) {
+        // CORS
+        if (request.method === 'OPTIONS') {
+            return new Response(null, {
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, X-API-Secret, Authorization',
                 }
+            });
+        }
+
+        try {
+            const url = new URL(request.url);
+            const path = url.pathname;
+            const method = request.method;
+
+            // ===== ตรวจสอบ Environment Variables (พร้อม log) =====
+            console.log('[Worker] Environment check:');
+            
+            const SPREADSHEET_ID = env.SPREADSHEET_ID;
+            if (!SPREADSHEET_ID) {
+                console.error('[Worker] Missing SPREADSHEET_ID');
+                return jsonResponse({ 
+                    error: 'Missing SPREADSHEET_ID environment variable',
+                    hint: 'Set SPREADSHEET_ID in Cloudflare Worker environment variables'
+                }, 500);
+            }
+            console.log(`[Worker] SPREADSHEET_ID: ${SPREADSHEET_ID.substring(0, 10)}...`);
+
+            const serviceAccountJson = env.GOOGLE_SERVICE_ACCOUNT_JSON;
+            if (!serviceAccountJson) {
+                console.error('[Worker] Missing GOOGLE_SERVICE_ACCOUNT_JSON');
+                return jsonResponse({ 
+                    error: 'Missing GOOGLE_SERVICE_ACCOUNT_JSON environment variable',
+                    hint: 'Set GOOGLE_SERVICE_ACCOUNT_JSON with your service account key'
+                }, 500);
+            }
+
+            let serviceAccount;
+            try {
+                serviceAccount = JSON.parse(serviceAccountJson);
+                if (!serviceAccount.client_email || !serviceAccount.private_key) {
+                    throw new Error('Missing client_email or private_key in service account');
+                }
+                console.log(`[Worker] Service Account: ${serviceAccount.client_email}`);
             } catch (e) {
-                console.error(e);
-                alert('โหลดข้อมูลไม่สำเร็จ: ' + e.message);
+                console.error(`[Worker] Invalid GOOGLE_SERVICE_ACCOUNT_JSON: ${e.message}`);
+                return jsonResponse({ 
+                    error: 'Invalid GOOGLE_SERVICE_ACCOUNT_JSON: ' + e.message,
+                    hint: 'Make sure it\'s a valid JSON with client_email and private_key'
+                }, 500);
             }
-        }
 
-        // ==============================================================
-        //  RENDER LEVELS
-        // ==============================================================
-        function renderLevels() {
-            const container = document.getElementById('levelList');
-            container.innerHTML = '';
-            if (!levels.length) {
-                container.innerHTML = '<span class="text-gray-400">ยังไม่มีด่าน</span>';
-                return;
-            }
-            levels.forEach(level => {
-                const progress = userProgress[level] || 0;
-                const isUnlocked = (level === levels[0]) || (userProgress[level - 1] >= CONFIG.PASSING_SCORE);
-                const isPassed = progress >= CONFIG.PASSING_SCORE;
+            // ===== ชื่อชีท =====
+            const SHEET_NAMES = {
+                users: env.SHEET_USERS || 'ผู้เล่น',
+                questions: env.SHEET_QUESTIONS || 'คำถาม',
+                vocab: env.SHEET_VOCAB || 'คลังศัพท์',
+                scores: env.SHEET_SCORES || 'คะแนน',
+                config: env.SHEET_CONFIG || 'ตั้งค่าระบบ',
+                admins: env.SHEET_ADMINS || 'ผู้ดูแล'
+            };
+            console.log('[Worker] Sheet names:', SHEET_NAMES);
 
-                const btn = document.createElement('button');
-                btn.className = 'level-btn';
-                if (isPassed) btn.classList.add('passed');
-                if (!isUnlocked) btn.classList.add('locked');
-                if (currentLevel === level) btn.classList.add('active-level');
+            // ===== Public Routes =====
+            const publicRoutes = ['/', '/questions', '/vocab', '/levels', '/config', '/leaderboard', '/admin/check', '/login', '/test-sheet'];
 
-                let label = `ด่าน ${level}`;
-                if (isPassed) label += ' ✅';
-                else if (!isUnlocked) label += ' 🔒';
-                else if (progress > 0) label += ` (${progress}%)`;
-
-                btn.textContent = label;
-                if (isUnlocked) btn.onclick = () => loadLevel(level);
-                container.appendChild(btn);
-            });
-        }
-
-        // ==============================================================
-        //  GAME
-        // ==============================================================
-        function loadLevel(level) {
-            currentLevel = level;
-            const questions = allQuestions.filter(q => (q.ระดับความยาก || 1) == level);
-            if (!questions.length) { alert('ไม่มีข้อสอบในด่านนี้'); return; }
-
-            const shuffled = [...questions].sort(() => Math.random() - 0.5);
-            currentRound = shuffled.slice(0, Math.min(CONFIG.QUESTIONS_PER_GAME, shuffled.length));
-            currentIndex = 0;
-            score = 0;
-            streak = 0;
-            mistakes = [];
-            gameEnded = false;
-            stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
-
-            document.getElementById('gameNotStarted').classList.add('hidden');
-            document.getElementById('gameArea').classList.remove('hidden');
-            document.getElementById('resultArea').classList.add('hidden');
-            document.getElementById('questionArea').classList.remove('hidden');
-
-            renderLevels();
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            if (currentIndex >= currentRound.length) { endGame(); return; }
-
-            const q = currentRound[currentIndex];
-            isAnswered = false;
-            clearInterval(timerInterval);
-
-            document.getElementById('progressText').textContent = `ข้อ ${currentIndex + 1} / ${currentRound.length}`;
-            document.getElementById('qCategory').textContent = q.หมวด || 'คำศัพท์';
-            document.getElementById('questionText').innerHTML = q.คำถามไทย + ' = ?';
-
-            const container = document.getElementById('optionsContainer');
-            container.innerHTML = '';
-            const opts = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง];
-            const letters = ['ก', 'ข', 'ค', 'ง'];
-            const shuffled = opts.map((t, i) => ({ text: t, idx: i })).sort(() => Math.random() - 0.5);
-
-            shuffled.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerHTML = `<span class="arabic">${opt.text}</span> <span class="text-xs text-gray-400 font-mono">${letters[opt.idx]}</span>`;
-                btn.dataset.idx = opt.idx;
-                btn.onclick = () => selectAnswer(opt.idx, q);
-                container.appendChild(btn);
-            });
-
-            // Timer
-            timeLeft = CONFIG.TIME_LIMIT;
-            document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
-            document.getElementById('timerFill').style.width = '100%';
-            timerInterval = setInterval(() => {
-                timeLeft -= 1;
-                document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
-                document.getElementById('timerFill').style.width = `${(timeLeft / CONFIG.TIME_LIMIT) * 100}%`;
-                if (timeLeft <= 0 && !isAnswered) {
-                    clearInterval(timerInterval);
-                    isAnswered = true;
-                    setTeacherMessage('⏰ หมดเวลา! อุสตะเฮงว่าไวไปหน่อย');
-                    highlightCorrect(q);
-                    addMistake(q);
-                    setTimeout(() => { currentIndex++; renderQuestion(); }, 1500);
+            // ===== Auth Check =====
+            let idToken = null;
+            if (!publicRoutes.includes(path)) {
+                const authHeader = request.headers.get('Authorization');
+                idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+                if (!idToken) {
+                    return jsonResponse({ error: 'Unauthorized' }, 401);
                 }
-            }, 1000);
-
-            updatePowerUI();
-            document.getElementById('hintBtn').onclick = () => useHint(q);
-            document.getElementById('skipBtn').onclick = () => useSkip();
-        }
-
-        function selectAnswer(selectedIdx, q) {
-            if (isAnswered || gameEnded) return;
-            isAnswered = true;
-            clearInterval(timerInterval);
-
-            const correctIdx = 'ABCD'.indexOf(q.เฉลย);
-            const isCorrect = (selectedIdx === correctIdx);
-            const btns = document.querySelectorAll('.option-btn');
-            btns.forEach(b => b.classList.add('disabled'));
-
-            btns.forEach(b => {
-                const idx = parseInt(b.dataset.idx);
-                if (idx === correctIdx) b.classList.add('correct');
-                if (idx === selectedIdx && !isCorrect) b.classList.add('wrong');
-            });
-
-            if (isCorrect) {
-                score += 10;
-                streak += 1;
-                setTeacherMessage('✅ ถูกต้อง! อุสตะเฮงประทับใจ');
-                if (streak >= 5) {
-                    score += 5;
-                    stars += 1;
-                    localStorage.setItem('arabic_stars', stars);
-                    setTeacherMessage('🔥 ติด 5 ข้อ! +5 แต้ม และได้ดาว');
-                }
-                if (streak === 10) { stars += 1; localStorage.setItem('arabic_stars', stars); }
-            } else {
-                streak = 0;
-                const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
-                setTeacherMessage(`❌ คำตอบที่ถูกคือ "${correctText}"`);
-                addMistake(q);
-            }
-            updatePowerUI();
-            setTimeout(() => { currentIndex++; renderQuestion(); }, 1500);
-        }
-
-        function highlightCorrect(q) {
-            const correctIdx = 'ABCD'.indexOf(q.เฉลย);
-            document.querySelectorAll('.option-btn').forEach(b => {
-                b.classList.add('disabled');
-                if (parseInt(b.dataset.idx) === correctIdx) b.classList.add('correct');
-            });
-        }
-
-        function addMistake(q) {
-            const correctIdx = 'ABCD'.indexOf(q.เฉลย);
-            const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
-            const entry = { thai: q.คำถามไทย, arabic: correctText, category: q.หมวด || 'ทั่วไป' };
-            if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
-        }
-
-        function endGame() {
-            gameEnded = true;
-            clearInterval(timerInterval);
-            document.getElementById('questionArea').classList.add('hidden');
-            document.getElementById('resultArea').classList.remove('hidden');
-
-            const total = currentRound.length;
-            const maxScore = total * 10;
-            const percent = Math.round((score / maxScore) * 100);
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalLevel').textContent = `ด่าน ${currentLevel}`;
-            document.getElementById('finalMessage').textContent =
-                percent >= CONFIG.PASSING_SCORE ?
-                `🎉 ผ่าน! (${percent}%) อุสตะเฮงภูมิใจในตัวคุณ` :
-                `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${CONFIG.PASSING_SCORE}% ขึ้นไป`;
-
-            if (isLoggedIn) {
-                callAPI('saveScore', 'POST', {
-                    email: userEmail,
-                    displayName: userName,
-                    level: currentLevel,
-                    score: score,
-                    time: Math.round((CONFIG.TIME_LIMIT * currentRound.length - timeLeft) || 0)
-                }).then(() => callAPI('getUserProgress', 'GET', null, { email: userEmail }))
-                  .then(res => { userProgress = res.data || {}; renderLevels(); renderLeaderboard(); })
-                  .catch(console.error);
             }
 
-            const list = document.getElementById('mistakeList');
-            list.innerHTML = '';
-            if (mistakes.length === 0) {
-                list.innerHTML = '<li class="text-green-600">🎉 ไม่มีคำที่ผิดเลย!</li>';
-            } else {
-                mistakes.forEach(m => {
-                    const li = document.createElement('li');
-                    li.textContent = `${m.thai} = ${m.arabic} (${m.category})`;
-                    list.appendChild(li);
-                });
-            }
-        }
-
-        function useHint(q) {
-            if (stars < 2 || isAnswered) return;
-            stars -= 2;
-            localStorage.setItem('arabic_stars', stars);
-            updatePowerUI();
-            const correctIdx = 'ABCD'.indexOf(q.เฉลย);
-            const btns = document.querySelectorAll('.option-btn');
-            let removed = 0;
-            btns.forEach(b => {
-                const idx = parseInt(b.dataset.idx);
-                if (idx !== correctIdx && removed < 2) {
-                    b.style.opacity = '0.3';
-                    b.style.pointerEvents = 'none';
-                    removed++;
-                }
-            });
-            setTeacherMessage('💡 อุสตะเฮงตัดตัวเลือกผิดให้แล้ว');
-        }
-
-        function useSkip() {
-            if (stars < 3 || isAnswered) return;
-            stars -= 3;
-            localStorage.setItem('arabic_stars', stars);
-            updatePowerUI();
-            setTeacherMessage('⏭️ ข้ามข้อนี้ไป');
-            clearInterval(timerInterval);
-            currentIndex++;
-            setTimeout(() => renderQuestion(), 500);
-        }
-
-        function updatePowerUI() {
-            const hint = document.getElementById('hintBtn');
-            const skip = document.getElementById('skipBtn');
-            hint.textContent = `💡 ใบ้ (⭐${stars}/2)`;
-            skip.textContent = `⏭️ ข้าม (⭐${stars}/3)`;
-            hint.disabled = stars < 2 || isAnswered || gameEnded;
-            skip.disabled = stars < 3 || isAnswered || gameEnded;
-        }
-
-        function setTeacherMessage(msg) {
-            document.getElementById('teacherMessage').textContent = msg;
-        }
-
-        // ==============================================================
-        //  VOCABULARY
-        // ==============================================================
-        function renderVocab() {
-            const tbody = document.getElementById('vocabBody');
-            tbody.innerHTML = '';
-            document.getElementById('vocabCount').textContent = allVocab.length;
-            allVocab.forEach((item, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-2">${idx + 1}</td>
-                    <td class="p-2">${item.คำศัพท์ไทย || ''}</td>
-                    <td class="p-2 arabic">${item.คำศัพท์อาหรับ || ''}</td>
-                    <td class="p-2 arabic">${item.รูปอดีต || ''}</td>
-                    <td class="p-2 arabic">${item.รูปปัจจุบัน || ''}</td>
-                    <td class="p-2 arabic">${item.รูปคำสั่ง || ''}</td>
-                    <td class="p-2 arabic">${item.เอกพจน์ || ''}</td>
-                    <td class="p-2 arabic">${item.พหูพจน์ || ''}</td>
-                    <td class="p-2">${item.หมวดหมู่ || ''}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ==============================================================
-        //  LEADERBOARD
-        // ==============================================================
-        async function renderLeaderboard() {
+            // ===== GET Access Token =====
+            let accessToken;
             try {
-                const res = await callAPI('getLeaderboard');
-                const data = res.data || [];
-                const tbody = document.getElementById('leaderboardBody');
-                tbody.innerHTML = '';
-                if (!data.length) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">ยังไม่มีคะแนน</td></tr>';
-                    return;
-                }
-                data.forEach((item, idx) => {
-                    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="p-2">${medal}</td>
-                        <td class="p-2 font-medium">${item.displayName || item.email}</td>
-                        <td class="p-2">${item.level}</td>
-                        <td class="p-2 font-bold text-emerald-700">${item.score}</td>
-                        <td class="p-2">${item.percent}%</td>
-                    `;
-                    tbody.appendChild(tr);
+                console.log('[Worker] Getting access token...');
+                accessToken = await getAccessToken(serviceAccount);
+                console.log('[Worker] Access token obtained successfully');
+            } catch (e) {
+                console.error('[Worker] Failed to get access token:', e);
+                return jsonResponse({ 
+                    error: 'Failed to get Google Sheets access token: ' + e.message,
+                    hint: 'Check your service account credentials and permissions'
+                }, 500);
+            }
+
+            // ================================================================
+            // ROUTES
+            // ================================================================
+
+            // ----- GET / (root) -----
+            if (path === '/' && method === 'GET') {
+                return jsonResponse({
+                    message: '📚 ระบบเกม "ศึกษา ต่างถิ่น"',
+                    version: VERSION,
+                    status: 'running',
+                    config: {
+                        spreadsheet_id: SPREADSHEET_ID ? '✅' : '❌',
+                        service_account: serviceAccount.client_email ? '✅' : '❌',
+                        sheet_names: SHEET_NAMES
+                    },
+                    endpoints: {
+                        questions: '/questions?level=1',
+                        vocab: '/vocab',
+                        levels: '/levels',
+                        config: '/config',
+                        leaderboard: '/leaderboard',
+                        user: '/user/:email',
+                        scores: '/scores (POST)',
+                        login: '/login (POST)',
+                        progress: '/progress?email=xxx',
+                        admin_check: '/admin/check?email=xxx',
+                        test_sheet: '/test-sheet (ทดสอบเชื่อมต่อ Google Sheets)'
+                    }
                 });
-            } catch (e) { console.error(e); }
+            }
+
+            // ----- GET /test-sheet (ทดสอบเชื่อมต่อ) -----
+            if (path === '/test-sheet' && method === 'GET') {
+                try {
+                    // ทดสอบอ่านข้อมูลจากชีทคำถาม แค่ 1 เซลล์
+                    const testSheet = SHEET_NAMES.questions;
+                    console.log(`[Worker] Testing sheet: ${testSheet}`);
+                    const result = await callSheetsAPI(accessToken, 'GET', `/values/${testSheet}!A1:A1`, null, SPREADSHEET_ID);
+                    return jsonResponse({
+                        success: true,
+                        message: '✅ เชื่อมต่อ Google Sheets สำเร็จ!',
+                        sheet: testSheet,
+                        data: result
+                    });
+                } catch (e) {
+                    console.error('[Worker] Test sheet failed:', e);
+                    return jsonResponse({
+                        success: false,
+                        error: e.message,
+                        hint: 'ตรวจสอบว่า SPREADSHEET_ID ถูกต้อง และ Service Account มีสิทธิ์เข้าถึงชีทนี้'
+                    }, 500);
+                }
+            }
+
+            // ----- GET /questions -----
+            if (path === '/questions' && method === 'GET') {
+                const level = parseInt(url.searchParams.get('level')) || 0;
+                const includeAll = url.searchParams.get('all') === 'true';
+                return await getSheetData(accessToken, SPREADSHEET_ID, SHEET_NAMES.questions, { level, includeAll });
+            }
+
+            // ----- GET /vocab -----
+            if (path === '/vocab' && method === 'GET') {
+                return await getSheetData(accessToken, SPREADSHEET_ID, SHEET_NAMES.vocab);
+            }
+
+            // ----- GET /levels -----
+            if (path === '/levels' && method === 'GET') {
+                return await getLevels(accessToken, SPREADSHEET_ID, SHEET_NAMES.questions);
+            }
+
+            // ----- GET /config -----
+            if (path === '/config' && method === 'GET') {
+                return await getConfig(accessToken, SPREADSHEET_ID, SHEET_NAMES.config);
+            }
+
+            // ----- GET /leaderboard -----
+            if (path === '/leaderboard' && method === 'GET') {
+                const level = parseInt(url.searchParams.get('level')) || 0;
+                return await getLeaderboard(accessToken, SPREADSHEET_ID, SHEET_NAMES.scores, level);
+            }
+
+            // ----- GET /user/:email -----
+            if (path.match(/^\/user\/[^/]+$/) && method === 'GET') {
+                const email = decodeURIComponent(path.split('/')[2]);
+                return await getUserByEmail(accessToken, SPREADSHEET_ID, SHEET_NAMES.users, email);
+            }
+
+            // ----- GET /progress -----
+            if (path === '/progress' && method === 'GET') {
+                const email = url.searchParams.get('email');
+                if (!email) return jsonResponse({ error: 'Missing email parameter' }, 400);
+                return await getUserProgress(accessToken, SPREADSHEET_ID, SHEET_NAMES.scores, email);
+            }
+
+            // ----- POST /login -----
+            if (path === '/login' && method === 'POST') {
+                try {
+                    const body = await request.json();
+                    const { email, displayName, facebookName } = body;
+                    if (!email) return jsonResponse({ error: 'Missing email' }, 400);
+                    return await loginUser(accessToken, SPREADSHEET_ID, SHEET_NAMES.users, email, displayName, facebookName);
+                } catch (e) {
+                    return jsonResponse({ error: 'Invalid JSON body: ' + e.message }, 400);
+                }
+            }
+
+            // ----- POST /scores -----
+            if (path === '/scores' && method === 'POST') {
+                try {
+                    const body = await request.json();
+                    const { email, displayName, level, score, time } = body;
+                    if (!email) return jsonResponse({ error: 'Missing email' }, 400);
+                    return await saveScore(accessToken, SPREADSHEET_ID, SHEET_NAMES.scores, email, displayName, level, score, time);
+                } catch (e) {
+                    return jsonResponse({ error: 'Invalid JSON body: ' + e.message }, 400);
+                }
+            }
+
+            // ----- GET /admin/check -----
+            if (path === '/admin/check' && method === 'GET') {
+                const email = url.searchParams.get('email') || '';
+                return await checkAdmin(accessToken, SPREADSHEET_ID, SHEET_NAMES.admins, email);
+            }
+
+            // ----- 404 -----
+            console.warn(`[Worker] Route not found: ${path}`);
+            return jsonResponse({ error: `Route not found: ${path}` }, 404);
+
+        } catch (error) {
+            console.error('[Worker] Unhandled error:', error);
+            return jsonResponse({ 
+                error: error.message, 
+                stack: error.stack,
+                hint: 'Check Worker logs for more details'
+            }, 500);
+        }
+    }
+};
+
+// ================================================================
+// JWT และ Google Sheets API
+// ================================================================
+
+async function getAccessToken(serviceAccount) {
+    const { client_email, private_key } = serviceAccount;
+
+    // แก้ไข private_key: แทนที่ \n ที่เป็นตัวอักษรด้วย newline จริง
+    const privateKeyPem = private_key
+        .replace(/\\n/g, '\n')
+        .replace(/\n/g, '\n'); // ให้แน่ใจว่ามี newline
+
+    const now = Math.floor(Date.now() / 1000);
+    const payload = {
+        iss: client_email,
+        scope: 'https://www.googleapis.com/auth/spreadsheets',
+        aud: 'https://oauth2.googleapis.com/token',
+        exp: now + 3600,
+        iat: now
+    };
+
+    const header = { alg: 'RS256', typ: 'JWT' };
+    const encodedHeader = base64UrlEncode(JSON.stringify(header));
+    const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+    const toSign = `${encodedHeader}.${encodedPayload}`;
+
+    // ใช้ privateKeyPem
+    const pemContents = privateKeyPem
+        .replace(/-----BEGIN (?:RSA )?PRIVATE KEY-----/g, '')
+        .replace(/-----END (?:RSA )?PRIVATE KEY-----/g, '')
+        .replace(/\s/g, '');
+
+    const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+
+    const cryptoKey = await crypto.subtle.importKey(
+        'pkcs8',
+        binaryDer.buffer,
+        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+        false,
+        ['sign']
+    );
+
+    const signature = await crypto.subtle.sign(
+        { name: 'RSASSA-PKCS1-v1_5' },
+        cryptoKey,
+        new TextEncoder().encode(toSign)
+    );
+
+    const encodedSignature = base64UrlEncode(
+        String.fromCharCode(...new Uint8Array(signature))
+    );
+
+    const jwt = `${toSign}.${encodedSignature}`;
+
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            assertion: jwt
+        })
+    });
+
+    const tokenData = await tokenResponse.json();
+    if (!tokenData.access_token) {
+        throw new Error(`Failed to get access token: ${JSON.stringify(tokenData)}`);
+    }
+    return tokenData.access_token;
+}
+
+async function callSheetsAPI(accessToken, method, path, body, spreadSheetId) {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadSheetId}${path}`;
+    const options = {
+        method: method,
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        }
+    };
+    if (body) options.body = JSON.stringify(body);
+
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Google Sheets API Error [${response.status}]: ${errorText}`);
+    }
+    return response.json();
+}
+
+function base64UrlEncode(str) {
+    return btoa(str)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
+
+function jsonResponse(data, status = 200) {
+    const body = status >= 400 ? data : { success: true, ...data };
+    return new Response(JSON.stringify({
+        ...body,
+        version: VERSION,
+        timestamp: new Date().toISOString()
+    }), {
+        status,
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }
+    });
+}
+
+// ================================================================
+// ฟังก์ชันจัดการข้อมูล
+// ================================================================
+
+async function getSheetData(accessToken, sheetId, sheetName, filters = {}) {
+    try {
+        console.log(`[getSheetData] Reading sheet: ${sheetName}`);
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length === 0) return jsonResponse({ data: [], total: 0 });
+
+        const headers = rows[0];
+        let data = rows.slice(1)
+            .filter(row => row.length > 0 && row[0])
+            .map(row => {
+                const obj = {};
+                headers.forEach((h, i) => {
+                    obj[h.trim()] = row[i] || '';
+                });
+                return obj;
+            });
+
+        if (filters.level && filters.level > 0 && !filters.includeAll) {
+            data = data.filter(q => parseInt(q.ระดับความยาก) === filters.level);
         }
 
-        // ==============================================================
-        //  EXPORT
-        // ==============================================================
-        document.getElementById('exportCSV').addEventListener('click', () => {
-            const rows = [['#','ไทย','อาหรับ','อดีต','ปัจจุบัน','คำสั่ง','เอกพจน์','พหูพจน์','หมวด']];
-            allVocab.forEach((item, idx) => {
-                rows.push([
-                    idx + 1,
-                    item.คำศัพท์ไทย || '',
-                    item.คำศัพท์อาหรับ || '',
-                    item.รูปอดีต || '',
-                    item.รูปปัจจุบัน || '',
-                    item.รูปคำสั่ง || '',
-                    item.เอกพจน์ || '',
-                    item.พหูพจน์ || '',
-                    item.หมวดหมู่ || ''
-                ]);
-            });
-            const csv = rows.map(r => r.join(',')).join('\n');
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'คำศัพท์_ศึกษา_ต่างถิ่น.csv';
-            link.click();
+        console.log(`[getSheetData] Found ${data.length} rows`);
+        return jsonResponse({ data, total: data.length });
+    } catch (e) {
+        console.error(`[getSheetData] Error for ${sheetName}:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
+
+async function getLevels(accessToken, sheetId, sheetName) {
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length < 2) return jsonResponse({ data: [] });
+
+        const headers = rows[0];
+        const levelIdx = headers.indexOf('ระดับความยาก');
+        if (levelIdx === -1) return jsonResponse({ data: [] });
+
+        const levels = [...new Set(rows.slice(1).map(row => parseInt(row[levelIdx]) || 1))];
+        return jsonResponse({ data: levels.sort((a, b) => a - b) });
+    } catch (e) {
+        console.error(`[getLevels] Error:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
+
+async function getLeaderboard(accessToken, sheetId, sheetName, level) {
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length < 2) return jsonResponse({ data: [] });
+
+        const headers = rows[0];
+        const emailIdx = headers.indexOf('email');
+        const nameIdx = headers.indexOf('ชื่อผู้เล่น');
+        const levelIdx = headers.indexOf('ด่าน');
+        const scoreIdx = headers.indexOf('คะแนน');
+        const percentIdx = headers.indexOf('เปอร์เซ็นต์');
+
+        let data = rows.slice(1)
+            .filter(row => row.length > 0 && row[0])
+            .map(row => ({
+                email: row[emailIdx] || '',
+                displayName: row[nameIdx] || '',
+                level: parseInt(row[levelIdx]) || 1,
+                score: parseInt(row[scoreIdx]) || 0,
+                percent: parseInt(row[percentIdx]) || 0,
+            }));
+
+        if (level > 0) {
+            data = data.filter(s => s.level === level);
+        }
+
+        const grouped = {};
+        data.forEach(s => {
+            const key = s.email + '_' + s.level;
+            if (!grouped[key] || s.score > grouped[key].score) {
+                grouped[key] = s;
+            }
         });
 
-        document.getElementById('exportPDF').addEventListener('click', () => {
-            const element = document.getElementById('vocabTable');
-            html2canvas(element, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                const imgWidth = 280;
-                const pageHeight = 210;
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight, pos = 0;
-                pdf.addImage(imgData, 'PNG', 10, pos, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                while (heightLeft > 0) {
-                    pos = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 10, pos, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+        const ranked = Object.values(grouped)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 10);
+
+        return jsonResponse({ data: ranked });
+    } catch (e) {
+        console.error(`[getLeaderboard] Error:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
+
+async function getUserByEmail(accessToken, sheetId, sheetName, email) {
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length < 2) return jsonResponse({ data: null });
+
+        const headers = rows[0];
+        const foundRow = rows.slice(1).find(row => row[0] === email);
+        if (!foundRow) return jsonResponse({ data: null });
+
+        const obj = {};
+        headers.forEach((h, i) => {
+            obj[h.trim()] = foundRow[i] || '';
+        });
+        return jsonResponse({ data: obj });
+    } catch (e) {
+        console.error(`[getUserByEmail] Error:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
+
+async function getUserProgress(accessToken, sheetId, sheetName, email) {
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length < 2) return jsonResponse({ data: {} });
+
+        const headers = rows[0];
+        const emailIdx = headers.indexOf('email');
+        const levelIdx = headers.indexOf('ด่าน');
+        const percentIdx = headers.indexOf('เปอร์เซ็นต์');
+
+        const progress = {};
+        rows.slice(1).forEach(row => {
+            if (row[emailIdx] === email) {
+                const level = parseInt(row[levelIdx]) || 1;
+                const percent = parseInt(row[percentIdx]) || 0;
+                if (!progress[level] || percent > progress[level]) {
+                    progress[level] = percent;
                 }
-                pdf.save('คำศัพท์_ศึกษา_ต่างถิ่น.pdf');
-            });
+            }
         });
+        return jsonResponse({ data: progress });
+    } catch (e) {
+        console.error(`[getUserProgress] Error:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
 
-        // ==============================================================
-        //  TABS + RESET
-        // ==============================================================
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-                document.getElementById(btn.dataset.tab).classList.remove('hidden');
-                if (btn.dataset.tab === 'leaderboardTab') renderLeaderboard();
-                if (btn.dataset.tab === 'vocabTab') renderVocab();
-            });
+async function loginUser(accessToken, sheetId, sheetName, email, displayName, facebookName) {
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        const headers = rows[0] || [];
+        const emailIdx = headers.indexOf('email');
+
+        if (emailIdx === -1) {
+            return jsonResponse({ error: 'ไม่พบคอลัมน์ email ในชีทผู้เล่น' }, 500);
+        }
+
+        let userExists = false;
+        let rowIndex = -1;
+        for (let i = 1; i < rows.length; i++) {
+            if (rows[i][emailIdx] === email) {
+                userExists = true;
+                rowIndex = i;
+                break;
+            }
+        }
+
+        if (!userExists) {
+            const today = new Date().toISOString().split('T')[0];
+            const newRow = [email, displayName || email.split('@')[0], facebookName || '', today, 'active'];
+            await callSheetsAPI(accessToken, 'POST',
+                `/values/${sheetName}!A1:append?valueInputOption=USER_ENTERED`,
+                { values: [newRow] },
+                sheetId
+            );
+            return jsonResponse({ success: true, newUser: true });
+        } else {
+            const nameIdx = headers.indexOf('ชื่อผู้เล่น');
+            const fbIdx = headers.indexOf('ชื่อเฟสบุ๊ค');
+            if (displayName && rows[rowIndex][nameIdx] !== displayName) {
+                await callSheetsAPI(accessToken, 'PUT',
+                    `/values/${sheetName}!${String.fromCharCode(65 + nameIdx)}${rowIndex + 1}?valueInputOption=USER_ENTERED`,
+                    { values: [[displayName]] },
+                    sheetId
+                );
+            }
+            if (facebookName && rows[rowIndex][fbIdx] !== facebookName) {
+                await callSheetsAPI(accessToken, 'PUT',
+                    `/values/${sheetName}!${String.fromCharCode(65 + fbIdx)}${rowIndex + 1}?valueInputOption=USER_ENTERED`,
+                    { values: [[facebookName]] },
+                    sheetId
+                );
+            }
+            return jsonResponse({ success: true, newUser: false });
+        }
+    } catch (e) {
+        console.error(`[loginUser] Error:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
+
+async function saveScore(accessToken, sheetId, sheetName, email, displayName, level, score, time) {
+    try {
+        const percent = Math.round((score / 100) * 100);
+        const now = new Date().toISOString();
+
+        const newRow = [email, displayName || email.split('@')[0], level || 1, score || 0, percent, now, time || 0];
+
+        await callSheetsAPI(accessToken, 'POST',
+            `/values/${sheetName}!A1:append?valueInputOption=USER_ENTERED`,
+            { values: [newRow] },
+            sheetId
+        );
+
+        return jsonResponse({ success: true });
+    } catch (e) {
+        console.error(`[saveScore] Error:`, e);
+        return jsonResponse({ error: e.message, sheet: sheetName }, 500);
+    }
+}
+
+async function checkAdmin(accessToken, sheetId, sheetName, email) {
+    if (!email) return jsonResponse({ isAdmin: false });
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length < 2) return jsonResponse({ isAdmin: false });
+        const found = rows.slice(1).some(row => row[0] === email);
+        return jsonResponse({ isAdmin: found });
+    } catch (e) {
+        return jsonResponse({ isAdmin: false, note: 'Admin sheet not found' });
+    }
+}
+
+async function getConfig(accessToken, sheetId, sheetName) {
+    try {
+        const result = await callSheetsAPI(accessToken, 'GET', `/values/${sheetName}`, null, sheetId);
+        const rows = result.values || [];
+        if (rows.length < 2) return jsonResponse({ data: {} });
+        const config = {};
+        rows.slice(1).forEach(row => {
+            if (row[0]) config[row[0]] = row[1] || '';
         });
-
-        document.getElementById('resetGameBtn').addEventListener('click', () => {
-            if (confirm('เริ่มเกมใหม่?')) loadLevel(currentLevel);
-        });
-
-        document.getElementById('playAgainBtn').addEventListener('click', () => {
-            loadLevel(currentLevel);
-        });
-
-        // ==============================================================
-        //  INIT
-        // ==============================================================
-        initGoogleLogin();
-        // ถ้าล็อกอินแล้ว ให้โหลดข้อมูล (จะถูกเรียกจาก callback)
-    </script>
-</body>
-</html>
+        return jsonResponse({ data: config });
+    } catch (e) {
+        return jsonResponse({ data: {}, note: 'Config sheet not found' });
+    }
+}

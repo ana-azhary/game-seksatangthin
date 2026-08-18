@@ -23,6 +23,7 @@
         .option-btn.correct { border-color: #16a34a; background: #dcfce7; }
         .option-btn.wrong { border-color: #dc2626; background: #fee2e2; }
         .option-btn.disabled { opacity: 0.6; pointer-events: none; }
+        .option-btn.hard-mode { border-width: 3px; border-color: #dc2626; background: #fef2f2; }
         .tab-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; background: #f1f5f9; color: #334155; }
         .tab-btn.active { background: #065f46; color: white; }
         .tab-btn:active { transform: scale(0.96); }
@@ -38,6 +39,8 @@
         .ustadh-bubble { background: #064e3b; color: #fef3c7; padding: 12px 20px; border-radius: 20px 20px 20px 6px; display: inline-block; max-width: 94%; font-size: 1rem; line-height: 1.6; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .timer-bar { height: 8px; background: #e5e7eb; border-radius: 20px; overflow: hidden; }
         .timer-fill { height: 100%; background: #0d9488; border-radius: 20px; transition: width 1s linear; }
+        .timer-fill.danger { background: #dc2626; }
+        .timer-fill.warning { background: #f59e0b; }
         .g_id_signin { visibility: hidden; }
         .g_id_signin.gsi-loaded { visibility: visible; }
         #loginStatus { font-size: 0.85rem; color: #6b7280; transition: all 0.3s; }
@@ -46,6 +49,12 @@
         .level-card.unlocked { border-left-color: #3b82f6; background: rgba(219, 234, 254, 0.4); }
         .level-card.completed { border-left-color: #16a34a; background: rgba(220, 252, 231, 0.4); }
         .level-card.locked { border-left-color: #9ca3af; opacity: 0.6; }
+        .feature-badge { background: #8b5cf6; color: white; font-size: 0.7rem; padding: 2px 10px; border-radius: 20px; margin-left: 6px; }
+        .lives-display { display: flex; align-items: center; gap: 4px; font-size: 1.2rem; }
+        .combo-display { background: #f59e0b; color: white; font-weight: bold; padding: 2px 12px; border-radius: 20px; font-size: 0.9rem; }
+        .glow-text { text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+        .level-up-anim { animation: pulse 0.5s ease; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         @media (max-width: 480px) {
             .arabic { font-size: 1.3rem; line-height: 1.9rem; }
             .option-btn { font-size: 1rem; padding: 12px 14px; }
@@ -90,9 +99,10 @@
         <!-- GAME TAB -->
         <section id="gameTab" class="tab-content">
             <div class="card p-5 md:p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2 flex-wrap">
                     <span>🗺️</span> เลือกด่าน
                     <span class="text-xs text-gray-400 ml-2">(ต้องผ่าน 60% เพื่อปลดล็อกด่านถัดไป)</span>
+                    <span id="levelFeatureBadge" class="feature-badge text-xs"></span>
                 </h2>
                 <div id="danList" class="flex flex-wrap flex-col gap-2">
                     <!-- JS จะสร้างปุ่มด่าน -->
@@ -105,11 +115,19 @@
                     <div class="w-11 h-11 rounded-full bg-emerald-900 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">อ</div>
                     <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ</div>
                 </div>
+
+                <!-- Status Bar: Level Info + Lives + Combo -->
                 <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mb-2">
-                    <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
+                        <span id="levelDisplay" class="bg-emerald-100 px-2 py-0.5 rounded-full text-emerald-800 text-xs">Level 1</span>
+                        <span id="livesDisplay" class="lives-display hidden">❤️❤️❤️</span>
+                        <span id="comboDisplay" class="combo-display hidden">🔥 x1</span>
+                    </div>
                     <span id="timerText" class="bg-gray-100 px-4 py-1.5 rounded-full">⏳ 20 วินาที</span>
                 </div>
                 <div class="timer-bar mb-5"><div id="timerFill" class="timer-fill" style="width:100%"></div></div>
+
                 <div id="questionArea">
                     <div class="text-center mb-4">
                         <span id="qCategory" class="inline-block text-xs text-gray-400 bg-gray-50 px-4 py-1 rounded-full">หมวด</span>
@@ -198,7 +216,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT - ระบบปลดล็อกทีละด่าน ต้องผ่าน 60% -->
+    <!-- JAVASCRIPT - ระบบ Feature ตาม Level -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -213,16 +231,56 @@
         };
 
         // ==============================================================
+        //  LEVEL FEATURES (ปลดล็อกตาม Level)
+        // ==============================================================
+        const LEVEL_FEATURES = {
+            1: { name: 'ปกติ', timeLimit: 20, lives: 0, combo: false, hardMode: false, 
+                 streakBonus: false, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
+            6: { name: '⏱️ สปีด', timeLimit: 15, lives: 0, combo: false, hardMode: false,
+                 streakBonus: false, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
+            11: { name: '⭐ สเตรค', timeLimit: 15, lives: 0, combo: false, hardMode: false,
+                 streakBonus: true, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
+            16: { name: '❤️ ชีวิต', timeLimit: 15, lives: 3, combo: false, hardMode: false,
+                 streakBonus: true, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
+            21: { name: '🔥 คอมโบ', timeLimit: 15, lives: 3, combo: true, hardMode: false,
+                 streakBonus: true, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
+            26: { name: '🎯 ฮาร์ด', timeLimit: 15, lives: 3, combo: true, hardMode: true,
+                 streakBonus: true, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
+            31: { name: '💀 อันตราย', timeLimit: 12, lives: 3, combo: true, hardMode: true,
+                 streakBonus: true, dangerMode: true, passingScore: 60, scorePerCorrect: 10 },
+            36: { name: '🏆 ท้าทาย', timeLimit: 12, lives: 3, combo: true, hardMode: true,
+                 streakBonus: true, dangerMode: true, passingScore: 80, scorePerCorrect: 10 },
+            41: { name: '⚡ ซูเปอร์สปีด', timeLimit: 10, lives: 3, combo: true, hardMode: true,
+                 streakBonus: true, dangerMode: true, passingScore: 80, scorePerCorrect: 15 },
+            46: { name: '👑 ตำนาน', timeLimit: 10, lives: 3, combo: true, hardMode: true,
+                 streakBonus: true, dangerMode: true, passingScore: 80, scorePerCorrect: 15 },
+        };
+
+        function getLevelFeature(level) {
+            // หา feature สูงสุดที่ <= level
+            let feature = LEVEL_FEATURES[1];
+            Object.keys(LEVEL_FEATURES).forEach(key => {
+                if (parseInt(key) <= level) {
+                    feature = LEVEL_FEATURES[key];
+                }
+            });
+            return feature;
+        }
+
+        // ==============================================================
         //  STATE
         // ==============================================================
         let allQuestions = [], allVocab = [], levelsData = [], userProgress = {};
         let currentDan = 0, currentLevel = 0;
         let currentRound = [], currentIndex = 0;
-        let score = 0, streak = 0, stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
+        let score = 0, streak = 0, combo = 1, lives = 0;
+        let stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
         let mistakes = [], timerInterval = null, timeLeft = CONFIG.TIME_LIMIT;
         let isAnswered = false, gameEnded = false;
         let userEmail = null, userName = null, userAvatar = null, isLoggedIn = false;
         let availableDans = [];
+        let currentFeature = null;
+        let consecutiveWrong = 0;
 
         const $ = id => document.getElementById(id);
 
@@ -416,7 +474,6 @@
                 levelsData = l.data || [];
                 userProgress = p.data || {};
 
-                // สร้างรายการ dan ทั้งหมด
                 availableDans = [];
                 levelsData.forEach(lv => {
                     lv.dans.forEach(d => {
@@ -436,7 +493,6 @@
                 renderVocab();
                 renderLeaderboard();
 
-                // เลือกด่านแรกที่ยังไม่ผ่านและปลดล็อกแล้ว
                 const firstUnlocked = availableDans.find(d => {
                     const progress = userProgress[d.dan] || 0;
                     return progress < CONFIG.PASSING_SCORE && isDanUnlocked(d);
@@ -458,33 +514,22 @@
         }
 
         // ==============================================================
-        //  CHECK IF DAN IS UNLOCKED (ปลดล็อกทีละด่าน!)
+        //  CHECK IF DAN IS UNLOCKED
         // ==============================================================
         function isDanUnlocked(dan) {
-            // ด่านที่ 1 ปลดล็อกเสมอ
             if (dan.dan === 1) return true;
-
-            // หาด่านก่อนหน้าใน Level เดียวกัน
             const prevDan = availableDans.find(d => d.dan === dan.dan - 1 && d.level === dan.level);
-
             if (prevDan) {
-                // ถ้ามีด่านก่อนหน้าใน Level เดียวกัน → ต้องผ่านด่านนั้นก่อน
-                const prevProgress = userProgress[prevDan.dan] || 0;
-                const isPrevPassed = prevProgress >= CONFIG.PASSING_SCORE;
-                debugLog('UNLOCK', `ด่าน ${dan.dan}: ต้องผ่านด่าน ${prevDan.dan} (${prevProgress}%) → ${isPrevPassed ? '✅' : '❌'}`);
-                return isPrevPassed;
+                return (userProgress[prevDan.dan] || 0) >= CONFIG.PASSING_SCORE;
             } else {
-                // ถ้าเป็นด่านแรกของ Level ใหม่ → ต้องผ่านทุกด่านของ Level ก่อนหน้า
                 const prevLevelDans = availableDans.filter(d => d.level === dan.level - 1);
                 if (prevLevelDans.length === 0) return true;
-                const allPrevPassed = prevLevelDans.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
-                debugLog('UNLOCK', `ด่าน ${dan.dan} (Level ${dan.level}): ต้องผ่าน Level ${dan.level-1} ทั้งหมด → ${allPrevPassed ? '✅' : '❌'}`);
-                return allPrevPassed;
+                return prevLevelDans.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
             }
         }
 
         // ==============================================================
-        //  RENDER DANS (แสดงปุ่มด่าน พร้อมสถานะปลดล็อก)
+        //  RENDER DANS
         // ==============================================================
         function renderDans() {
             const container = document.getElementById('danList');
@@ -494,7 +539,6 @@
                 return;
             }
 
-            // จัดกลุ่มตาม Level
             const grouped = {};
             availableDans.forEach(d => {
                 if (!grouped[d.level]) grouped[d.level] = [];
@@ -505,10 +549,8 @@
 
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                const allDansInLevel = levelData;
-                const allPassed = allDansInLevel.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
+                const allPassed = levelData.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
 
-                // ตรวจสอบว่า Level นี้ปลดล็อกหรือยัง
                 let isLevelUnlocked = false;
                 if (parseInt(level) === 1) {
                     isLevelUnlocked = true;
@@ -521,21 +563,24 @@
                 levelDiv.className = 'level-card ' + 
                     (allPassed ? 'completed' : (isLevelUnlocked ? 'unlocked' : 'locked'));
 
-                // Level header
+                // Get feature for this level
+                const feature = getLevelFeature(parseInt(level));
+                const featureLabel = feature.name !== 'ปกติ' ? `🎯 ${feature.name}` : '';
+
                 const header = document.createElement('div');
                 header.className = 'level-header';
                 header.innerHTML = `
                     <span class="text-lg font-bold text-gray-700">🏰 Level ${level}</span>
+                    ${featureLabel ? `<span class="feature-badge">${featureLabel}</span>` : ''}
                     ${allPassed ? '<span class="text-sm text-green-600 font-medium">✅ ผ่านทั้งหมด</span>' : ''}
                     ${!isLevelUnlocked && parseInt(level) > 1 ? '<span class="text-sm text-gray-400">🔒 ยังไม่ปลดล็อก</span>' : ''}
-                    <span class="text-xs text-gray-400">(${allDansInLevel.length} ด่าน)</span>
+                    <span class="text-xs text-gray-400">(${levelData.length} ด่าน)</span>
                     <span class="level-progress">
-                        ${allDansInLevel.filter(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE).length} / ${allDansInLevel.length} ด่านผ่าน
+                        ${levelData.filter(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE).length} / ${levelData.length} ด่านผ่าน
                     </span>
                 `;
                 levelDiv.appendChild(header);
 
-                // Dan buttons
                 const danContainer = document.createElement('div');
                 danContainer.className = 'flex flex-wrap gap-1';
 
@@ -543,8 +588,6 @@
                     const progress = userProgress[d.dan] || 0;
                     const isPassed = progress >= CONFIG.PASSING_SCORE;
                     const isActive = currentDan === d.dan;
-
-                    // ตรวจสอบการปลดล็อกของด่านนี้ (ใช้ isDanUnlocked)
                     const unlocked = isDanUnlocked(d);
 
                     const btn = document.createElement('button');
@@ -570,13 +613,23 @@
                 levelDiv.appendChild(danContainer);
                 container.appendChild(levelDiv);
             });
+
+            // Update feature badge
+            const currentLevel = currentDan > 0 ? availableDans.find(d => d.dan === currentDan)?.level || 0 : 0;
+            const feature = getLevelFeature(currentLevel);
+            const badge = document.getElementById('levelFeatureBadge');
+            if (feature && feature.name !== 'ปกติ') {
+                badge.textContent = `🎯 ${feature.name}`;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         // ==============================================================
         //  LOAD DAN
         // ==============================================================
         async function loadDan(dan) {
-            // ตรวจสอบว่าปลดล็อกแล้วหรือไม่
             const danInfo = availableDans.find(d => d.dan === dan);
             if (!danInfo) {
                 alert('ไม่พบด่านนี้');
@@ -590,6 +643,13 @@
 
             currentDan = dan;
             currentLevel = danInfo.level;
+            currentFeature = getLevelFeature(currentLevel);
+
+            // รีเซ็ตสถานะเกม
+            lives = currentFeature.lives || 0;
+            combo = 1;
+            consecutiveWrong = 0;
+            streak = 0;
 
             const res = await callAPI('questions', 'GET', null, { dan: dan });
             const questions = res.data || [];
@@ -598,12 +658,11 @@
                 return;
             }
 
-            // สุ่ม 10 ข้อจาก 20 ข้อที่มี (สำรอง 10 ข้อ)
             const shuffled = [...questions].sort(() => Math.random() - 0.5);
-            currentRound = shuffled.slice(0, Math.min(CONFIG.QUESTIONS_PER_GAME, shuffled.length));
+            const totalQuestions = Math.min(CONFIG.QUESTIONS_PER_GAME, shuffled.length);
+            currentRound = shuffled.slice(0, totalQuestions);
             currentIndex = 0;
             score = 0;
-            streak = 0;
             mistakes = [];
             gameEnded = false;
             stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
@@ -613,16 +672,62 @@
             document.getElementById('resultArea').classList.add('hidden');
             document.getElementById('questionArea').classList.remove('hidden');
 
-            setTeacherMessage(`⚔️ กำลังเล่น ด่าน ${dan} (Level ${currentLevel})`);
+            // แสดง Level Info
+            document.getElementById('levelDisplay').textContent = `Level ${currentLevel}`;
+            updateLivesDisplay();
+            updateComboDisplay();
+
+            const featureText = currentFeature.name !== 'ปกติ' ? ` (${currentFeature.name})` : '';
+            setTeacherMessage(`⚔️ กำลังเล่น ด่าน ${dan} (Level ${currentLevel})${featureText}`);
             renderDans();
             renderQuestion();
+        }
+
+        // ==============================================================
+        //  UI UPDATES
+        // ==============================================================
+        function updateLivesDisplay() {
+            const el = document.getElementById('livesDisplay');
+            if (currentFeature && currentFeature.lives > 0) {
+                el.classList.remove('hidden');
+                el.textContent = '❤️'.repeat(lives);
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function updateComboDisplay() {
+            const el = document.getElementById('comboDisplay');
+            if (currentFeature && currentFeature.combo && streak >= 2) {
+                el.classList.remove('hidden');
+                const multiplier = Math.min(combo, 3);
+                el.textContent = `🔥 x${multiplier}`;
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function updateTimerDisplay(timeLeft) {
+            const el = document.getElementById('timerFill');
+            const percent = (timeLeft / (currentFeature?.timeLimit || CONFIG.TIME_LIMIT)) * 100;
+            el.style.width = `${percent}%`;
+            if (percent < 25) {
+                el.className = 'timer-fill danger';
+            } else if (percent < 50) {
+                el.className = 'timer-fill warning';
+            } else {
+                el.className = 'timer-fill';
+            }
         }
 
         // ==============================================================
         //  GAME FUNCTIONS
         // ==============================================================
         function renderQuestion() {
-            if (currentIndex >= currentRound.length) { endGame(); return; }
+            if (currentIndex >= currentRound.length || gameEnded) { 
+                if (!gameEnded) endGame(); 
+                return; 
+            }
 
             const q = currentRound[currentIndex];
             isAnswered = false;
@@ -638,29 +743,61 @@
             const letters = ['ก', 'ข', 'ค', 'ง'];
             const shuffled = opts.map((t, i) => ({ text: t, idx: i })).sort(() => Math.random() - 0.5);
 
-            shuffled.forEach(opt => {
+            // Hard Mode: ตัดตัวเลือกผิด 1 ข้อ
+            let hardModeOptions = shuffled;
+            if (currentFeature && currentFeature.hardMode) {
+                const correctIdx = 'ABCD'.indexOf(q.เฉลย);
+                const wrongOptions = shuffled.filter(opt => opt.idx !== correctIdx);
+                const toRemove = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+                hardModeOptions = shuffled.filter(opt => opt.idx !== toRemove.idx);
+                document.getElementById('qCategory').textContent = '🎯 ' + (q.หมวด || 'คำศัพท์') + ' (ฮาร์ด)';
+            }
+
+            hardModeOptions.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
+                if (currentFeature && currentFeature.hardMode) {
+                    btn.classList.add('hard-mode');
+                }
                 btn.innerHTML = `<span class="arabic">${opt.text}</span> <span class="text-xs text-gray-400 font-mono">${letters[opt.idx]}</span>`;
                 btn.dataset.idx = opt.idx;
                 btn.onclick = () => selectAnswer(opt.idx, q);
                 container.appendChild(btn);
             });
 
-            timeLeft = CONFIG.TIME_LIMIT;
+            // Timer
+            const timeLimit = currentFeature?.timeLimit || CONFIG.TIME_LIMIT;
+            timeLeft = timeLimit;
             document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
-            document.getElementById('timerFill').style.width = '100%';
+            updateTimerDisplay(timeLeft);
+            
             timerInterval = setInterval(() => {
                 timeLeft -= 1;
                 document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
-                document.getElementById('timerFill').style.width = `${(timeLeft / CONFIG.TIME_LIMIT) * 100}%`;
+                updateTimerDisplay(timeLeft);
                 if (timeLeft <= 0 && !isAnswered) {
                     clearInterval(timerInterval);
                     isAnswered = true;
                     setTeacherMessage('⏰ หมดเวลา! อุสตะเฮงว่าไวไปหน่อย');
+                    // หมดเวลา = ตอบผิด
+                    if (currentFeature && currentFeature.lives > 0) {
+                        lives -= 1;
+                        updateLivesDisplay();
+                        if (lives <= 0) {
+                            setTeacherMessage('💀 หมดชีวิต! เกมจบ');
+                            gameEnded = true;
+                            setTimeout(() => endGame(), 1000);
+                            return;
+                        }
+                    }
                     highlightCorrect(q);
                     addMistake(q);
-                    setTimeout(() => { currentIndex++; renderQuestion(); }, 1500);
+                    setTimeout(() => { 
+                        if (!gameEnded) {
+                            currentIndex++; 
+                            renderQuestion(); 
+                        }
+                    }, 1500);
                 }
             }, 1000);
 
@@ -686,24 +823,73 @@
             });
 
             if (isCorrect) {
-                score += 10;
+                // Calculate score with combo
+                let scoreAdd = currentFeature?.scorePerCorrect || 10;
+                if (currentFeature && currentFeature.combo && streak >= 2) {
+                    const multiplier = Math.min(combo, 3);
+                    scoreAdd = Math.round(scoreAdd * multiplier);
+                    setTeacherMessage(`✅ ถูกต้อง! (x${multiplier}) อุสตะเฮงประทับใจ`);
+                } else {
+                    setTeacherMessage('✅ ถูกต้อง! อุสตะเฮงประทับใจ');
+                }
+                score += scoreAdd;
                 streak += 1;
-                setTeacherMessage('✅ ถูกต้อง! อุสตะเฮงประทับใจ');
-                if (streak >= 5) {
+                combo = Math.min(combo + 0.5, 3);
+                consecutiveWrong = 0;
+
+                // Streak Bonus (Level 11+)
+                if (currentFeature && currentFeature.streakBonus && streak >= 3) {
                     score += 5;
+                    setTeacherMessage(`⭐ สเตรค! +5 แต้มพิเศษ (ติด ${streak} ข้อ)`);
+                }
+
+                if (streak >= 5) {
                     stars += 1;
                     localStorage.setItem('arabic_stars', stars);
-                    setTeacherMessage('🔥 ติด 5 ข้อ! +5 แต้ม และได้ดาว');
+                    if (streak === 5) setTeacherMessage('🔥 ติด 5 ข้อ! ได้ดาว');
                 }
-                if (streak === 10) { stars += 1; localStorage.setItem('arabic_stars', stars); }
+                if (streak === 10) { 
+                    stars += 1; 
+                    localStorage.setItem('arabic_stars', stars);
+                }
             } else {
                 streak = 0;
+                combo = 1;
+                consecutiveWrong += 1;
+
+                // Lives system (Level 16+)
+                if (currentFeature && currentFeature.lives > 0) {
+                    lives -= 1;
+                    updateLivesDisplay();
+                    if (lives <= 0) {
+                        setTeacherMessage('💀 หมดชีวิต! เกมจบ');
+                        gameEnded = true;
+                        setTimeout(() => endGame(), 1500);
+                        return;
+                    }
+                }
+
+                // Danger mode (Level 31+) - ตอบผิด 2 ข้อติด เกมจบ
+                if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) {
+                    setTeacherMessage('💀 ตอบผิดติดกัน 2 ข้อ! เกมจบ');
+                    gameEnded = true;
+                    setTimeout(() => endGame(), 1500);
+                    return;
+                }
+
                 const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
                 setTeacherMessage(`❌ คำตอบที่ถูกคือ "${correctText}"`);
                 addMistake(q);
             }
+
+            updateComboDisplay();
             updatePowerUI();
-            setTimeout(() => { currentIndex++; renderQuestion(); }, 1500);
+            setTimeout(() => { 
+                if (!gameEnded) {
+                    currentIndex++; 
+                    renderQuestion(); 
+                }
+            }, 1500);
         }
 
         function highlightCorrect(q) {
@@ -728,22 +914,35 @@
             document.getElementById('resultArea').classList.remove('hidden');
 
             const total = currentRound.length;
-            const maxScore = total * 10;
-            const percent = Math.round((score / maxScore) * 100);
+            const maxScore = total * (currentFeature?.scorePerCorrect || 10);
+            const percent = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+            const passingScore = currentFeature?.passingScore || CONFIG.PASSING_SCORE;
+            
             document.getElementById('finalScore').textContent = score;
             document.getElementById('finalDan').textContent = `ด่าน ${currentDan} (Level ${currentLevel})`;
-            document.getElementById('finalMessage').textContent =
-                percent >= CONFIG.PASSING_SCORE ?
-                `🎉 ผ่าน! (${percent}%) อุสตะเฮงภูมิใจในตัวคุณ` :
-                `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${CONFIG.PASSING_SCORE}% ขึ้นไป`;
+            
+            if (percent >= passingScore) {
+                document.getElementById('finalMessage').textContent = 
+                    `🎉 ผ่าน! (${percent}%) อุสตะเฮงภูมิใจในตัวคุณ`;
+            } else if (lives <= 0 && currentFeature?.lives > 0) {
+                document.getElementById('finalMessage').textContent = 
+                    `💀 หมดชีวิต! (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
+            } else if (consecutiveWrong >= 2 && currentFeature?.dangerMode) {
+                document.getElementById('finalMessage').textContent = 
+                    `💀 ตอบผิดติดกัน! (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
+            } else {
+                document.getElementById('finalMessage').textContent = 
+                    `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
+            }
 
+            // ยังบันทึกคะแนนแม้จะไม่ผ่าน (เพื่อ track ความก้าวหน้า)
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
                     email: userEmail,
                     displayName: userName,
                     level: currentDan,
                     score: score,
-                    time: Math.round((CONFIG.TIME_LIMIT * currentRound.length - timeLeft) || 0)
+                    time: Math.round((currentFeature?.timeLimit || CONFIG.TIME_LIMIT) * currentRound.length - timeLeft || 0)
                 }).then(() => callAPI('progress', 'GET', null, { email: userEmail }))
                   .then(res => { userProgress = res.data || {}; renderDans(); renderLeaderboard(); })
                   .catch(console.error);
@@ -939,7 +1138,7 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v2.9)`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.0)`);
         debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
     </script>
 

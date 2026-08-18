@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
     <meta name="google-signin-client_id" content="952813224851-9ufpehbgb7gvk6l4abp2pmteckafe3bl.apps.googleusercontent.com" />
     <title>ศึกษา ต่างถิ่น • เกมภาษาอาหรับ</title>
-    <!-- Tailwind + Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -65,10 +64,34 @@
         .level-up-anim { animation: pulse 0.5s ease; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         .ustadh-avatar { width: 60px; height: 60px; border-radius: 50%; background: #fef3c7; border: 3px solid #065f46; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .sentence-word { display: inline-block; padding: 8px 16px; margin: 4px; background: white; border-radius: 12px; border: 2px solid #d1d5db; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
-        .sentence-word:hover { border-color: #0d9488; background: #f0fdfa; }
-        .sentence-word.selected { border-color: #0d9488; background: #0d9488; color: white; }
+        
+        /* Sentence game - RTL support */
+        #sentenceDropZone, #sentenceWordBank {
+            direction: rtl;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            min-height: 60px;
+            padding: 8px;
+        }
+        .sentence-word {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 4px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #d1d5db;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.1rem;
+            unicode-bidi: plaintext;
+            direction: rtl;
+        }
+        .sentence-word:hover:not(.placed) { border-color: #0d9488; background: #f0fdfa; }
         .sentence-word.placed { border-color: #16a34a; background: #dcfce7; cursor: default; opacity: 0.7; }
+        .sentence-word.selected { border-color: #0d9488; background: #0d9488; color: white; }
+
         .share-card { background: linear-gradient(135deg, #065f46, #0d9488); color: white; border-radius: 20px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
         @media (max-width: 480px) {
             .arabic { font-size: 1.3rem; line-height: 1.9rem; }
@@ -120,9 +143,10 @@
         </nav>
 
         <!-- ============================================================ -->
-        <!-- TAB: GAME -->
+        <!-- TAB: GAME (เหมือนเดิม) -->
         <!-- ============================================================ -->
         <section id="gameTab" class="tab-content">
+            <!-- ... (โค้ดเกมท่องศัพท์เหมือนเดิม) ... -->
             <div class="card p-5 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2 flex-wrap">
                     <span>🗺️</span> เลือกด่าน
@@ -144,12 +168,11 @@
             </div>
 
             <div id="gameArea" class="card p-5 md:p-7 hidden">
+                <!-- ... (เหมือนเดิม) ... -->
                 <div class="flex items-start gap-3 mb-5">
                     <div class="ustadh-avatar">👳</div>
                     <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ</div>
                 </div>
-
-                <!-- Status Bar -->
                 <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mb-2">
                     <div class="flex items-center gap-3 flex-wrap">
                         <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
@@ -160,7 +183,6 @@
                     <span id="timerText" class="bg-gray-100 px-4 py-1.5 rounded-full">⏳ 20 วินาที</span>
                 </div>
                 <div class="timer-bar mb-5"><div id="timerFill" class="timer-fill" style="width:100%"></div></div>
-
                 <div id="questionArea">
                     <div class="text-center mb-4">
                         <span id="qCategory" class="inline-block text-xs text-gray-400 bg-gray-50 px-4 py-1 rounded-full">หมวด</span>
@@ -195,7 +217,7 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB: SENTENCE (เกมต่อประโยค) -->
+        <!-- TAB: SENTENCE (เกมต่อประโยค) - ปรับปรุง RTL และด่าน -->
         <!-- ============================================================ -->
         <section id="sentenceTab" class="tab-content hidden">
             <div class="card p-5 md:p-6 mb-6">
@@ -203,9 +225,13 @@
                     <span>🧩</span> เกมต่อประโยคภาษาอาหรับ
                     <span class="text-xs text-gray-400">(เรียงคำให้ถูกต้อง)</span>
                 </h2>
-                <div id="sentenceLevelList" class="flex flex-wrap gap-2">
-                    <!-- JS สร้างปุ่มเลือก Level -->
+                <div class="flex flex-wrap gap-2 items-center">
+                    <label for="sentenceDanInput" class="text-sm font-medium text-gray-600">เลือกด่าน:</label>
+                    <input type="number" id="sentenceDanInput" min="1" max="1000" value="1" class="w-20 border border-gray-300 rounded-full px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                    <button class="btn-primary text-sm py-1 px-4" onclick="loadSentenceDan()">ไป</button>
+                    <span class="text-xs text-gray-400 ml-2">(สูงสุด 1000 ด่าน)</span>
                 </div>
+                <p id="sentenceDanStatus" class="text-sm text-gray-500 mt-2"></p>
             </div>
 
             <div id="sentenceGameArea" class="card p-5 md:p-7 hidden">
@@ -218,11 +244,11 @@
                     <div class="text-center mb-4">
                         <span id="sentenceCategory" class="inline-block text-xs text-gray-400 bg-gray-50 px-4 py-1 rounded-full">หมวด</span>
                         <p class="text-sm text-gray-500 mt-1">ความหมาย: <span id="sentenceThai" class="font-medium text-gray-700"></span></p>
-                        <div class="mt-4 flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-xl min-h-[60px] border-2 border-dashed border-gray-300" id="sentenceDropZone">
-                            <!-- คำที่วางแล้วจะแสดงที่นี่ -->
+                        <div id="sentenceDropZone" class="mt-4 flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-xl min-h-[60px] border-2 border-dashed border-gray-300" style="direction: rtl;">
+                            <!-- คำที่วางแล้วจะแสดงที่นี่ (RTL) -->
                         </div>
-                        <div class="mt-4 flex flex-wrap justify-center gap-2 p-3" id="sentenceWordBank">
-                            <!-- คำให้เลือกจะแสดงที่นี่ -->
+                        <div id="sentenceWordBank" class="mt-4 flex flex-wrap justify-center gap-2 p-3" style="direction: rtl;">
+                            <!-- คำให้เลือกจะแสดงที่นี่ (RTL) -->
                         </div>
                     </div>
                     <div class="flex flex-wrap justify-center gap-3 mt-4">
@@ -237,20 +263,21 @@
                     <h3 class="text-2xl font-bold text-emerald-900">จบเกมต่อประโยค!</h3>
                     <p class="text-gray-600 mt-1">คุณทำคะแนนได้ <span id="sentenceFinalScore" class="font-bold text-3xl text-amber-700">0</span> คะแนน</p>
                     <p id="sentenceFinalMsg" class="mt-2 text-emerald-800"></p>
-                    <button class="btn-primary mt-5" onclick="loadSentenceLevel(currentSentenceLevel)">🔄 เล่นใหม่</button>
+                    <button class="btn-primary mt-5" onclick="loadSentenceDan(currentSentenceDan)">🔄 เล่นใหม่</button>
                 </div>
             </div>
 
             <div id="sentenceNotStarted" class="card p-8 text-center text-gray-500">
                 <span class="text-4xl block mb-3">🧩</span>
-                <p class="text-lg font-medium">เลือก Level เพื่อเริ่มเกมต่อประโยค</p>
+                <p class="text-lg font-medium">กรุณาเลือกด่านเพื่อเริ่มเกมต่อประโยค</p>
             </div>
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB: VOCAB -->
+        <!-- TAB: VOCAB (เหมือนเดิม) -->
         <!-- ============================================================ -->
         <section id="vocabTab" class="tab-content hidden">
+            <!-- ... (เหมือนเดิม) ... -->
             <div class="card p-5 md:p-6">
                 <div class="flex flex-wrap justify-between items-center mb-5">
                     <h2 class="text-xl font-bold text-gray-800">📖 คลังคำศัพท์ <span id="vocabCount" class="text-emerald-700">0</span> คำ</h2>
@@ -285,7 +312,7 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB: LEADERBOARD -->
+        <!-- TAB: LEADERBOARD (เหมือนเดิม) -->
         <!-- ============================================================ -->
         <section id="leaderboardTab" class="tab-content hidden">
             <div class="card p-5 md:p-6">
@@ -308,7 +335,7 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB: SHARE -->
+        <!-- TAB: SHARE (เหมือนเดิม) -->
         <!-- ============================================================ -->
         <section id="shareTab" class="tab-content hidden">
             <div class="card p-5 md:p-6">
@@ -351,7 +378,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT ฉบับสมบูรณ์ V3.1 -->
+    <!-- JAVASCRIPT ฉบับสมบูรณ์ V3.2 -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -418,9 +445,9 @@
         let consecutiveWrong = 0;
         let gameStarted = false;
 
-        // Sentence game state
+        // Sentence game state (ปรับใช้ dan แทน level)
         let sentenceQuestions = [], sentenceIndex = 0, sentenceScore = 0;
-        let currentSentenceLevel = 0;
+        let currentSentenceDan = 0;
         let selectedWords = [], placedWords = [];
 
         const $ = id => document.getElementById(id);
@@ -440,7 +467,7 @@
         }
 
         // ==============================================================
-        //  GOOGLE LOGIN
+        //  GOOGLE LOGIN (เหมือนเดิม)
         // ==============================================================
         function initGoogleLogin() {
             debugLog('GSI', '⏳ กำลังเริ่มต้น Google Login...');
@@ -599,7 +626,7 @@
         }
 
         // ==============================================================
-        //  LOAD DATA
+        //  LOAD DATA (เหมือนเดิม)
         // ==============================================================
         async function loadAllData() {
             try {
@@ -635,7 +662,6 @@
                 renderDans();
                 renderVocab();
                 renderLeaderboard();
-                renderSentenceLevels();
                 updateShareCard();
 
                 const firstUnlocked = availableDans.find(d => {
@@ -666,7 +692,7 @@
         }
 
         // ==============================================================
-        //  RENDER DANS
+        //  RENDER DANS (เหมือนเดิม)
         // ==============================================================
         function renderDans() {
             const container = document.getElementById('danList');
@@ -778,7 +804,7 @@
         }
 
         // ==============================================================
-        //  START GAME
+        //  START GAME (เหมือนเดิม)
         // ==============================================================
         function startGame() {
             if (!currentDan) {
@@ -796,7 +822,7 @@
         }
 
         // ==============================================================
-        //  LOAD DAN
+        //  LOAD DAN (เหมือนเดิม)
         // ==============================================================
         async function loadDan(dan) {
             const danInfo = availableDans.find(d => d.dan === dan);
@@ -851,7 +877,7 @@
         }
 
         // ==============================================================
-        //  UI UPDATES
+        //  UI UPDATES (เหมือนเดิม)
         // ==============================================================
         function updateLivesDisplay() {
             const el = document.getElementById('livesDisplay');
@@ -888,7 +914,7 @@
         }
 
         // ==============================================================
-        //  GAME FUNCTIONS
+        //  GAME FUNCTIONS (เหมือนเดิม)
         // ==============================================================
         function renderQuestion() {
             if (currentIndex >= currentRound.length || gameEnded) { 
@@ -1074,7 +1100,7 @@
         }
 
         // ==============================================================
-        //  REPORT FUNCTION
+        //  REPORT FUNCTION (เหมือนเดิม)
         // ==============================================================
         function reportMistake(idx) {
             const m = mistakes[idx];
@@ -1106,7 +1132,7 @@
         }
 
         // ==============================================================
-        //  END GAME
+        //  END GAME (เหมือนเดิม)
         // ==============================================================
         function endGame() {
             gameEnded = true;
@@ -1168,7 +1194,7 @@
         }
 
         // ==============================================================
-        //  POWER-UPS
+        //  POWER-UPS (เหมือนเดิม)
         // ==============================================================
         function useHint(q) {
             if (stars < 2 || isAnswered) return;
@@ -1214,39 +1240,34 @@
         }
 
         // ==============================================================
-        //  SENTENCE GAME (เกมต่อประโยค)
+        //  SENTENCE GAME (ปรับปรุงให้ใช้ Dan และ RTL)
         // ==============================================================
-        function renderSentenceLevels() {
-            const container = document.getElementById('sentenceLevelList');
-            container.innerHTML = '';
-            if (!levelsData.length) {
-                container.innerHTML = '<span class="text-gray-400">ยังไม่มี Level</span>';
-                return;
-            }
-            levelsData.forEach(lv => {
-                const btn = document.createElement('button');
-                btn.className = 'tab-btn mr-2';
-                btn.textContent = `Level ${lv.level}`;
-                btn.onclick = () => loadSentenceLevel(lv.level);
-                container.appendChild(btn);
-            });
+        function loadSentenceDan() {
+            const danInput = document.getElementById('sentenceDanInput');
+            let dan = parseInt(danInput.value) || 1;
+            if (dan < 1) dan = 1;
+            if (dan > 1000) dan = 1000;
+            danInput.value = dan;
+            currentSentenceDan = dan;
+            loadSentenceDanData(dan);
         }
 
-        async function loadSentenceLevel(level) {
-            currentSentenceLevel = level;
+        async function loadSentenceDanData(dan) {
+            currentSentenceDan = dan;
             document.getElementById('sentenceNotStarted').classList.add('hidden');
             document.getElementById('sentenceGameArea').classList.remove('hidden');
             document.getElementById('sentenceGameOver').classList.add('hidden');
             document.getElementById('sentenceQuestionArea').classList.remove('hidden');
 
-            const res = await callAPI('sentences', 'GET', null, { level: level });
+            const res = await callAPI('sentences', 'GET', null, { dan: dan });
             sentenceQuestions = res.data || [];
             if (!sentenceQuestions.length) {
-                alert('ไม่มีประโยคใน Level นี้');
+                alert('ไม่มีประโยคในด่านนี้');
                 return;
             }
             sentenceIndex = 0;
             sentenceScore = 0;
+            document.getElementById('sentenceDanStatus').textContent = `ด่าน ${dan} มี ${sentenceQuestions.length} ประโยค`;
             renderSentenceQuestion();
         }
 
@@ -1259,7 +1280,7 @@
             document.getElementById('sentenceCategory').textContent = q.หมวดหมู่ || 'ทั่วไป';
             document.getElementById('sentenceThai').textContent = q['ประโยคไทย'] || '';
 
-            // แยกคำ
+            // แยกคำ (อาหรับ)
             const words = q['ประโยคอาหรับ (แยกคำ)'].split(' ').filter(w => w.trim() !== '');
             const shuffled = [...words].sort(() => Math.random() - 0.5);
 
@@ -1278,7 +1299,7 @@
             dropZone.innerHTML = '';
             wordBank.innerHTML = '';
 
-            // drop zone
+            // drop zone (RTL)
             placedWords.forEach((word, idx) => {
                 const span = document.createElement('span');
                 span.className = 'sentence-word placed';
@@ -1287,7 +1308,7 @@
                 dropZone.appendChild(span);
             });
 
-            // word bank
+            // word bank (RTL)
             selectedWords.forEach((word, idx) => {
                 const span = document.createElement('span');
                 span.className = 'sentence-word';
@@ -1330,7 +1351,6 @@
                 document.getElementById('sentenceNextBtn').classList.remove('hidden');
             } else {
                 resultDiv.innerHTML = `<p class="text-red-600 font-bold">❌ คำตอบที่ถูกคือ: "${correct}"</p>`;
-                // ยังไม่ให้ไปข้อถัดไป ให้ลองใหม่
                 document.getElementById('sentenceCheckBtn').classList.remove('hidden');
             }
             document.getElementById('sentenceCheckBtn').disabled = true;
@@ -1366,7 +1386,7 @@
         }
 
         // ==============================================================
-        //  VOCABULARY
+        //  VOCABULARY (เหมือนเดิม)
         // ==============================================================
         function renderVocab() {
             const filterLevel = parseInt(document.getElementById('vocabLevelFilter').value) || 0;
@@ -1378,7 +1398,6 @@
             }
             document.getElementById('vocabCount').textContent = filtered.length;
 
-            // populate filter
             const filterSelect = document.getElementById('vocabLevelFilter');
             const currentVal = filterSelect.value;
             filterSelect.innerHTML = '<option value="0">ทุก Level</option>';
@@ -1414,7 +1433,7 @@
         }
 
         // ==============================================================
-        //  LEADERBOARD
+        //  LEADERBOARD (เหมือนเดิม)
         // ==============================================================
         async function renderLeaderboard() {
             try {
@@ -1444,7 +1463,7 @@
         }
 
         // ==============================================================
-        //  SHARE
+        //  SHARE (เหมือนเดิม)
         // ==============================================================
         function updateShareCard() {
             const level = currentLevel || 1;
@@ -1472,7 +1491,7 @@
         }
 
         // ==============================================================
-        //  EDIT NAME
+        //  EDIT NAME (เหมือนเดิม)
         // ==============================================================
         function openEditName() {
             document.getElementById('editNameModal').classList.remove('hidden');
@@ -1507,7 +1526,7 @@
         }
 
         // ==============================================================
-        //  EXPORT
+        //  EXPORT (เหมือนเดิม)
         // ==============================================================
         document.getElementById('exportCSV').addEventListener('click', () => {
             const filterLevel = parseInt(document.getElementById('vocabLevelFilter').value) || 0;
@@ -1561,7 +1580,7 @@
         });
 
         // ==============================================================
-        //  TABS
+        //  TABS (เหมือนเดิม)
         // ==============================================================
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1572,7 +1591,11 @@
                 if (btn.dataset.tab === 'leaderboardTab') renderLeaderboard();
                 if (btn.dataset.tab === 'vocabTab') renderVocab();
                 if (btn.dataset.tab === 'shareTab') updateShareCard();
-                if (btn.dataset.tab === 'sentenceTab') renderSentenceLevels();
+                if (btn.dataset.tab === 'sentenceTab') {
+                    // แสดงฟอร์มเลือกด่าน
+                    document.getElementById('sentenceNotStarted').classList.remove('hidden');
+                    document.getElementById('sentenceGameArea').classList.add('hidden');
+                }
             });
         });
 
@@ -1594,7 +1617,7 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.1) พร้อมเกมต่อประโยค`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.2) พร้อมเกมต่อประโยคแบบ RTL และด่าน`);
         debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
     </script>
 </body>

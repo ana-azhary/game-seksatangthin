@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
-    <meta name="google-signin-client_id" content="952813224851-9ufpehbgb7gvk6l4abp2pmteckafe3bl.apps.googleusercontent.com" />
     <title>ศึกษา ต่างถิ่น • เกมภาษาอาหรับ</title>
+    <!-- Tailwind + Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -13,30 +13,116 @@
     <style>
         * { font-family: 'Noto Sans Thai', sans-serif; }
         .arabic { font-family: 'Noto Naskh Arabic', serif; font-size: 1.5rem; line-height: 2.2rem; }
-        .card { background: rgba(255,255,255,0.85); backdrop-filter: blur(4px); border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
-        .btn-primary { background: #065f46; color: white; font-weight: 600; padding: 12px 28px; border-radius: 40px; transition: 0.2s; border: none; cursor: pointer; font-size: 1.05rem; }
+
+        /* Smooth card & transitions */
+        .card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+        }
+        .btn-primary {
+            background: #065f46;
+            color: white;
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 40px;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
         .btn-primary:active { transform: scale(0.97); }
-        .btn-secondary { background: #f0fdf4; color: #065f46; border: 2px solid #065f46; font-weight: 600; padding: 10px 24px; border-radius: 40px; transition: 0.2s; cursor: pointer; font-size: 1rem; }
+        .btn-secondary {
+            background: #f0fdf4;
+            color: #065f46;
+            border: 2px solid #065f46;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 40px;
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 1rem;
+        }
         .btn-secondary:active { background: #dcfce7; }
-        .option-btn { border: 2px solid #e5e7eb; border-radius: 16px; padding: 14px 16px; background: white; transition: all 0.15s; text-align: right; font-size: 1.15rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+
+        .option-btn {
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 14px 16px;
+            background: white;
+            transition: all 0.15s;
+            text-align: right;
+            font-size: 1.15rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
         .option-btn:active { transform: scale(0.97); }
         .option-btn.correct { border-color: #16a34a; background: #dcfce7; }
         .option-btn.wrong { border-color: #dc2626; background: #fee2e2; }
         .option-btn.disabled { opacity: 0.6; pointer-events: none; }
-        .tab-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; background: #f1f5f9; color: #334155; }
-        .tab-btn.active { background: #065f46; color: white; }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .tab-btn.active {
+            background: #065f46;
+            color: white;
+        }
         .tab-btn:active { transform: scale(0.96); }
-        .level-btn { padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.95rem; border: 2px solid transparent; background: #f1f5f9; color: #1e293b; cursor: pointer; transition: 0.2s; }
+
+        .level-btn {
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 2px solid transparent;
+            background: #f1f5f9;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.2s;
+        }
         .level-btn:active { transform: scale(0.95); }
         .level-btn.passed { background: #dcfce7; border-color: #16a34a; color: #14532d; }
         .level-btn.active-level { background: #dbeafe; border-color: #3b82f6; }
         .level-btn.locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.3); }
-        .ustadh-bubble { background: #064e3b; color: #fef3c7; padding: 12px 20px; border-radius: 20px 20px 20px 6px; display: inline-block; max-width: 94%; font-size: 1rem; line-height: 1.6; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .timer-bar { height: 8px; background: #e5e7eb; border-radius: 20px; overflow: hidden; }
-        .timer-fill { height: 100%; background: #0d9488; border-radius: 20px; transition: width 1s linear; }
-        .g_id_signin { visibility: hidden; }
-        .g_id_signin.gsi-loaded { visibility: visible; }
-        #loginStatus { font-size: 0.85rem; color: #6b7280; transition: all 0.3s; }
+
+        .ustadh-bubble {
+            background: #064e3b;
+            color: #fef3c7;
+            padding: 12px 20px;
+            border-radius: 20px 20px 20px 6px;
+            display: inline-block;
+            max-width: 94%;
+            font-size: 1rem;
+            line-height: 1.6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .timer-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%;
+            background: #0d9488;
+            border-radius: 20px;
+            transition: width 1s linear;
+        }
+
+        /* ปรับขนาดข้อความและระยะห่างสำหรับมือถือ */
         @media (max-width: 480px) {
             .arabic { font-size: 1.3rem; line-height: 1.9rem; }
             .option-btn { font-size: 1rem; padding: 12px 14px; }
@@ -49,7 +135,7 @@
 
     <div id="app" class="max-w-4xl mx-auto">
 
-        <!-- HEADER -->
+        <!-- ===== HEADER ===== -->
         <header class="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div class="flex items-center gap-3">
                 <span class="text-3xl md:text-4xl">📚</span>
@@ -59,7 +145,6 @@
                 </div>
             </div>
             <div id="userArea" class="flex items-center gap-3">
-                <span id="loginStatus" class="text-sm text-gray-500">⏳ กำลังโหลด...</span>
                 <div id="userInfo" class="hidden flex items-center gap-2 bg-white/80 px-3 py-1.5 rounded-full shadow-sm">
                     <img id="avatarImg" class="w-8 h-8 rounded-full border-2 border-emerald-200" src="" alt="avatar" />
                     <span id="userName" class="text-sm font-medium text-gray-800"></span>
@@ -69,43 +154,62 @@
             </div>
         </header>
 
-        <!-- TABS -->
+        <!-- ===== TABS ===== -->
         <nav class="flex flex-wrap gap-2 mb-6">
             <button class="tab-btn active" data-tab="gameTab">🎮 เกม</button>
             <button class="tab-btn" data-tab="vocabTab">📖 คำศัพท์</button>
             <button class="tab-btn" data-tab="leaderboardTab">🏆 ลีดเดอร์</button>
         </nav>
 
-        <!-- GAME TAB -->
+        <!-- ============================================================ -->
+        <!-- TAB: GAME -->
+        <!-- ============================================================ -->
         <section id="gameTab" class="tab-content">
+
+            <!-- เลือกด่าน -->
             <div class="card p-5 md:p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2"><span>🗺️</span> เลือกด่าน</h2>
-                <div id="levelList" class="flex flex-wrap gap-2"></div>
+                <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <span>🗺️</span> เลือกด่าน
+                </h2>
+                <div id="levelList" class="flex flex-wrap gap-2">
+                    <!-- JS จะสร้างปุ่มด่าน -->
+                </div>
                 <p id="levelStatus" class="text-sm text-gray-500 mt-2"></p>
             </div>
 
+            <!-- เกม -->
             <div id="gameArea" class="card p-5 md:p-7 hidden">
+                <!-- อุสตะเฮง -->
                 <div class="flex items-start gap-3 mb-5">
                     <div class="w-11 h-11 rounded-full bg-emerald-900 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">อ</div>
-                    <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ</div>
+                    <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">
+                        สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ
+                    </div>
                 </div>
+
+                <!-- ความคืบหน้า + เวลา -->
                 <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mb-2">
                     <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
                     <span id="timerText" class="bg-gray-100 px-4 py-1.5 rounded-full">⏳ 20 วินาที</span>
                 </div>
                 <div class="timer-bar mb-5"><div id="timerFill" class="timer-fill" style="width:100%"></div></div>
+
+                <!-- คำถาม -->
                 <div id="questionArea">
                     <div class="text-center mb-4">
                         <span id="qCategory" class="inline-block text-xs text-gray-400 bg-gray-50 px-4 py-1 rounded-full">หมวด</span>
                         <h2 id="questionText" class="text-xl md:text-2xl font-bold text-emerald-900 mt-2">โหลดคำถาม...</h2>
                     </div>
                     <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+
                     <div class="flex flex-wrap justify-center gap-3 mt-6">
                         <button id="hintBtn" class="btn-secondary text-sm py-2 px-5" disabled>💡 ใบ้ (⭐2)</button>
                         <button id="skipBtn" class="btn-secondary text-sm py-2 px-5" disabled>⏭️ ข้าม (⭐3)</button>
                         <button id="resetGameBtn" class="text-sm text-emerald-700 hover:text-emerald-900 font-medium underline-offset-2 underline">🔄 เริ่มใหม่</button>
                     </div>
                 </div>
+
+                <!-- ผลลัพธ์ -->
                 <div id="resultArea" class="hidden text-center py-6">
                     <div class="text-6xl mb-2">🏆</div>
                     <h3 class="text-2xl font-bold text-emerald-900">จบเกม!</h3>
@@ -120,6 +224,7 @@
                 </div>
             </div>
 
+            <!-- สถานะเริ่มต้น -->
             <div id="gameNotStarted" class="card p-8 text-center text-gray-500">
                 <span class="text-5xl block mb-3">🌍</span>
                 <p class="text-lg font-medium">กรุณาเข้าสู่ระบบและเลือกด่าน</p>
@@ -127,7 +232,9 @@
             </div>
         </section>
 
-        <!-- VOCAB TAB -->
+        <!-- ============================================================ -->
+        <!-- TAB: VOCAB -->
+        <!-- ============================================================ -->
         <section id="vocabTab" class="tab-content hidden">
             <div class="card p-5 md:p-6">
                 <div class="flex flex-wrap justify-between items-center mb-5">
@@ -158,7 +265,9 @@
             </div>
         </section>
 
-        <!-- LEADERBOARD TAB -->
+        <!-- ============================================================ -->
+        <!-- TAB: LEADERBOARD -->
+        <!-- ============================================================ -->
         <section id="leaderboardTab" class="tab-content hidden">
             <div class="card p-5 md:p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">🏆 ลีดเดอร์บอร์ด</h2>
@@ -181,13 +290,16 @@
 
     </div>
 
+    <!-- ============================================================== -->
+    <!-- JAVASCRIPT ครบถ้วน -->
+    <!-- ============================================================== -->
     <script>
         // ==============================================================
         //  CONFIG
         // ==============================================================
         const CONFIG = {
-            WORKER_URL: 'https://game-seksatangthin.hem5426.workers.dev',
-            GOOGLE_CLIENT_ID: '952813224851-9ufpehbgb7gvk6l4abp2pmteckafe3bl.apps.googleusercontent.com',
+            WORKER_URL: 'https://your-worker.workers.dev',      // เปลี่ยนเป็น URL ของคุณ
+            GOOGLE_CLIENT_ID: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
             PASSING_SCORE: 60,
             QUESTIONS_PER_GAME: 10,
             TIME_LIMIT: 20,
@@ -206,116 +318,40 @@
         const $ = id => document.getElementById(id);
 
         // ==============================================================
-        //  DEBUG
-        // ==============================================================
-        function debugLog(module, message, data) {
-            const ts = new Date().toISOString().slice(11, 19);
-            console.log(`[${ts}] [${module}] ${message}`, data || '');
-        }
-
-        function setStatus(text, color) {
-            const el = document.getElementById('loginStatus');
-            if (el) { el.textContent = text; el.style.color = color || '#6b7280'; }
-            debugLog('UI', '📌 ' + text);
-        }
-
-        // ==============================================================
         //  GOOGLE LOGIN
         // ==============================================================
         function initGoogleLogin() {
-            debugLog('GSI', '⏳ กำลังเริ่มต้น Google Login...');
-            const savedToken = localStorage.getItem('id_token');
-            if (savedToken) {
-                debugLog('GSI', '🔑 พบ token ใน localStorage');
-                try {
-                    const payload = decodeJwtResponse(savedToken);
-                    if (payload && payload.email) {
-                        debugLog('GSI', `✅ session เก่าสำหรับ ${payload.email}`);
-                        handleCredentialResponse({ credential: savedToken });
-                        return;
-                    }
-                } catch (e) {
-                    debugLog('GSI', '⚠️ token เสีย, ลบออก');
-                    localStorage.removeItem('id_token');
-                }
-            }
-
             window.onGoogleLibraryLoad = () => {
-                debugLog('GSI', '📦 Google Library โหลดเสร็จ');
-                try {
-                    google.accounts.id.initialize({
-                        client_id: CONFIG.GOOGLE_CLIENT_ID,
-                        callback: handleCredentialResponse,
-                        cancel_on_tap_outside: false,
-                        auto_select: true,
-                        context: 'signin',
-                        state_cookie_domain: 'single_host_origin',
-                    });
-                    debugLog('GSI', '✅ Initialize สำเร็จ');
-
-                    const loginBtn = document.querySelector('.g_id_signin');
-                    if (loginBtn) {
-                        google.accounts.id.renderButton(loginBtn, {
-                            theme: 'outline', size: 'medium', shape: 'pill',
-                            text: 'signin_with', logo_alignment: 'left',
-                        });
-                        loginBtn.classList.add('gsi-loaded');
-                        debugLog('GSI', '✅ ปุ่ม Login แสดงแล้ว');
-                        setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280');
-                    }
-
-                    try {
-                        google.accounts.id.prompt((notification) => {
-                            const reason = notification.getNotDisplayedReason() ||
-                                notification.getSkippedReason() || 'แสดงแล้ว';
-                            debugLog('GSI', `📩 Prompt: ${reason}`);
-                        });
-                    } catch (e) {
-                        debugLog('GSI', `⚠️ Prompt error: ${e.message}`);
-                    }
-                } catch (e) {
-                    debugLog('GSI', `❌ Error: ${e.message}`);
-                    setStatus('⚠️ เกิดข้อผิดพลาด กรุณารีเฟรช', '#dc2626');
-                }
+                google.accounts.id.initialize({
+                    client_id: CONFIG.GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse,
+                    cancel_on_tap_outside: false,
+                });
+                google.accounts.id.renderButton(
+                    document.querySelector('.g_id_signin'),
+                    { theme: 'outline', size: 'medium', shape: 'pill' }
+                );
+                google.accounts.id.prompt();
             };
         }
 
         function handleCredentialResponse(response) {
-            debugLog('GSI', '📩 รับ credential แล้ว');
-            try {
-                const payload = decodeJwtResponse(response.credential);
-                userEmail = payload.email;
-                userName = payload.name || payload.email.split('@')[0];
-                userAvatar = payload.picture;
-                isLoggedIn = true;
+            const payload = decodeJwtResponse(response.credential);
+            userEmail = payload.email;
+            userName = payload.name || payload.email.split('@')[0];
+            userAvatar = payload.picture;
+            isLoggedIn = true;
 
-                debugLog('GSI', `✅ Login สำเร็จ: ${userEmail}`);
-                setStatus(`👋 สวัสดี ${userName}`, '#065f46');
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('avatarImg').src = userAvatar;
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('logoutBtn').classList.remove('hidden');
 
-                localStorage.setItem('id_token', response.credential);
-                localStorage.setItem('user_email', userEmail);
-                localStorage.setItem('user_name', userName);
-
-                document.getElementById('userInfo').classList.remove('hidden');
-                document.getElementById('avatarImg').src = userAvatar;
-                document.getElementById('userName').textContent = userName;
-                document.getElementById('loginButton').style.display = 'none';
-                document.getElementById('logoutBtn').classList.remove('hidden');
-
-                // ✅ เรียก login ด้วย path-based
-                callAPI('login', 'POST', { email: userEmail, displayName: userName })
-                    .then((res) => {
-                        debugLog('API', `✅ ลงทะเบียนสำเร็จ (newUser: ${res.newUser})`);
-                        loadAllData();
-                    })
-                    .catch((err) => {
-                        debugLog('API', `❌ ลงทะเบียนล้มเหลว: ${err.message}`);
-                        loadAllData(); // ยังโหลดข้อมูลต่อไป
-                    });
-            } catch (e) {
-                debugLog('GSI', `❌ Decode token ล้มเหลว: ${e.message}`);
-                setStatus('⚠️ ข้อมูลไม่ถูกต้อง กรุณาลองใหม่', '#dc2626');
-            }
+            // ลงทะเบียนผ่าน API
+            callAPI('login', 'POST', { email: userEmail, displayName: userName })
+                .then(() => loadAllData())
+                .catch(() => loadAllData());
         }
 
         function decodeJwtResponse(token) {
@@ -325,46 +361,24 @@
         }
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            debugLog('GSI', '🚪 ออกจากระบบ');
             google.accounts.id.disableAutoSelect();
-            localStorage.removeItem('id_token');
-            localStorage.removeItem('user_email');
-            localStorage.removeItem('user_name');
             isLoggedIn = false;
-            userEmail = null;
-            userName = null;
-            userAvatar = null;
-
             document.getElementById('userInfo').classList.add('hidden');
             document.getElementById('loginButton').style.display = 'block';
             document.getElementById('logoutBtn').classList.add('hidden');
-            setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280');
             document.getElementById('gameNotStarted').classList.remove('hidden');
             document.getElementById('gameArea').classList.add('hidden');
-
-            allQuestions = []; allVocab = []; levels = []; userProgress = {};
-            renderLevels(); renderVocab(); renderLeaderboard();
-            debugLog('GSI', '✅ ออกจากระบบสำเร็จ');
+            location.reload();
         });
 
         // ==============================================================
-        //  ✅ API HELPER - ใช้ PATH-BASED ROUTING (ไม่มี ?action=)
+        //  API HELPER
         // ==============================================================
-        async function callAPI(action, method = 'GET', body = null, query = {}) {
+        async function callAPI(action, method = 'GET', body = null) {
             const url = new URL(CONFIG.WORKER_URL);
-            // action ต้องขึ้นต้นด้วย / เช่น '/login', '/questions', '/vocab'
-            const path = action.startsWith('/') ? action : '/' + action;
-            url.pathname = path;
-
+            url.searchParams.set('action', action);
             const options = { method, headers: { 'Content-Type': 'application/json' } };
-            if (method === 'POST' || method === 'PUT') {
-                if (body) options.body = JSON.stringify(body);
-            }
-            // GET ใช้ query parameters
-            if (method === 'GET' && query && Object.keys(query).length) {
-                Object.entries(query).forEach(([k, v]) => url.searchParams.set(k, v));
-            }
-
+            if (body) options.body = JSON.stringify(body);
             const token = localStorage.getItem('id_token');
             if (token) options.headers['Authorization'] = 'Bearer ' + token;
 
@@ -374,31 +388,26 @@
         }
 
         // ==============================================================
-        //  LOAD DATA (ใช้ path-based)
+        //  LOAD DATA
         // ==============================================================
         async function loadAllData() {
             try {
-                setStatus('⏳ กำลังโหลดข้อมูล...', '#6b7280');
-
                 const [q, v, l, p] = await Promise.all([
-                    callAPI('questions', 'GET', null, {}),
-                    callAPI('vocab', 'GET'),
-                    callAPI('levels', 'GET'),
-                    callAPI('progress', 'GET', null, { email: userEmail }),
+                    callAPI('getQuestions'),
+                    callAPI('getVocab'),
+                    callAPI('getLevels'),
+                    callAPI('getUserProgress', 'GET', null, { email: userEmail }),
                 ]);
-
                 allQuestions = q.data || [];
                 allVocab = v.data || [];
                 levels = l.data || [];
                 userProgress = p.data || {};
 
-                debugLog('DATA', `📚 โหลดสำเร็จ: ${allQuestions.length} คำถาม, ${allVocab.length} คำศัพท์, ${levels.length} ด่าน`);
-                setStatus(`📚 โหลดข้อมูลสำเร็จ`, '#065f46');
-
                 renderLevels();
                 renderVocab();
                 renderLeaderboard();
 
+                // เล่นด่านแรกที่ยังไม่ผ่าน หรือด่านแรก
                 const firstUnlocked = levels.find(l => !userProgress[l] || userProgress[l] < CONFIG.PASSING_SCORE);
                 if (firstUnlocked) loadLevel(firstUnlocked);
                 else if (levels.length) loadLevel(levels[0]);
@@ -407,8 +416,7 @@
                     document.getElementById('gameArea').classList.add('hidden');
                 }
             } catch (e) {
-                debugLog('DATA', `❌ โหลดข้อมูลล้มเหลว: ${e.message}`);
-                setStatus(`⚠️ ${e.message}`, '#dc2626');
+                console.error(e);
                 alert('โหลดข้อมูลไม่สำเร็จ: ' + e.message);
             }
         }
@@ -497,6 +505,7 @@
                 container.appendChild(btn);
             });
 
+            // Timer
             timeLeft = CONFIG.TIME_LIMIT;
             document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
             document.getElementById('timerFill').style.width = '100%';
@@ -588,13 +597,13 @@
                 `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${CONFIG.PASSING_SCORE}% ขึ้นไป`;
 
             if (isLoggedIn) {
-                callAPI('scores', 'POST', {
+                callAPI('saveScore', 'POST', {
                     email: userEmail,
                     displayName: userName,
                     level: currentLevel,
                     score: score,
                     time: Math.round((CONFIG.TIME_LIMIT * currentRound.length - timeLeft) || 0)
-                }).then(() => callAPI('progress', 'GET', null, { email: userEmail }))
+                }).then(() => callAPI('getUserProgress', 'GET', null, { email: userEmail }))
                   .then(res => { userProgress = res.data || {}; renderLevels(); renderLeaderboard(); })
                   .catch(console.error);
             }
@@ -680,11 +689,11 @@
         }
 
         // ==============================================================
-        //  LEADERBOARD (ใช้ path-based)
+        //  LEADERBOARD
         // ==============================================================
         async function renderLeaderboard() {
             try {
-                const res = await callAPI('leaderboard', 'GET');
+                const res = await callAPI('getLeaderboard');
                 const data = res.data || [];
                 const tbody = document.getElementById('leaderboardBody');
                 tbody.innerHTML = '';
@@ -704,9 +713,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (e) {
-                console.error('Leaderboard error:', e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         // ==============================================================
@@ -758,7 +765,7 @@
         });
 
         // ==============================================================
-        //  TABS
+        //  TABS + RESET
         // ==============================================================
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -782,15 +789,8 @@
         // ==============================================================
         //  INIT
         // ==============================================================
-        const hasSession = localStorage.getItem('id_token') ? true : false;
         initGoogleLogin();
-
-        if (!hasSession) {
-            setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
-        }
-
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v2.2)`);
-        debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
+        // ถ้าล็อกอินแล้ว ให้โหลดข้อมูล (จะถูกเรียกจาก callback)
     </script>
 </body>
 </html>

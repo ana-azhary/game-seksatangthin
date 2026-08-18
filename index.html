@@ -116,7 +116,7 @@
                     <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ</div>
                 </div>
 
-                <!-- Status Bar: Level Info + Lives + Combo -->
+                <!-- Status Bar -->
                 <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mb-2">
                     <div class="flex items-center gap-3 flex-wrap">
                         <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
@@ -216,7 +216,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT - ระบบ Feature ตาม Level -->
+    <!-- JAVASCRIPT ฉบับสมบูรณ์ (พร้อมระบบรายงาน) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -234,7 +234,7 @@
         //  LEVEL FEATURES (ปลดล็อกตาม Level)
         // ==============================================================
         const LEVEL_FEATURES = {
-            1: { name: 'ปกติ', timeLimit: 20, lives: 0, combo: false, hardMode: false, 
+            1: { name: 'ปกติ', timeLimit: 20, lives: 0, combo: false, hardMode: false,
                  streakBonus: false, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
             6: { name: '⏱️ สปีด', timeLimit: 15, lives: 0, combo: false, hardMode: false,
                  streakBonus: false, dangerMode: false, passingScore: 60, scorePerCorrect: 10 },
@@ -257,7 +257,6 @@
         };
 
         function getLevelFeature(level) {
-            // หา feature สูงสุดที่ <= level
             let feature = LEVEL_FEATURES[1];
             Object.keys(LEVEL_FEATURES).forEach(key => {
                 if (parseInt(key) <= level) {
@@ -563,7 +562,6 @@
                 levelDiv.className = 'level-card ' + 
                     (allPassed ? 'completed' : (isLevelUnlocked ? 'unlocked' : 'locked'));
 
-                // Get feature for this level
                 const feature = getLevelFeature(parseInt(level));
                 const featureLabel = feature.name !== 'ปกติ' ? `🎯 ${feature.name}` : '';
 
@@ -645,7 +643,6 @@
             currentLevel = danInfo.level;
             currentFeature = getLevelFeature(currentLevel);
 
-            // รีเซ็ตสถานะเกม
             lives = currentFeature.lives || 0;
             combo = 1;
             consecutiveWrong = 0;
@@ -672,7 +669,6 @@
             document.getElementById('resultArea').classList.add('hidden');
             document.getElementById('questionArea').classList.remove('hidden');
 
-            // แสดง Level Info
             document.getElementById('levelDisplay').textContent = `Level ${currentLevel}`;
             updateLivesDisplay();
             updateComboDisplay();
@@ -743,7 +739,6 @@
             const letters = ['ก', 'ข', 'ค', 'ง'];
             const shuffled = opts.map((t, i) => ({ text: t, idx: i })).sort(() => Math.random() - 0.5);
 
-            // Hard Mode: ตัดตัวเลือกผิด 1 ข้อ
             let hardModeOptions = shuffled;
             if (currentFeature && currentFeature.hardMode) {
                 const correctIdx = 'ABCD'.indexOf(q.เฉลย);
@@ -765,7 +760,6 @@
                 container.appendChild(btn);
             });
 
-            // Timer
             const timeLimit = currentFeature?.timeLimit || CONFIG.TIME_LIMIT;
             timeLeft = timeLimit;
             document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
@@ -779,7 +773,6 @@
                     clearInterval(timerInterval);
                     isAnswered = true;
                     setTeacherMessage('⏰ หมดเวลา! อุสตะเฮงว่าไวไปหน่อย');
-                    // หมดเวลา = ตอบผิด
                     if (currentFeature && currentFeature.lives > 0) {
                         lives -= 1;
                         updateLivesDisplay();
@@ -823,7 +816,6 @@
             });
 
             if (isCorrect) {
-                // Calculate score with combo
                 let scoreAdd = currentFeature?.scorePerCorrect || 10;
                 if (currentFeature && currentFeature.combo && streak >= 2) {
                     const multiplier = Math.min(combo, 3);
@@ -837,7 +829,6 @@
                 combo = Math.min(combo + 0.5, 3);
                 consecutiveWrong = 0;
 
-                // Streak Bonus (Level 11+)
                 if (currentFeature && currentFeature.streakBonus && streak >= 3) {
                     score += 5;
                     setTeacherMessage(`⭐ สเตรค! +5 แต้มพิเศษ (ติด ${streak} ข้อ)`);
@@ -857,7 +848,6 @@
                 combo = 1;
                 consecutiveWrong += 1;
 
-                // Lives system (Level 16+)
                 if (currentFeature && currentFeature.lives > 0) {
                     lives -= 1;
                     updateLivesDisplay();
@@ -869,7 +859,6 @@
                     }
                 }
 
-                // Danger mode (Level 31+) - ตอบผิด 2 ข้อติด เกมจบ
                 if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) {
                     setTeacherMessage('💀 ตอบผิดติดกัน 2 ข้อ! เกมจบ');
                     gameEnded = true;
@@ -903,10 +892,51 @@
         function addMistake(q) {
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
-            const entry = { thai: q.คำถามไทย, arabic: correctText, category: q.หมวด || 'ทั่วไป' };
+            const entry = { 
+                thai: q.คำถามไทย, 
+                arabic: correctText, 
+                category: q.หมวด || 'ทั่วไป',
+                questionId: q.id || '',
+                selectedAnswer: '' // จะไม่ใช้
+            };
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
+        // ==============================================================
+        //  REPORT FUNCTION (ใหม่!)
+        // ==============================================================
+        function reportMistake(idx) {
+            const m = mistakes[idx];
+            if (!m) return;
+            if (confirm(`🚨 รายงานคำนี้: "${m.thai}" = "${m.arabic}" ?\n\n(ข้อมูลนี้จะช่วยให้ทีมงานปรับปรุงคลังคำศัพท์ให้ดีขึ้น)`)) {
+                callAPI('report', 'POST', {
+                    userEmail: userEmail,
+                    userName: userName,
+                    level: currentLevel,
+                    dan: currentDan,
+                    questionId: m.questionId || '',
+                    questionThai: m.thai,
+                    correctAnswer: m.arabic,
+                    selectedAnswer: m.selectedAnswer || '',
+                    category: m.category || '',
+                    reportType: 'ตอบผิด'
+                }).then(() => {
+                    alert('✅ รายงานคำนี้เรียบร้อยแล้ว ขอบคุณที่ช่วยพัฒนาคลังคำศัพท์ครับ 🙏');
+                    const btns = document.querySelectorAll('.report-btn');
+                    if (btns[idx]) {
+                        btns[idx].textContent = '✅ รายงานแล้ว';
+                        btns[idx].disabled = true;
+                        btns[idx].className = 'text-xs text-green-500';
+                    }
+                }).catch(err => {
+                    alert('❌ รายงานล้มเหลว: ' + err.message + ' กรุณาลองใหม่ภายหลัง');
+                });
+            }
+        }
+
+        // ==============================================================
+        //  END GAME (ปรับปรุงให้มีปุ่มรายงาน)
+        // ==============================================================
         function endGame() {
             gameEnded = true;
             clearInterval(timerInterval);
@@ -935,7 +965,6 @@
                     `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
             }
 
-            // ยังบันทึกคะแนนแม้จะไม่ผ่าน (เพื่อ track ความก้าวหน้า)
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
                     email: userEmail,
@@ -953,14 +982,23 @@
             if (mistakes.length === 0) {
                 list.innerHTML = '<li class="text-green-600">🎉 ไม่มีคำที่ผิดเลย!</li>';
             } else {
-                mistakes.forEach(m => {
+                mistakes.forEach((m, idx) => {
                     const li = document.createElement('li');
-                    li.textContent = `${m.thai} = ${m.arabic} (${m.category})`;
+                    li.className = 'flex justify-between items-center py-1 border-b border-gray-100';
+                    li.innerHTML = `
+                        <span class="flex-1">${m.thai} = ${m.arabic} <span class="text-xs text-gray-400">(${m.category})</span></span>
+                        <button onclick="reportMistake(${idx})" class="report-btn text-xs text-red-500 hover:text-red-700 hover:underline px-2 py-1 rounded">
+                            🚨 รายงาน
+                        </button>
+                    `;
                     list.appendChild(li);
                 });
             }
         }
 
+        // ==============================================================
+        //  POWER-UPS
+        // ==============================================================
         function useHint(q) {
             if (stars < 2 || isAnswered) return;
             stars -= 2;
@@ -1138,7 +1176,7 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.0)`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.0) พร้อมระบบรายงานคำผิด`);
         debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
     </script>
 

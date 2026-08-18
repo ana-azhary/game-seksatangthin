@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <meta name="google-signin-client_id" content="952813224851-9ufpehbgb7gvk6l4abp2pmteckafe3bl.apps.googleusercontent.com" />
     <title>ศึกษา ต่างถิ่น • เกมภาษาอาหรับ</title>
     <!-- Tailwind + Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +15,6 @@
         * { font-family: 'Noto Sans Thai', sans-serif; }
         .arabic { font-family: 'Noto Naskh Arabic', serif; font-size: 1.5rem; line-height: 2.2rem; }
 
-        /* Smooth card & transitions */
         .card {
             background: rgba(255,255,255,0.85);
             backdrop-filter: blur(4px);
@@ -122,7 +122,14 @@
             transition: width 1s linear;
         }
 
-        /* ปรับขนาดข้อความและระยะห่างสำหรับมือถือ */
+        /* GSI Button visibility */
+        .g_id_signin {
+            visibility: hidden;
+        }
+        .g_id_signin.gsi-loaded {
+            visibility: visible;
+        }
+
         @media (max-width: 480px) {
             .arabic { font-size: 1.3rem; line-height: 1.9rem; }
             .option-btn { font-size: 1rem; padding: 12px 14px; }
@@ -298,7 +305,7 @@
         //  CONFIG
         // ==============================================================
         const CONFIG = {
-            WORKER_URL: 'https://game-seksatangthin.hem5426.workers.dev',      // เปลี่ยนเป็น URL ของคุณ
+            WORKER_URL: 'https://game-seksatangthin.hem5426.workers.dev',
             GOOGLE_CLIENT_ID: '952813224851-9ufpehbgb7gvk6l4abp2pmteckafe3bl.apps.googleusercontent.com',
             PASSING_SCORE: 60,
             QUESTIONS_PER_GAME: 10,
@@ -318,20 +325,41 @@
         const $ = id => document.getElementById(id);
 
         // ==============================================================
-        //  GOOGLE LOGIN
+        //  GOOGLE LOGIN (แก้ไข)
         // ==============================================================
         function initGoogleLogin() {
             window.onGoogleLibraryLoad = () => {
+                // 1. Initialize ก่อน
                 google.accounts.id.initialize({
                     client_id: CONFIG.GOOGLE_CLIENT_ID,
                     callback: handleCredentialResponse,
                     cancel_on_tap_outside: false,
+                    auto_select: false, // ลดปัญหา FedCM
                 });
-                google.accounts.id.renderButton(
-                    document.querySelector('.g_id_signin'),
-                    { theme: 'outline', size: 'medium', shape: 'pill' }
-                );
-                google.accounts.id.prompt();
+
+                // 2. แล้วค่อย render button
+                const loginBtn = document.querySelector('.g_id_signin');
+                if (loginBtn) {
+                    google.accounts.id.renderButton(
+                        loginBtn,
+                        { 
+                            theme: 'outline', 
+                            size: 'medium', 
+                            shape: 'pill',
+                            text: 'signin_with',
+                            logo_alignment: 'left'
+                        }
+                    );
+                    // แสดงปุ่มเมื่อโหลดเสร็จ
+                    loginBtn.classList.add('gsi-loaded');
+                }
+
+                // 3. เรียก prompt (พยายาม)
+                try {
+                    google.accounts.id.prompt();
+                } catch (e) {
+                    console.log('Prompt skipped:', e.message);
+                }
             };
         }
 
@@ -341,6 +369,9 @@
             userName = payload.name || payload.email.split('@')[0];
             userAvatar = payload.picture;
             isLoggedIn = true;
+
+            // เก็บ token ไว้ใช้กับ API
+            localStorage.setItem('id_token', response.credential);
 
             document.getElementById('userInfo').classList.remove('hidden');
             document.getElementById('avatarImg').src = userAvatar;
@@ -360,15 +391,29 @@
             return JSON.parse(json);
         }
 
+        // ==============================================================
+        //  LOGOUT (แก้ไข)
+        // ==============================================================
         document.getElementById('logoutBtn').addEventListener('click', () => {
             google.accounts.id.disableAutoSelect();
+            localStorage.removeItem('id_token');
             isLoggedIn = false;
+            userEmail = null;
+            userName = null;
+            userAvatar = null;
             document.getElementById('userInfo').classList.add('hidden');
             document.getElementById('loginButton').style.display = 'block';
             document.getElementById('logoutBtn').classList.add('hidden');
             document.getElementById('gameNotStarted').classList.remove('hidden');
             document.getElementById('gameArea').classList.add('hidden');
-            location.reload();
+            // รีเซ็ตข้อมูล
+            allQuestions = [];
+            allVocab = [];
+            levels = [];
+            userProgress = {};
+            renderLevels();
+            renderVocab();
+            renderLeaderboard();
         });
 
         // ==============================================================

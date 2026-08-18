@@ -53,7 +53,7 @@
 
     <div id="app" class="max-w-4xl mx-auto">
 
-        <!-- ===== HEADER ===== -->
+        <!-- HEADER -->
         <header class="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div class="flex items-center gap-3">
                 <span class="text-3xl md:text-4xl">📚</span>
@@ -73,16 +73,14 @@
             </div>
         </header>
 
-        <!-- ===== TABS ===== -->
+        <!-- TABS -->
         <nav class="flex flex-wrap gap-2 mb-6">
             <button class="tab-btn active" data-tab="gameTab">🎮 เกม</button>
             <button class="tab-btn" data-tab="vocabTab">📖 คำศัพท์</button>
             <button class="tab-btn" data-tab="leaderboardTab">🏆 ลีดเดอร์</button>
         </nav>
 
-        <!-- ============================================================ -->
-        <!-- TAB: GAME -->
-        <!-- ============================================================ -->
+        <!-- GAME TAB -->
         <section id="gameTab" class="tab-content">
             <div class="card p-5 md:p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2"><span>🗺️</span> เลือกด่าน</h2>
@@ -133,9 +131,7 @@
             </div>
         </section>
 
-        <!-- ============================================================ -->
-        <!-- TAB: VOCAB -->
-        <!-- ============================================================ -->
+        <!-- VOCAB TAB -->
         <section id="vocabTab" class="tab-content hidden">
             <div class="card p-5 md:p-6">
                 <div class="flex flex-wrap justify-between items-center mb-5">
@@ -166,9 +162,7 @@
             </div>
         </section>
 
-        <!-- ============================================================ -->
-        <!-- TAB: LEADERBOARD -->
-        <!-- ============================================================ -->
+        <!-- LEADERBOARD TAB -->
         <section id="leaderboardTab" class="tab-content hidden">
             <div class="card p-5 md:p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">🏆 ลีดเดอร์บอร์ด</h2>
@@ -361,11 +355,10 @@
         });
 
         // ==============================================================
-        //  ✅ API HELPER - PATH-BASED ROUTING (แก้ไขแล้ว)
+        //  ✅ API HELPER - PATH-BASED ROUTING
         // ==============================================================
         async function callAPI(action, method = 'GET', body = null, query = {}) {
             const url = new URL(CONFIG.WORKER_URL);
-            // action ต้องขึ้นต้นด้วย / เช่น '/login', '/questions', '/vocab'
             const path = action.startsWith('/') ? action : '/' + action;
             url.pathname = path;
 
@@ -373,7 +366,6 @@
             if (method === 'POST' || method === 'PUT') {
                 if (body) options.body = JSON.stringify(body);
             }
-            // GET ใช้ query parameters
             if (method === 'GET' && query && Object.keys(query).length) {
                 Object.entries(query).forEach(([k, v]) => url.searchParams.set(k, v));
             }
@@ -390,17 +382,18 @@
         }
 
         // ==============================================================
-        //  LOAD DATA (ใช้ PATH-BASED)
+        //  LOAD DATA
         // ==============================================================
         async function loadAllData() {
             try {
                 setStatus('⏳ กำลังโหลดข้อมูล...', '#6b7280');
 
-                // ทดสอบเรียก API ทีละตัว
-                const q = await callAPI('questions', 'GET');
-                const v = await callAPI('vocab', 'GET');
-                const l = await callAPI('levels', 'GET');
-                const p = await callAPI('progress', 'GET', null, { email: userEmail });
+                const [q, v, l, p] = await Promise.all([
+                    callAPI('questions', 'GET'),
+                    callAPI('vocab', 'GET'),
+                    callAPI('levels', 'GET'),
+                    callAPI('progress', 'GET', null, { email: userEmail }),
+                ]);
 
                 allQuestions = q.data || [];
                 allVocab = v.data || [];

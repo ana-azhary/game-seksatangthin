@@ -329,7 +329,24 @@
     </section>
 
     <section id="leaderboardTab" class="tab-content hidden px-4 pb-6">
-        <div class="card-modern"><h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด</h2><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 text-gray-600"><tr><th class="p-2 text-left">อันดับ</th><th class="p-2 text-left">ชื่อ</th><th class="p-2 text-left">ด่าน</th><th class="p-2 text-left">คะแนน</th><th class="p-2 text-left">%</th></tr></thead><tbody id="leaderboardBody"></tbody></table></div></div>
+        <div class="card-modern">
+            <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-600">
+                        <tr>
+                            <th class="p-2 text-left">อันดับ</th>
+                            <th class="p-2 text-left">ชื่อ</th>
+                            <th class="p-2 text-left">ด่าน</th>
+                            <th class="p-2 text-left">คะแนน</th>
+                            <th class="p-2 text-left">%</th>
+                            <th class="p-2 text-left">กำลังใจ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
     </section>
 
     <section id="shareTab" class="tab-content hidden px-4 pb-6">
@@ -402,7 +419,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v4.4 (อัปเดตการแสดงคำศัพท์ตาม Level) -->
+    <!-- JAVASCRIPT v4.4 (ปรับปรุงเฉพาะ Export CSV/PDF และ Leaderboard) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -781,7 +798,6 @@
         //  GAME 1: VOCABULARY (ไม่เปลี่ยนแปลง)
         // ==============================================================
         function renderDans() {
-            // ใช้โค้ดเดิม (ไม่ต้องแก้ไข)
             const container = $('danList');
             container.innerHTML = '';
             if (!availableDans.length) { container.innerHTML = '<div class="text-sm text-gray-400">ยังไม่มีด่าน</div>'; return; }
@@ -885,7 +901,6 @@
         }
 
         function startGame() {
-            // ใช้โค้ดเดิม
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
             const levelUnlocked = vocabUnlockedLevels[currentLevel] === true || isDanUnlocked(availableDans.find(d => d.dan === currentDan));
@@ -901,7 +916,6 @@
         }
 
         async function loadDan(dan) {
-            // ใช้โค้ดเดิม
             const danInfo = availableDans.find(d => d.dan === dan);
             if (!danInfo) { alert('ไม่พบด่านนี้'); return; }
             const levelUnlocked = vocabUnlockedLevels[danInfo.level] === true || isDanUnlocked(danInfo);
@@ -924,7 +938,6 @@
         }
 
         function renderOverlayGame() {
-            // ใช้โค้ดเดิม
             const content = $('overlayContent');
             content.innerHTML = `
                 <div class="card-modern">
@@ -980,7 +993,6 @@
         }
 
         function renderQuestion() {
-            // ใช้โค้ดเดิม (ไม่ต้องแก้)
             if (currentIndex >= currentRound.length || gameEnded) { if (!gameEnded) endGame(); return; }
             const q = currentRound[currentIndex];
             isAnswered = false; clearInterval(timerInterval);
@@ -1037,7 +1049,6 @@
         }
 
         function selectAnswer(selectedIdx, q) {
-            // ใช้โค้ดเดิม
             if (isAnswered || gameEnded) return;
             isAnswered = true; clearInterval(timerInterval);
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
@@ -1080,7 +1091,6 @@
         }
 
         function endGame() {
-            // ใช้โค้ดเดิม
             gameEnded = true; clearInterval(timerInterval);
             $('questionArea').classList.add('hidden');
             $('resultArea').classList.remove('hidden');
@@ -1970,22 +1980,18 @@
             const tbody = $('vocabBody');
             tbody.innerHTML = '';
 
-            // กรองข้อมูลตาม level
             let filtered = allVocab;
             if (filterLevel > 0) {
                 filtered = filtered.filter(item => parseInt(item.level) === filterLevel);
             }
             document.getElementById('vocabCount').textContent = filtered.length;
 
-            // อัปเดต dropdown: แสดงรายการ Level ที่มีอยู่
             const filterSelect = $('vocabLevelFilter');
             const currentVal = filterSelect.value;
-            // เก็บตัวเลือก "ทุก Level" ไว้
             const allOption = filterSelect.querySelector('option[value="0"]');
             filterSelect.innerHTML = '';
             filterSelect.appendChild(allOption);
 
-            // หา Level ทั้งหมดที่มีในข้อมูล (ไม่ซ้ำ)
             const levels = [...new Set(allVocab.map(item => parseInt(item.level)).filter(l => l > 0))].sort((a,b)=>a-b);
             levels.forEach(l => {
                 const count = allVocab.filter(item => parseInt(item.level) === l).length;
@@ -1996,7 +2002,6 @@
             });
             filterSelect.value = currentVal || '0';
 
-            // แสดงข้อมูลที่กรองแล้ว
             filtered.forEach((item, idx) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -2017,6 +2022,116 @@
 
         function filterVocab() { renderVocab(); }
 
+        // ==============================================================
+        //  EXPORT CSV & PDF (ฟังก์ชันใหม่)
+        // ==============================================================
+        function exportCSV() {
+            const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+            let data = allVocab;
+            if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+            if (data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+
+            const headers = ['คำศัพท์ไทย', 'คำศัพท์อาหรับ', 'รูปอดีต', 'รูปปัจจุบัน', 'รูปคำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวดหมู่', 'Level'];
+            const rows = data.map(item => [
+                item.คำศัพท์ไทย || '',
+                item.คำศัพท์อาหรับ || '',
+                item.รูปอดีต || '',
+                item.รูปปัจจุบัน || '',
+                item.รูปคำสั่ง || '',
+                item.เอกพจน์ || '',
+                item.พหูพจน์ || '',
+                item.หมวดหมู่ || '',
+                item.level || ''
+            ]);
+
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `vocab_level${filterLevel || 'all'}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function exportPDF() {
+            const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+            let data = allVocab;
+            if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+            if (data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 10;
+            let y = 10;
+            const lineHeight = 7;
+            const fontSize = 8;
+            doc.setFontSize(fontSize);
+
+            const columns = ['ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+            const colWidths = [20, 22, 16, 16, 16, 16, 16, 16, 12];
+            const totalWidth = colWidths.reduce((a, b) => a + b, 0);
+            const startX = (pageWidth - totalWidth) / 2;
+
+            doc.setFontSize(14);
+            doc.text(`คำศัพท์ (Level ${filterLevel || 'ทั้งหมด'})`, pageWidth / 2, y, { align: 'center' });
+            y += 8;
+            doc.setFontSize(fontSize);
+
+            doc.setFont('helvetica', 'bold');
+            let x = startX;
+            columns.forEach((col, i) => {
+                doc.text(col, x + 1, y);
+                x += colWidths[i];
+            });
+            y += lineHeight;
+            doc.setFont('helvetica', 'normal');
+
+            data.forEach((item, idx) => {
+                const row = [
+                    item.คำศัพท์ไทย || '',
+                    item.คำศัพท์อาหรับ || '',
+                    item.รูปอดีต || '',
+                    item.รูปปัจจุบัน || '',
+                    item.รูปคำสั่ง || '',
+                    item.เอกพจน์ || '',
+                    item.พหูพจน์ || '',
+                    item.หมวดหมู่ || '',
+                    item.level || ''
+                ];
+
+                if (y + lineHeight > pageHeight - margin) {
+                    doc.addPage();
+                    y = margin;
+                    doc.setFont('helvetica', 'bold');
+                    x = startX;
+                    columns.forEach((col, i) => {
+                        doc.text(col, x + 1, y);
+                        x += colWidths[i];
+                    });
+                    y += lineHeight;
+                    doc.setFont('helvetica', 'normal');
+                }
+
+                x = startX;
+                row.forEach((cell, i) => {
+                    doc.text(cell, x + 1, y);
+                    x += colWidths[i];
+                });
+                y += lineHeight;
+            });
+
+            doc.save(`vocab_level${filterLevel || 'all'}.pdf`);
+        }
+
+        // ==============================================================
+        //  LEADERBOARD (ปรับปรุง: 20 อันดับ + กำลังใจ)
+        // ==============================================================
         async function renderLeaderboard() {
             try {
                 const res = await callAPI('leaderboard', 'GET');
@@ -2030,18 +2145,60 @@
                 });
                 const uniqueData = Object.values(grouped);
                 uniqueData.sort((a, b) => b.score - a.score);
+                const top20 = uniqueData.slice(0, 20);
+
                 const tbody = $('leaderboardBody');
                 tbody.innerHTML = '';
-                if (!uniqueData.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-4">ยังไม่มีคะแนน</td></tr>'; return; }
-                uniqueData.forEach((item, idx) => {
+                if (!top20.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-4">ยังไม่มีคะแนน</td></tr>';
+                    return;
+                }
+
+                const messages = [
+                    "🏆 สุดยอด! คุณคือตำนานแห่งการเรียนภาษาอาหรับ!",
+                    "🥇 ยอดเยี่ยมมาก! รักษามาตรฐานนี้ไว้ให้นาน",
+                    "🥈 เก่งมาก! ใกล้ถึงอันดับ 1 แล้ว สู้ต่อไป!",
+                    "🥉 เยี่ยม! ติดท็อป 3 ได้แล้ว ภูมิใจในตัวเอง",
+                    "👍 ดีมาก! อยู่ท็อป 5 ถือว่าเก่งแล้ว",
+                    "💪 แข็งแกร่ง! อย่าหยุดพัฒนาตัวเอง",
+                    "🌟 เก่ง! ทุกความพยายามมีค่า",
+                    "🔥 ร้อนแรง! ยังต้องพัฒนาอีกนิดเพื่อท็อป 5",
+                    "📚 ขยัน! การเรียนอย่างสม่ำเสมอคือกุญแจสู่ความสำเร็จ",
+                    "🎯 มุ่งมั่น! ตั้งเป้าให้สูง แล้วไปให้ถึง",
+                    "⏳ อย่าท้อ! ทุกคนเริ่มจากจุดนี้",
+                    "✨ มีไฟ! การฝึกฝนทำให้เก่ง",
+                    "🌀 สู้ๆ! อุปสรรคคือบันไดสู่ความสำเร็จ",
+                    "🌱 เติบโต! ทุกวันคือโอกาสเรียนรู้ใหม่",
+                    "📈 ก้าวหน้า! อย่าเปรียบเทียบกับใคร เปรียบกับตัวเองเมื่อวาน",
+                    "💡 ฉลาด! การเรียนรู้ไม่มีที่สิ้นสุด",
+                    "🎓 นักเรียนดี! เป็นแบบอย่างให้คนอื่น",
+                    "👏 ปรบมือให้ความมุ่งมั่น!",
+                    "⭐ เป็นดาวเด่น! อย่าหยุดแค่นี้",
+                    "🌈 สู้ต่อไป! อนาคตสดใสแน่นอน",
+                ];
+
+                top20.forEach((item, idx) => {
                     const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td class="p-2">${medal}</td><td class="p-2 font-medium">${item.displayName || item.email}</td><td class="p-2">${item.level}</td><td class="p-2 font-bold text-emerald-700">${item.score}</td><td class="p-2">${item.percent}%</td>`;
+                    const msg = messages[idx % messages.length];
+                    tr.innerHTML = `
+                        <td class="p-2">${medal}</td>
+                        <td class="p-2 font-medium">${item.displayName || item.email}</td>
+                        <td class="p-2">${item.level}</td>
+                        <td class="p-2 font-bold text-emerald-700">${item.score}</td>
+                        <td class="p-2">${item.percent}%</td>
+                        <td class="p-2 text-xs text-gray-500 italic">${msg}</td>
+                    `;
                     tbody.appendChild(tr);
                 });
-            } catch(e) { console.error('Leaderboard error:', e); }
+            } catch(e) {
+                console.error('Leaderboard error:', e);
+            }
         }
 
+        // ==============================================================
+        //  SHARE
+        // ==============================================================
         function updateShareCard() {
             const level = currentLevel || 1;
             const dan = currentDan || 1;
@@ -2133,6 +2290,10 @@
         $('vibrationToggle').checked = vibrationEnabled;
         $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
+        // 绑定导出按钮事件
+        document.getElementById('exportCSV').addEventListener('click', exportCSV);
+        document.getElementById('exportPDF').addEventListener('click', exportPDF);
+
         document.addEventListener('click', function(e) {
             const popup = $('dictionaryPopup');
             if (popup.classList.contains('show')) {
@@ -2157,6 +2318,8 @@
         console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
         console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที');
         console.log('📚 คำศัพท์: แบ่งตาม Level อัตโนมัติ 100 คำต่อ Level (จากข้อมูลในชีท)');
+        console.log('📤 ส่งออก CSV/PDF ตาม Level ที่เลือก');
+        console.log('🏆 ลีดเดอร์บอร์ดแสดง 20 อันดับพร้อมกำลังใจจากอุสตะเฮง');
     </script>
 </body>
 </html>

@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet" />
     <style>
+        /* ... (CSS เหมือนเดิม) ... */
         * { font-family: 'Noto Sans Thai', sans-serif; }
         .arabic { font-family: 'Noto Naskh Arabic', serif; font-size: 1.5rem; line-height: 2.2rem; }
         .card { background: rgba(255,255,255,0.85); backdrop-filter: blur(4px); border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.06); transition: all 0.3s; }
@@ -25,6 +26,8 @@
         .btn-gold:hover { background: #d97706; transform: scale(1.02); }
         .btn-danger { background: #dc2626; color: white; font-weight: 600; padding: 12px 28px; border-radius: 40px; transition: 0.2s; border: none; cursor: pointer; font-size: 1.05rem; }
         .btn-danger:hover { background: #b91c1c; transform: scale(1.02); }
+        .btn-warning { background: #f59e0b; color: white; font-weight: 600; padding: 12px 28px; border-radius: 40px; transition: 0.2s; border: none; cursor: pointer; font-size: 1.05rem; }
+        .btn-warning:hover { background: #d97706; transform: scale(1.02); }
         .option-btn { border: 2px solid #e5e7eb; border-radius: 16px; padding: 14px 16px; background: white; transition: all 0.15s; text-align: right; font-size: 1.15rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .option-btn:hover:not(.disabled) { border-color: #0d9488; background: #f0fdfa; }
         .option-btn:active { transform: scale(0.97); }
@@ -122,6 +125,8 @@
             transition: 0.4s ease;
             opacity: 0;
             pointer-events: none;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .dictionary-popup.show {
             opacity: 1;
@@ -129,14 +134,20 @@
             pointer-events: auto;
         }
         .dictionary-popup .close-btn {
-            position: absolute;
-            top: 12px;
-            right: 16px;
+            position: sticky;
+            top: 0;
+            float: right;
             font-size: 1.5rem;
             cursor: pointer;
             color: #6b7280;
+            background: white;
+            padding: 0 4px;
+            z-index: 10;
         }
         .dictionary-popup .close-btn:hover { color: #1f2937; }
+        .report-type-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .report-type-selector label { display: flex; align-items: center; gap: 4px; font-size: 0.85rem; cursor: pointer; }
+        .report-type-selector input[type="radio"] { accent-color: #065f46; }
 
         @media (max-width: 480px) {
             .arabic { font-size: 1.3rem; line-height: 1.9rem; }
@@ -189,7 +200,7 @@
         </nav>
 
         <!-- ============================================================ -->
-        <!-- TAB: GAME (ท่องศัพท์) -->
+        <!-- TAB: GAME (ท่องศัพท์) - เหมือนเดิม ใส่เฉพาะโครงสร้าง -->
         <!-- ============================================================ -->
         <section id="gameTab" class="tab-content">
             <div class="card p-5 md:p-6 mb-6">
@@ -253,7 +264,7 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB: SENTENCE (ต่อประโยค) -->
+        <!-- TAB: SENTENCE (ต่อประโยค) - เหมือนเดิม -->
         <!-- ============================================================ -->
         <section id="sentenceTab" class="tab-content hidden">
             <div class="card p-5 md:p-6 mb-6">
@@ -277,10 +288,7 @@
                     <div id="sentenceTeacher" class="ustadh-bubble text-sm md:text-base">มาเรียงประโยคภาษาอาหรับให้ถูกต้องกันครับ!</div>
                 </div>
                 <div class="flex flex-wrap justify-between items-center mb-4">
-                    <div>
-                        <span class="text-sm font-medium text-gray-600">Level <span id="sentenceGameLevel">1</span></span>
-                        <span class="text-sm font-medium text-gray-600 ml-2">· Dan <span id="sentenceGameDan">1</span></span>
-                    </div>
+                    <div><span class="text-sm font-medium text-gray-600">Level <span id="sentenceGameLevel">1</span></span><span class="text-sm font-medium text-gray-600 ml-2">· Dan <span id="sentenceGameDan">1</span></span></div>
                     <span id="sentenceProgressText" class="text-sm text-gray-500">ข้อ 0 / 0</span>
                 </div>
                 <div id="sentenceQuestionArea">
@@ -312,7 +320,7 @@
         </section>
 
         <!-- ============================================================ -->
-        <!-- TAB: READING (อ่านบทความ) -->
+        <!-- TAB: READING (อ่านบทความ) - ปรับปรุงระบบรายงาน -->
         <!-- ============================================================ -->
         <section id="readingTab" class="tab-content hidden">
             <div class="card p-5 md:p-6 mb-6">
@@ -445,13 +453,20 @@
         </div>
     </div>
 
-    <!-- POPUP: พจนานุกรม -->
+    <!-- POPUP: พจนานุกรม - ปรับปรุงระบบรายงาน -->
     <div id="dictionaryPopup" class="dictionary-popup">
         <span class="close-btn" onclick="closeDictionary()">&times;</span>
         <div id="dictionaryContent">
             <p class="text-lg font-bold arabic text-emerald-900" id="dictWord"></p>
             <p class="text-sm text-gray-500" id="dictReading"></p>
             <p class="mt-2 text-gray-700" id="dictMeaning"></p>
+            
+            <!-- แสดง Article ID -->
+            <div class="mt-2 text-xs text-gray-400 border-t border-gray-100 pt-2 flex justify-between">
+                <span>📌 Article ID: <span id="dictArticleId" class="font-mono font-bold text-gray-600">-</span></span>
+                <span id="dictMatchType" class="text-emerald-600"></span>
+            </div>
+
             <div class="mt-3 border-t border-gray-200 pt-3">
                 <p class="text-sm font-semibold text-gray-700">🔄 คำพ้องความหมาย (مرادف):</p>
                 <ul id="dictSynonyms" class="list-disc list-inside text-sm text-gray-600"></ul>
@@ -468,14 +483,23 @@
                 <p class="text-sm font-semibold text-gray-700">📖 รากศัพท์ (مادة):</p>
                 <p id="dictRoot" class="text-sm text-gray-600"></p>
             </div>
+            
+            <!-- ระบบรายงานแบบเลือกประเภท -->
             <div class="mt-3 border-t border-gray-200 pt-3">
-                <button id="reportWordBtn" class="btn-danger text-sm py-1 px-4 rounded-full" onclick="reportWord()">🚨 รายงานคำนี้</button>
+                <p class="text-sm font-semibold text-gray-700 mb-2">🚨 รายงานปัญหาคำศัพท์</p>
+                <div class="report-type-selector">
+                    <label><input type="radio" name="reportType" value="สงสัยความหมาย" checked /> 🤔 สงสัยความหมาย</label>
+                    <label><input type="radio" name="reportType" value="ข้อมูลไม่ถูกต้อง" /> ❌ ข้อมูลไม่ถูกต้อง</label>
+                    <label><input type="radio" name="reportType" value="คำผิด/สะกดผิด" /> ✏️ คำผิด/สะกดผิด</label>
+                    <label><input type="radio" name="reportType" value="ไม่พบคำในพจนานุกรม" /> 📭 ไม่พบคำในพจนานุกรม</label>
+                </div>
+                <button id="reportWordBtn" class="btn-danger text-sm py-1 px-4 rounded-full mt-2 w-full" onclick="reportWord()">🚨 ส่งรายงาน</button>
             </div>
         </div>
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT (ย่อเพื่อให้โฟกัสเฉพาะส่วนที่ปรับปรุง) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -732,16 +756,12 @@
         }
 
         // ==============================================================
-        //  NORMALIZE ARABIC WORD (Advanced)
+        //  NORMALIZE ARABIC WORD
         // ==============================================================
         function normalizeArabicWord(word) {
             if (!word) return '';
             let normalized = word;
-
-            // Remove diacritics and tanween
             normalized = normalized.replace(/[ًٌٍَُِّْ]/g, '');
-
-            // Remove prefixes
             normalized = normalized.replace(/^ال/g, '');
             normalized = normalized.replace(/^وَال/g, '');
             normalized = normalized.replace(/^فَال/g, '');
@@ -749,8 +769,6 @@
             normalized = normalized.replace(/^لِل/g, '');
             normalized = normalized.replace(/^كَال/g, '');
             normalized = normalized.replace(/^(و|ف|ب|ل|ك)/, '');
-
-            // Remove possessive pronouns
             normalized = normalized.replace(/ي$/g, '');
             normalized = normalized.replace(/كَ$/g, '');
             normalized = normalized.replace(/كِ$/g, '');
@@ -760,14 +778,10 @@
             normalized = normalized.replace(/كُمْ$/g, '');
             normalized = normalized.replace(/هُمْ$/g, '');
             normalized = normalized.replace(/هِنَّ$/g, '');
-
-            // Remove subject pronouns
             normalized = normalized.replace(/^أ/g, '');
             normalized = normalized.replace(/^ن/g, '');
             normalized = normalized.replace(/^ت/g, '');
             normalized = normalized.replace(/^ي/g, '');
-
-            // Remove verb suffixes
             normalized = normalized.replace(/ُون$/g, '');
             normalized = normalized.replace(/ُونَ$/g, '');
             normalized = normalized.replace(/َان$/g, '');
@@ -775,8 +789,6 @@
             normalized = normalized.replace(/ِين$/g, '');
             normalized = normalized.replace(/ِينَ$/g, '');
             normalized = normalized.replace(/نَ$/g, '');
-
-            // Remove noun suffixes
             normalized = normalized.replace(/َة$/g, '');
             normalized = normalized.replace(/َةٌ$/g, '');
             normalized = normalized.replace(/َةٍ$/g, '');
@@ -784,32 +796,26 @@
             normalized = normalized.replace(/َات$/g, '');
             normalized = normalized.replace(/َاتٌ$/g, '');
             normalized = normalized.replace(/َاتٍ$/g, '');
-
-            // Final cleanup
             normalized = normalized.replace(/[َُِّ]$/g, '');
-
             return normalized;
         }
 
         // ==============================================================
-        //  LOAD ALL DATA
+        //  LOAD ALL DATA (ย่อ)
         // ==============================================================
         async function loadAllData() {
             try {
                 setStatus('⏳ กำลังโหลดข้อมูล...', '#6b7280');
-
                 const [q, v, l, p] = await Promise.all([
                     callAPI('questions', 'GET', null, { all: 'true' }),
                     callAPI('vocab', 'GET'),
                     callAPI('levels', 'GET'),
                     callAPI('progress', 'GET', null, { email: userEmail }),
                 ]);
-
                 allQuestions = q.data || [];
                 allVocab = v.data || [];
                 levelsData = l.data || [];
                 userProgress = p.data || {};
-
                 availableDans = [];
                 levelsData.forEach(lv => {
                     lv.dans.forEach(d => {
@@ -821,10 +827,8 @@
                         });
                     });
                 });
-
                 debugLog('DATA', `📚 โหลดสำเร็จ: ${allQuestions.length} คำถาม, ${allVocab.length} คำศัพท์, ${levelsData.length} Level, ${availableDans.length} ด่าน`);
                 setStatus(`📚 โหลดข้อมูลสำเร็จ`, '#065f46');
-
                 renderDans();
                 renderVocab();
                 renderLeaderboard();
@@ -836,7 +840,6 @@
                     const progress = userProgress[d.dan] || 0;
                     return progress < CONFIG.PASSING_SCORE && isDanUnlocked(d);
                 });
-
                 if (firstUnlocked) {
                     currentDan = firstUnlocked.dan;
                     currentLevel = firstUnlocked.level;
@@ -860,28 +863,25 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY
+        //  GAME 1: VOCABULARY (ย่อ - สงวนโครงสร้าง)
         // ==============================================================
         function renderDans() {
+            // ... เหมือนเดิม ...
             const container = document.getElementById('danList');
             container.innerHTML = '';
             if (!availableDans.length) {
                 container.innerHTML = '<span class="text-gray-400">ยังไม่มีด่าน</span>';
                 return;
             }
-
             const grouped = {};
             availableDans.forEach(d => {
                 if (!grouped[d.level]) grouped[d.level] = [];
                 grouped[d.level].push(d);
             });
-
             const sortedLevels = Object.keys(grouped).sort((a, b) => a - b);
-
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
                 const allPassed = levelData.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
-
                 let isLevelUnlocked = false;
                 if (parseInt(level) === 1) {
                     isLevelUnlocked = true;
@@ -889,14 +889,10 @@
                     const prevLevelDans = availableDans.filter(d => d.level === parseInt(level) - 1);
                     isLevelUnlocked = prevLevelDans.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
                 }
-
                 const levelDiv = document.createElement('div');
-                levelDiv.className = 'level-card ' + 
-                    (allPassed ? 'completed' : (isLevelUnlocked ? 'unlocked' : 'locked'));
-
+                levelDiv.className = 'level-card ' + (allPassed ? 'completed' : (isLevelUnlocked ? 'unlocked' : 'locked'));
                 const feature = getLevelFeature(parseInt(level));
                 const featureLabel = feature.name !== 'ปกติ' ? `🎯 ${feature.name}` : '';
-
                 const header = document.createElement('div');
                 header.className = 'level-header';
                 header.innerHTML = `
@@ -905,33 +901,26 @@
                     ${allPassed ? '<span class="text-sm text-green-600 font-medium">✅ ผ่านทั้งหมด</span>' : ''}
                     ${!isLevelUnlocked && parseInt(level) > 1 ? '<span class="text-sm text-gray-400">🔒 ยังไม่ปลดล็อก</span>' : ''}
                     <span class="text-xs text-gray-400">(${levelData.length} ด่าน)</span>
-                    <span class="level-progress">
-                        ${levelData.filter(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE).length} / ${levelData.length} ด่านผ่าน
-                    </span>
+                    <span class="level-progress">${levelData.filter(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE).length} / ${levelData.length} ด่านผ่าน</span>
                 `;
                 levelDiv.appendChild(header);
-
                 const danContainer = document.createElement('div');
                 danContainer.className = 'flex flex-wrap gap-1';
-
                 levelData.forEach(d => {
                     const progress = userProgress[d.dan] || 0;
                     const isPassed = progress >= CONFIG.PASSING_SCORE;
                     const isActive = currentDan === d.dan;
                     const unlocked = isDanUnlocked(d);
-
                     const btn = document.createElement('button');
                     btn.className = 'dan-btn';
                     if (isPassed) btn.classList.add('passed');
                     else if (unlocked) btn.classList.add('unlocked');
                     else btn.classList.add('locked');
                     if (isActive) btn.classList.add('active-dan');
-
                     let label = `ด่าน ${d.dan}`;
                     if (isPassed) label += ' ✅';
                     else if (!unlocked) label += ' 🔒';
                     else if (progress > 0) label += ` (${progress}%)`;
-
                     btn.textContent = label;
                     btn.title = `${d.questionCount} คำถาม`;
                     if (unlocked) {
@@ -943,11 +932,9 @@
                     }
                     danContainer.appendChild(btn);
                 });
-
                 levelDiv.appendChild(danContainer);
                 container.appendChild(levelDiv);
             });
-
             const feature = getLevelFeature(currentLevel);
             const badge = document.getElementById('levelFeatureBadge');
             if (feature && feature.name !== 'ปกติ') {
@@ -986,33 +973,29 @@
         }
 
         async function loadDan(dan) {
+            // ... เหมือนเดิม (สงวนฟังก์ชัน) ...
             const danInfo = availableDans.find(d => d.dan === dan);
             if (!danInfo) {
                 alert('ไม่พบด่านนี้');
                 return;
             }
-
             if (!isDanUnlocked(danInfo) && dan !== 1) {
                 alert('กรุณาทำคะแนนให้ผ่านด่านก่อนหน้า (60% ขึ้นไป)');
                 return;
             }
-
             currentDan = dan;
             currentLevel = danInfo.level;
             currentFeature = getLevelFeature(currentLevel);
-
             lives = currentFeature.lives || 0;
             combo = 1;
             consecutiveWrong = 0;
             streak = 0;
-
             const res = await callAPI('questions', 'GET', null, { dan: dan });
             const questions = res.data || [];
             if (!questions.length) {
                 alert('ไม่มีข้อสอบในด่านนี้');
                 return;
             }
-
             const shuffled = [...questions].sort(() => Math.random() - 0.5);
             const totalQuestions = Math.min(CONFIG.QUESTIONS_PER_GAME, shuffled.length);
             currentRound = shuffled.slice(0, totalQuestions);
@@ -1021,16 +1004,13 @@
             mistakes = [];
             gameEnded = false;
             stars = parseInt(localStorage.getItem('arabic_stars')) || 0;
-
             document.getElementById('gameNotStarted').classList.add('hidden');
             document.getElementById('gameArea').classList.remove('hidden');
             document.getElementById('resultArea').classList.add('hidden');
             document.getElementById('questionArea').classList.remove('hidden');
-
             document.getElementById('levelDisplay').textContent = `Level ${currentLevel}`;
             updateLivesDisplay();
             updateComboDisplay();
-
             const featureText = currentFeature.name !== 'ปกติ' ? ` (${currentFeature.name})` : '';
             setTeacherMessage(`⚔️ กำลังเล่น ด่าน ${dan} (Level ${currentLevel})${featureText}`);
             renderDans();
@@ -1072,25 +1052,19 @@
         }
 
         function renderQuestion() {
-            if (currentIndex >= currentRound.length || gameEnded) { 
-                if (!gameEnded) endGame(); 
-                return; 
-            }
-
+            // ... สงวนฟังก์ชัน ...
+            if (currentIndex >= currentRound.length || gameEnded) { if (!gameEnded) endGame(); return; }
             const q = currentRound[currentIndex];
             isAnswered = false;
             clearInterval(timerInterval);
-
             document.getElementById('progressText').textContent = `ข้อ ${currentIndex + 1} / ${currentRound.length}`;
             document.getElementById('qCategory').textContent = q.หมวด || 'คำศัพท์';
             document.getElementById('questionText').innerHTML = q.คำถามไทย + ' = ?';
-
             const container = document.getElementById('optionsContainer');
             container.innerHTML = '';
             const opts = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง];
             const letters = ['ก', 'ข', 'ค', 'ง'];
             const shuffled = opts.map((t, i) => ({ text: t, idx: i })).sort(() => Math.random() - 0.5);
-
             let hardModeOptions = shuffled;
             if (currentFeature && currentFeature.hardMode) {
                 const correctIdx = 'ABCD'.indexOf(q.เฉลย);
@@ -1099,24 +1073,19 @@
                 hardModeOptions = shuffled.filter(opt => opt.idx !== toRemove.idx);
                 document.getElementById('qCategory').textContent = '🎯 ' + (q.หมวด || 'คำศัพท์') + ' (ฮาร์ด)';
             }
-
             hardModeOptions.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
-                if (currentFeature && currentFeature.hardMode) {
-                    btn.classList.add('hard-mode');
-                }
+                if (currentFeature && currentFeature.hardMode) { btn.classList.add('hard-mode'); }
                 btn.innerHTML = `<span class="arabic">${opt.text}</span> <span class="text-xs text-gray-400 font-mono">${letters[opt.idx]}</span>`;
                 btn.dataset.idx = opt.idx;
                 btn.onclick = () => selectAnswer(opt.idx, q);
                 container.appendChild(btn);
             });
-
             const timeLimit = currentFeature?.timeLimit || CONFIG.TIME_LIMIT;
             timeLeft = timeLimit;
             document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
             updateTimerDisplay(timeLeft);
-            
             timerInterval = setInterval(() => {
                 timeLeft -= 1;
                 document.getElementById('timerText').textContent = `⏳ ${timeLeft} วินาที`;
@@ -1137,15 +1106,9 @@
                     }
                     highlightCorrect(q);
                     addMistake(q);
-                    setTimeout(() => { 
-                        if (!gameEnded) {
-                            currentIndex++; 
-                            renderQuestion(); 
-                        }
-                    }, 1500);
+                    setTimeout(() => { if (!gameEnded) { currentIndex++; renderQuestion(); } }, 1500);
                 }
             }, 1000);
-
             updatePowerUI();
             document.getElementById('hintBtn').onclick = () => useHint(q);
             document.getElementById('skipBtn').onclick = () => useSkip();
@@ -1155,18 +1118,15 @@
             if (isAnswered || gameEnded) return;
             isAnswered = true;
             clearInterval(timerInterval);
-
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const isCorrect = (selectedIdx === correctIdx);
             const btns = document.querySelectorAll('.option-btn');
             btns.forEach(b => b.classList.add('disabled'));
-
             btns.forEach(b => {
                 const idx = parseInt(b.dataset.idx);
                 if (idx === correctIdx) b.classList.add('correct');
                 if (idx === selectedIdx && !isCorrect) b.classList.add('wrong');
             });
-
             if (isCorrect) {
                 let scoreAdd = currentFeature?.scorePerCorrect || 10;
                 if (currentFeature && currentFeature.combo && streak >= 2) {
@@ -1180,26 +1140,20 @@
                 streak += 1;
                 combo = Math.min(combo + 0.5, 3);
                 consecutiveWrong = 0;
-
                 if (currentFeature && currentFeature.streakBonus && streak >= 3) {
                     score += 5;
                     setTeacherMessage(`⭐ สเตรค! +5 แต้มพิเศษ (ติด ${streak} ข้อ)`);
                 }
-
                 if (streak >= 5) {
                     stars += 1;
                     localStorage.setItem('arabic_stars', stars);
                     if (streak === 5) setTeacherMessage('🔥 ติด 5 ข้อ! ได้ดาว');
                 }
-                if (streak === 10) { 
-                    stars += 1; 
-                    localStorage.setItem('arabic_stars', stars);
-                }
+                if (streak === 10) { stars += 1; localStorage.setItem('arabic_stars', stars); }
             } else {
                 streak = 0;
                 combo = 1;
                 consecutiveWrong += 1;
-
                 if (currentFeature && currentFeature.lives > 0) {
                     lives -= 1;
                     updateLivesDisplay();
@@ -1210,27 +1164,19 @@
                         return;
                     }
                 }
-
                 if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) {
                     setTeacherMessage('💀 ตอบผิดติดกัน 2 ข้อ! เกมจบ');
                     gameEnded = true;
                     setTimeout(() => endGame(), 1500);
                     return;
                 }
-
                 const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
                 setTeacherMessage(`❌ คำตอบที่ถูกคือ "${correctText}"`);
                 addMistake(q);
             }
-
             updateComboDisplay();
             updatePowerUI();
-            setTimeout(() => { 
-                if (!gameEnded) {
-                    currentIndex++; 
-                    renderQuestion(); 
-                }
-            }, 1500);
+            setTimeout(() => { if (!gameEnded) { currentIndex++; renderQuestion(); } }, 1500);
         }
 
         function highlightCorrect(q) {
@@ -1244,13 +1190,7 @@
         function addMistake(q) {
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
-            const entry = { 
-                thai: q.คำถามไทย, 
-                arabic: correctText, 
-                category: q.หมวด || 'ทั่วไป',
-                questionId: q.id || '',
-                selectedAnswer: ''
-            };
+            const entry = { thai: q.คำถามไทย, arabic: correctText, category: q.หมวด || 'ทั่วไป', questionId: q.id || '', selectedAnswer: '' };
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
@@ -1288,29 +1228,21 @@
             clearInterval(timerInterval);
             document.getElementById('questionArea').classList.add('hidden');
             document.getElementById('resultArea').classList.remove('hidden');
-
             const total = currentRound.length;
             const maxScore = total * (currentFeature?.scorePerCorrect || 10);
             const percent = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
             const passingScore = currentFeature?.passingScore || CONFIG.PASSING_SCORE;
-            
             document.getElementById('finalScore').textContent = score;
             document.getElementById('finalDan').textContent = `ด่าน ${currentDan} (Level ${currentLevel})`;
-            
             if (percent >= passingScore) {
-                document.getElementById('finalMessage').textContent = 
-                    `🎉 ผ่าน! (${percent}%) อุสตะเฮงภูมิใจในตัวคุณ`;
+                document.getElementById('finalMessage').textContent = `🎉 ผ่าน! (${percent}%) อุสตะเฮงภูมิใจในตัวคุณ`;
             } else if (lives <= 0 && currentFeature?.lives > 0) {
-                document.getElementById('finalMessage').textContent = 
-                    `💀 หมดชีวิต! (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
+                document.getElementById('finalMessage').textContent = `💀 หมดชีวิต! (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
             } else if (consecutiveWrong >= 2 && currentFeature?.dangerMode) {
-                document.getElementById('finalMessage').textContent = 
-                    `💀 ตอบผิดติดกัน! (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
+                document.getElementById('finalMessage').textContent = `💀 ตอบผิดติดกัน! (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
             } else {
-                document.getElementById('finalMessage').textContent = 
-                    `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
+                document.getElementById('finalMessage').textContent = `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}% ขึ้นไป ลองใหม่`;
             }
-
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
                     email: userEmail,
@@ -1322,7 +1254,6 @@
                   .then(res => { userProgress = res.data || {}; renderDans(); renderLeaderboard(); updateShareCard(); })
                   .catch(console.error);
             }
-
             const list = document.getElementById('mistakeList');
             list.innerHTML = '';
             if (mistakes.length === 0) {
@@ -1386,7 +1317,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE
+        //  GAME 2: SENTENCE (ย่อ)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1419,13 +1350,8 @@
                 btn.className = 'tab-btn mr-2';
                 const levelData = sentenceLevels.find(l => l.level === i);
                 const isUnlocked = i === 1 || sentenceLevels.some(l => l.level === i - 1 && l.completed);
-                
                 if (levelData && levelData.totalDans > 0) {
-                    if (i === currentSentenceLevel) {
-                        btn.className += ' active';
-                    } else {
-                        btn.className += ' bg-green-100';
-                    }
+                    if (i === currentSentenceLevel) { btn.className += ' active'; } else { btn.className += ' bg-green-100'; }
                     btn.textContent = `Level ${i} ✅`;
                     btn.onclick = () => loadSentenceLevel(i);
                 } else if (isUnlocked) {
@@ -1464,7 +1390,6 @@
                 btn.className = 'dan-btn';
                 const isUnlocked = i === 1 || sentenceDans.includes(i - 1);
                 const isCompleted = sentenceDans.includes(i);
-                
                 if (isCompleted) {
                     btn.classList.add('passed');
                     btn.textContent = `Dan ${i} ✅`;
@@ -1493,10 +1418,8 @@
             document.getElementById('sentenceGameArea').classList.remove('hidden');
             document.getElementById('sentenceGameOver').classList.add('hidden');
             document.getElementById('sentenceQuestionArea').classList.remove('hidden');
-
             document.getElementById('sentenceGameLevel').textContent = level;
             document.getElementById('sentenceGameDan').textContent = dan;
-
             try {
                 const res = await callAPI('sentences', 'GET', null, { level: level, dan: dan });
                 sentenceQuestions = res.data || [];
@@ -1517,21 +1440,15 @@
         }
 
         function renderSentenceQuestion() {
-            if (sentenceIndex >= sentenceQuestions.length) {
-                endSentenceGame();
-                return;
-            }
+            if (sentenceIndex >= sentenceQuestions.length) { endSentenceGame(); return; }
             const q = sentenceQuestions[sentenceIndex];
             document.getElementById('sentenceCategory').textContent = q.หมวดหมู่ || 'ทั่วไป';
             document.getElementById('sentenceThai').textContent = q['ประโยคไทย'] || '';
             document.getElementById('sentenceProgressText').textContent = `ข้อ ${sentenceIndex + 1} / ${sentenceTotalQuestions}`;
-
             const words = q['ประโยคอาหรับ (แยกคำ)'].split(' ').filter(w => w.trim() !== '');
             const shuffled = [...words].sort(() => Math.random() - 0.5);
-
             placedWords = [];
             selectedWords = shuffled;
-
             renderSentenceWords();
             document.getElementById('sentenceResult').classList.add('hidden');
             document.getElementById('sentenceCheckBtn').classList.remove('hidden');
@@ -1543,7 +1460,6 @@
             const wordBank = document.getElementById('sentenceWordBank');
             dropZone.innerHTML = '';
             wordBank.innerHTML = '';
-
             placedWords.forEach((word, idx) => {
                 const span = document.createElement('span');
                 span.className = 'sentence-word placed';
@@ -1551,7 +1467,6 @@
                 span.onclick = () => removeWord(idx);
                 dropZone.appendChild(span);
             });
-
             selectedWords.forEach((word, idx) => {
                 const span = document.createElement('span');
                 span.className = 'sentence-word';
@@ -1628,22 +1543,14 @@
             const total = sentenceQuestions.length;
             const maxScore = total * 10;
             const percent = maxScore > 0 ? Math.round((sentenceScore / maxScore) * 100) : 0;
-            document.getElementById('sentenceFinalMsg').textContent = 
-                percent >= CONFIG.SENTENCE_PASSING_SCORE ? `🎉 ผ่าน! (${percent}%) เก่งมาก!` : `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${CONFIG.SENTENCE_PASSING_SCORE}% ขึ้นไป`;
-
-            document.getElementById('sentenceTeacher').textContent = 
-                percent >= CONFIG.SENTENCE_PASSING_SCORE ? `🎉 ยอดเยี่ยม! คุณผ่าน Dan ${currentSentenceDan} แล้ว!` : `💪 สู้ๆ นะครับ ลองใหม่อีกครั้ง!`;
-            
+            document.getElementById('sentenceFinalMsg').textContent = percent >= CONFIG.SENTENCE_PASSING_SCORE ? `🎉 ผ่าน! (${percent}%) เก่งมาก!` : `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${CONFIG.SENTENCE_PASSING_SCORE}% ขึ้นไป`;
+            document.getElementById('sentenceTeacher').textContent = percent >= CONFIG.SENTENCE_PASSING_SCORE ? `🎉 ยอดเยี่ยม! คุณผ่าน Dan ${currentSentenceDan} แล้ว!` : `💪 สู้ๆ นะครับ ลองใหม่อีกครั้ง!`;
             if (percent >= CONFIG.SENTENCE_PASSING_SCORE) {
                 if (!sentenceDans.includes(currentSentenceDan)) {
                     sentenceDans.push(currentSentenceDan);
                     const progress = JSON.parse(localStorage.getItem('sentence_progress') || '{}');
-                    if (!progress[currentSentenceLevel]) {
-                        progress[currentSentenceLevel] = [];
-                    }
-                    if (!progress[currentSentenceLevel].includes(currentSentenceDan)) {
-                        progress[currentSentenceLevel].push(currentSentenceDan);
-                    }
+                    if (!progress[currentSentenceLevel]) { progress[currentSentenceLevel] = []; }
+                    if (!progress[currentSentenceLevel].includes(currentSentenceDan)) { progress[currentSentenceLevel].push(currentSentenceDan); }
                     localStorage.setItem('sentence_progress', JSON.stringify(progress));
                 }
                 renderSentenceDans();
@@ -1654,7 +1561,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING
+        //  GAME 3: READING (ปรับปรุงระบบรายงาน)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1683,13 +1590,8 @@
                 btn.className = 'tab-btn mr-2';
                 const levelData = readingLevels.find(l => l.level === i);
                 const isUnlocked = i === 1 || readingLevels.some(l => l.level === i - 1 && l.completed);
-                
                 if (levelData && levelData.totalDans > 0) {
-                    if (i === currentReadingLevel) {
-                        btn.className += ' active';
-                    } else {
-                        btn.className += ' bg-green-100';
-                    }
+                    if (i === currentReadingLevel) { btn.className += ' active'; } else { btn.className += ' bg-green-100'; }
                     btn.textContent = `Level ${i} ✅`;
                     btn.onclick = () => loadReadingLevel(i);
                 } else if (isUnlocked) {
@@ -1728,7 +1630,6 @@
                 btn.className = 'dan-btn';
                 const isUnlocked = i === 1 || readingDans.includes(i - 1);
                 const isCompleted = readingDans.includes(i);
-                
                 if (isCompleted) {
                     btn.classList.add('passed');
                     btn.textContent = `Dan ${i} ✅`;
@@ -1757,7 +1658,6 @@
             document.getElementById('readingArticleArea').classList.remove('hidden');
             document.getElementById('readingGameOver').classList.add('hidden');
             document.getElementById('readingArticleContent').classList.remove('hidden');
-
             try {
                 const res = await callAPI('articles', 'GET', null, { level: level, dan: dan });
                 readingArticles = res.data || [];
@@ -1775,26 +1675,20 @@
         }
 
         function renderReadingArticle() {
-            if (readingIndex >= readingArticles.length) {
-                endReadingGame();
-                return;
-            }
+            if (readingIndex >= readingArticles.length) { endReadingGame(); return; }
             const article = readingArticles[readingIndex];
             currentArticleId = parseInt(article.id) || 0;
             document.getElementById('readingArticleTitle').textContent = article['หัวข้อ'] || `บทความที่ ${readingIndex + 1}`;
             document.getElementById('readingArticleInfo').textContent = `Dan ${currentReadingDan} · ${readingIndex + 1}/${readingTotalArticles} · ${article.จำนวนคำ || 0} คำ`;
-
             const body = document.getElementById('readingArticleBody');
             const arabicText = article['บทความ (อาหรับ)'] || '';
             const words = arabicText.split(' ').filter(w => w.trim() !== '');
             body.innerHTML = words.map((word, idx) => {
                 return `<span class="reading-word" data-word="${word}" onclick="showWordMeaning('${word}')">${word}</span> `;
             }).join('');
-
             document.getElementById('readingTranslation').classList.add('hidden');
             readingTranslationVisible = false;
             document.getElementById('readingShowTranslationBtn').textContent = '📝 ดูคำแปล';
-
             loadArticleDictionary(currentArticleId);
         }
 
@@ -1831,129 +1725,118 @@
             }
         }
 
-        // ===== SHOW WORD MEANING (Advanced Multi-Step Search) =====
+        // ==============================================================
+        //  SHOW WORD MEANING (ปรับปรุงให้แสดง Article ID และประเภท)
+        // ==============================================================
         function showWordMeaning(word) {
-            // Show loading
             const popup = document.getElementById('dictionaryPopup');
             document.getElementById('dictWord').textContent = word;
             document.getElementById('dictMeaning').textContent = '⏳ กำลังค้นหา...';
+            document.getElementById('dictArticleId').textContent = currentArticleId || '-';
             popup.classList.add('show');
 
-            // Step 1: Try exact match via API
-            callAPI('article-dictionary', 'GET', null, {
-                articleId: currentArticleId,
-                word: word
-            }).then(res => {
-                const data = res.data || [];
-                if (data.length === 0) {
-                    // Step 2: Try with normalized word
-                    const normalized = normalizeArabicWord(word);
-                    return callAPI('article-dictionary', 'GET', null, {
-                        articleId: currentArticleId,
-                        word: normalized
-                    });
-                }
-                return res;
-            }).then(res => {
-                const data = res.data || [];
-                if (data.length === 0) {
-                    // Step 3: Try with root extraction (3 letters) - only if word length >= 3
-                    const root = normalizeArabicWord(word).substring(0, 3);
-                    if (root.length >= 3) {
-                        return callAPI('article-dictionary', 'GET', null, {
-                            articleId: currentArticleId,
-                            word: root
-                        });
+            // Step 1: Exact match
+            callAPI('article-dictionary', 'GET', null, { articleId: currentArticleId, word: word })
+                .then(res => {
+                    const data = res.data || [];
+                    if (data.length === 0) {
+                        const normalized = normalizeArabicWord(word);
+                        return callAPI('article-dictionary', 'GET', null, { articleId: currentArticleId, word: normalized });
                     }
-                    return { data: [] };
-                }
-                return res;
-            }).then(res => {
-                const data = res.data || [];
-                if (data.length === 0) {
-                    // No match found - show friendly message with report button
-                    document.getElementById('dictMeaning').innerHTML = `
-                        ❌ ไม่พบข้อมูลคำนี้ในพจนานุกรม<br>
-                        <span class="text-sm text-gray-500">💡 กรุณากด "🚨 รายงานคำนี้" เพื่อช่วยเพิ่มข้อมูล</span>
-                    `;
-                    document.getElementById('dictSynonyms').innerHTML = '<li class="text-gray-400">-</li>';
-                    document.getElementById('dictAntonyms').innerHTML = '<li class="text-gray-400">-</li>';
-                    document.getElementById('dictPluralSection').style.display = 'none';
-                    document.getElementById('dictRoot').textContent = '-';
+                    return res;
+                })
+                .then(res => {
+                    const data = res.data || [];
+                    if (data.length === 0) {
+                        const root = normalizeArabicWord(word).substring(0, 3);
+                        if (root.length >= 3) {
+                            return callAPI('article-dictionary', 'GET', null, { articleId: currentArticleId, word: root });
+                        }
+                        return { data: [] };
+                    }
+                    return res;
+                })
+                .then(res => {
+                    const data = res.data || [];
+                    if (data.length === 0) {
+                        // Fallback: ไม่พบคำ
+                        document.getElementById('dictMeaning').textContent = '❌ ไม่พบข้อมูลคำนี้ในพจนานุกรม';
+                        document.getElementById('dictSynonyms').innerHTML = '<li class="text-gray-400">-</li>';
+                        document.getElementById('dictAntonyms').innerHTML = '<li class="text-gray-400">-</li>';
+                        document.getElementById('dictPluralSection').style.display = 'none';
+                        document.getElementById('dictRoot').textContent = '-';
+                        document.getElementById('dictMatchType').textContent = '⚠️ ไม่พบคำ';
+                        document.getElementById('reportWordBtn').dataset.word = word;
+                        document.getElementById('dictMeaning').textContent += ' 💡 กรุณากด "ส่งรายงาน" เพื่อช่วยปรับปรุง';
+                        return;
+                    }
+                    const info = data[0];
+                    document.getElementById('dictWord').textContent = info['คำศัพท์อาหรับ'] || word;
+                    document.getElementById('dictReading').textContent = info['คำอ่าน'] ? `คำอ่าน: ${info['คำอ่าน']}` : '';
+                    document.getElementById('dictMeaning').textContent = info['ความหมาย (ไทย)'] || 'ไม่พบความหมาย';
+
+                    // Match type
+                    const matchType = info._matchType || '✅ พบคำ';
+                    document.getElementById('dictMatchType').textContent = matchType;
+
+                    // Synonyms
+                    const synList = document.getElementById('dictSynonyms');
+                    synList.innerHTML = '';
+                    const synonyms = [];
+                    if (info['คำพ้องที่ 1'] && info['ความหมายคำพ้อง 1']) {
+                        synonyms.push({ word: info['คำพ้องที่ 1'], meaning: info['ความหมายคำพ้อง 1'] });
+                    }
+                    if (info['คำพ้องที่ 2'] && info['ความหมายคำพ้อง 2']) {
+                        synonyms.push({ word: info['คำพ้องที่ 2'], meaning: info['ความหมายคำพ้อง 2'] });
+                    }
+                    if (synonyms.length > 0) {
+                        synonyms.forEach(s => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<span class="arabic">${s.word}</span> = ${s.meaning}`;
+                            synList.appendChild(li);
+                        });
+                    } else {
+                        synList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
+                    }
+
+                    // Antonyms
+                    const antList = document.getElementById('dictAntonyms');
+                    antList.innerHTML = '';
+                    const antonyms = [];
+                    if (info['คำตรงข้ามที่ 1'] && info['ความหมายคำตรงข้าม 1']) {
+                        antonyms.push({ word: info['คำตรงข้ามที่ 1'], meaning: info['ความหมายคำตรงข้าม 1'] });
+                    }
+                    if (info['คำตรงข้ามที่ 2'] && info['ความหมายคำตรงข้าม 2']) {
+                        antonyms.push({ word: info['คำตรงข้ามที่ 2'], meaning: info['ความหมายคำตรงข้าม 2'] });
+                    }
+                    if (antonyms.length > 0) {
+                        antonyms.forEach(a => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<span class="arabic">${a.word}</span> = ${a.meaning}`;
+                            antList.appendChild(li);
+                        });
+                    } else {
+                        antList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
+                    }
+
+                    // Plural
+                    const pluralSection = document.getElementById('dictPluralSection');
+                    const pluralEl = document.getElementById('dictPlural');
+                    if (info['พหูพจน์ (جمع)']) {
+                        pluralSection.style.display = 'block';
+                        pluralEl.textContent = info['พหูพจน์ (جمع)'];
+                    } else {
+                        pluralSection.style.display = 'none';
+                    }
+
+                    document.getElementById('dictRoot').textContent = info['รากศัพท์'] || 'ไม่มีข้อมูล';
                     document.getElementById('reportWordBtn').dataset.word = word;
-                    document.getElementById('reportWordBtn').textContent = '🚨 รายงานคำนี้';
                     document.getElementById('reportWordBtn').disabled = false;
-                    return;
-                }
-                // Found data - display it
-                displayDictionaryData(data[0], word);
-            }).catch(err => {
-                document.getElementById('dictMeaning').textContent = '⚠️ เกิดข้อผิดพลาด: ' + err.message;
-            });
-        }
-
-        function displayDictionaryData(info, word) {
-            document.getElementById('dictWord').textContent = info['คำศัพท์อาหรับ'] || word;
-            document.getElementById('dictReading').textContent = info['คำอ่าน'] ? `คำอ่าน: ${info['คำอ่าน']}` : '';
-            document.getElementById('dictMeaning').textContent = info['ความหมาย (ไทย)'] || 'ไม่พบความหมาย';
-
-            // Synonyms
-            const synList = document.getElementById('dictSynonyms');
-            synList.innerHTML = '';
-            const synonyms = [];
-            if (info['คำพ้องที่ 1'] && info['ความหมายคำพ้อง 1']) {
-                synonyms.push({ word: info['คำพ้องที่ 1'], meaning: info['ความหมายคำพ้อง 1'] });
-            }
-            if (info['คำพ้องที่ 2'] && info['ความหมายคำพ้อง 2']) {
-                synonyms.push({ word: info['คำพ้องที่ 2'], meaning: info['ความหมายคำพ้อง 2'] });
-            }
-            if (synonyms.length > 0) {
-                synonyms.forEach(s => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span class="arabic">${s.word}</span> = ${s.meaning}`;
-                    synList.appendChild(li);
+                    document.getElementById('reportWordBtn').textContent = '🚨 ส่งรายงาน';
+                })
+                .catch(err => {
+                    document.getElementById('dictMeaning').textContent = '⚠️ เกิดข้อผิดพลาด: ' + err.message;
                 });
-            } else {
-                synList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
-            }
-
-            // Antonyms
-            const antList = document.getElementById('dictAntonyms');
-            antList.innerHTML = '';
-            const antonyms = [];
-            if (info['คำตรงข้ามที่ 1'] && info['ความหมายคำตรงข้าม 1']) {
-                antonyms.push({ word: info['คำตรงข้ามที่ 1'], meaning: info['ความหมายคำตรงข้าม 1'] });
-            }
-            if (info['คำตรงข้ามที่ 2'] && info['ความหมายคำตรงข้าม 2']) {
-                antonyms.push({ word: info['คำตรงข้ามที่ 2'], meaning: info['ความหมายคำตรงข้าม 2'] });
-            }
-            if (antonyms.length > 0) {
-                antonyms.forEach(a => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span class="arabic">${a.word}</span> = ${a.meaning}`;
-                    antList.appendChild(li);
-                });
-            } else {
-                antList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
-            }
-
-            // Plural
-            const pluralSection = document.getElementById('dictPluralSection');
-            const pluralEl = document.getElementById('dictPlural');
-            if (info['พหูพจน์ (جمع)']) {
-                pluralSection.style.display = 'block';
-                pluralEl.textContent = info['พหูพจน์ (جمع)'];
-            } else {
-                pluralSection.style.display = 'none';
-            }
-
-            // Root
-            document.getElementById('dictRoot').textContent = info['รากศัพท์'] || 'ไม่มีข้อมูล';
-
-            // Report button
-            document.getElementById('reportWordBtn').dataset.word = word;
-            document.getElementById('reportWordBtn').textContent = '🚨 รายงานคำนี้';
-            document.getElementById('reportWordBtn').disabled = false;
         }
 
         function closeDictionary() {
@@ -1964,7 +1847,6 @@
             const container = document.getElementById('readingTranslation');
             const article = readingArticles[readingIndex];
             if (!article) return;
-            
             if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
                 document.getElementById('readingTranslationText').textContent = article['บทความ (ไทย)'] || 'ไม่มีคำแปล';
@@ -1992,42 +1874,51 @@
             document.getElementById('readingGameOver').classList.remove('hidden');
             document.getElementById('readingTotalArticles').textContent = readingTotalArticles;
             document.getElementById('readingTeacher').textContent = `🎉 อ่านครบ ${readingTotalArticles} บทความแล้ว!`;
-            
             if (!readingDans.includes(currentReadingDan)) {
                 readingDans.push(currentReadingDan);
                 const progress = JSON.parse(localStorage.getItem('reading_progress') || '{}');
-                if (!progress[currentReadingLevel]) {
-                    progress[currentReadingLevel] = [];
-                }
-                if (!progress[currentReadingLevel].includes(currentReadingDan)) {
-                    progress[currentReadingLevel].push(currentReadingDan);
-                }
+                if (!progress[currentReadingLevel]) { progress[currentReadingLevel] = []; }
+                if (!progress[currentReadingLevel].includes(currentReadingDan)) { progress[currentReadingLevel].push(currentReadingDan); }
                 localStorage.setItem('reading_progress', JSON.stringify(progress));
                 renderReadingDans();
             }
         }
 
         // ==============================================================
-        //  REPORT WORD (สำหรับเกมอ่านบทความ)
+        //  REPORT WORD (ปรับปรุงให้รองรับหลายประเภท)
         // ==============================================================
         function reportWord() {
             const word = document.getElementById('reportWordBtn').dataset.word;
-            if (!word) return;
-            if (confirm(`🚨 รายงานคำนี้: "${word}" ?\n\n(ข้อมูลนี้จะช่วยให้ทีมงานปรับปรุงพจนานุกรมให้ดีขึ้น)`)) {
+            if (!word) {
+                alert('ไม่พบคำที่ต้องการรายงาน');
+                return;
+            }
+
+            // ดึงประเภทการรายงานจาก radio button
+            const selectedReportType = document.querySelector('input[name="reportType"]:checked');
+            const reportType = selectedReportType ? selectedReportType.value : 'สงสัยความหมาย';
+
+            const meaning = document.getElementById('dictMeaning').textContent || '';
+            const articleId = currentArticleId || 0;
+            const level = currentReadingLevel || 0;
+            const dan = currentReadingDan || 0;
+
+            if (confirm(`🚨 รายงานคำนี้: "${word}"\nประเภท: ${reportType}\nArticle ID: ${articleId}\n\n(ข้อมูลนี้จะช่วยให้ทีมงานปรับปรุงพจนานุกรมให้ถูกต้อง)`)) {
                 callAPI('report-word', 'POST', {
                     userEmail: userEmail,
                     userName: userName,
-                    level: currentReadingLevel,
-                    dan: currentReadingDan,
-                    articleId: currentArticleId,
+                    level: level,
+                    dan: dan,
+                    articleId: articleId,
                     word: word,
-                    meaning: document.getElementById('dictMeaning').textContent || '',
-                    reportType: 'สงสัยความหมาย',
-                    note: 'ผู้ใช้สงสัยความหมายของคำนี้'
+                    meaning: meaning,
+                    reportType: reportType,
+                    note: `รายงานจากบทความ ID ${articleId}`
                 }).then(() => {
                     alert('✅ รายงานคำนี้เรียบร้อยแล้ว ขอบคุณที่ช่วยพัฒนาพจนานุกรมครับ 🙏');
                     document.getElementById('reportWordBtn').textContent = '✅ รายงานแล้ว';
                     document.getElementById('reportWordBtn').disabled = true;
+                    document.getElementById('reportWordBtn').className = 'text-sm py-1 px-4 rounded-full mt-2 w-full bg-green-600 text-white';
                 }).catch(err => {
                     alert('❌ รายงานล้มเหลว: ' + err.message);
                 });
@@ -2035,7 +1926,7 @@
         }
 
         // ==============================================================
-        //  VOCABULARY BANK
+        //  VOCABULARY
         // ==============================================================
         function renderVocab() {
             const filterLevel = parseInt(document.getElementById('vocabLevelFilter').value) || 0;
@@ -2046,11 +1937,10 @@
                 filtered = filtered.filter(item => parseInt(item.level) === filterLevel);
             }
             document.getElementById('vocabCount').textContent = filtered.length;
-
             const filterSelect = document.getElementById('vocabLevelFilter');
             const currentVal = filterSelect.value;
             filterSelect.innerHTML = '<option value="0">ทุก Level</option>';
-            const levels = [...new Set(allVocab.map(item => parseInt(item.level)).filter(l => l > 0))].sort((a,b)=>a-b);
+            const levels = [...new Set(allVocab.map(item => parseInt(item.level)).filter(l => l > 0))].sort((a, b) => a - b);
             levels.forEach(l => {
                 const opt = document.createElement('option');
                 opt.value = l;
@@ -2058,7 +1948,6 @@
                 filterSelect.appendChild(opt);
             });
             filterSelect.value = currentVal;
-
             filtered.forEach((item, idx) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -2077,9 +1966,7 @@
             });
         }
 
-        function filterVocab() {
-            renderVocab();
-        }
+        function filterVocab() { renderVocab(); }
 
         // ==============================================================
         //  LEADERBOARD
@@ -2106,9 +1993,7 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (e) {
-                console.error('Leaderboard error:', e);
-            }
+            } catch (e) { console.error('Leaderboard error:', e); }
         }
 
         // ==============================================================
@@ -2153,10 +2038,7 @@
 
         async function saveName() {
             const newName = document.getElementById('editNameInput').value.trim();
-            if (!newName) {
-                alert('กรุณากรอกชื่อ');
-                return;
-            }
+            if (!newName) { alert('กรุณากรอกชื่อ'); return; }
             try {
                 const res = await callAPI('user/update', 'POST', { email: userEmail, displayName: newName });
                 if (res.success) {
@@ -2185,18 +2067,7 @@
             }
             const rows = [['#','ไทย','อาหรับ','อดีต','ปัจจุบัน','คำสั่ง','เอกพจน์','พหูพจน์','หมวด','Level']];
             data.forEach((item, idx) => {
-                rows.push([
-                    idx + 1,
-                    item.คำศัพท์ไทย || '',
-                    item.คำศัพท์อาหรับ || '',
-                    item.รูปอดีต || '',
-                    item.รูปปัจจุบัน || '',
-                    item.รูปคำสั่ง || '',
-                    item.เอกพจน์ || '',
-                    item.พหูพจน์ || '',
-                    item.หมวดหมู่ || '',
-                    item.level || ''
-                ]);
+                rows.push([idx + 1, item.คำศัพท์ไทย || '', item.คำศัพท์อาหรับ || '', item.รูปอดีต || '', item.รูปปัจจุบัน || '', item.รูปคำสั่ง || '', item.เอกพจน์ || '', item.พหูพจน์ || '', item.หมวดหมู่ || '', item.level || '']);
             });
             const csv = rows.map(r => r.join(',')).join('\n');
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
@@ -2244,17 +2115,13 @@
                     document.getElementById('sentenceNotStarted').classList.remove('hidden');
                     document.getElementById('sentenceGameArea').classList.add('hidden');
                     document.getElementById('sentenceDanContainer').classList.add('hidden');
-                    if (sentenceLevels.length) {
-                        loadSentenceLevel(sentenceLevels[0]?.level || 1);
-                    }
+                    if (sentenceLevels.length) { loadSentenceLevel(sentenceLevels[0]?.level || 1); }
                 }
                 if (btn.dataset.tab === 'readingTab') {
                     document.getElementById('readingNotStarted').classList.remove('hidden');
                     document.getElementById('readingArticleArea').classList.add('hidden');
                     document.getElementById('readingDanContainer').classList.add('hidden');
-                    if (readingLevels.length) {
-                        loadReadingLevel(readingLevels[0]?.level || 1);
-                    }
+                    if (readingLevels.length) { loadReadingLevel(readingLevels[0]?.level || 1); }
                 }
             });
         });
@@ -2269,16 +2136,15 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.8) - 3 เกม + พจนานุกรม Normalize`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.9) - รองรับรายงานคำศัพท์แบบเลือกประเภท + Article ID`);
 
-        // Close popup when clicking outside
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('dictionaryPopup');
             if (popup.classList.contains('show')) {
                 const rect = popup.getBoundingClientRect();
                 const isInside = (e.clientX >= rect.left && e.clientX <= rect.right &&
                                   e.clientY >= rect.top && e.clientY <= rect.bottom);
-                if (!isInside && e.target.closest('.reading-word') === null && e.target.closest('.close-btn') === null) {
+                if (!isInside && e.target.closest('.reading-word') === null && !e.target.closest('.close-btn')) {
                     closeDictionary();
                 }
             }

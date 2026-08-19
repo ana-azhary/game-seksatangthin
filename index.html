@@ -43,6 +43,9 @@
         .btn-support { background: rgba(255,255,255,0.15); color: #fff; font-weight: 600; padding: 4px 12px; border-radius: 40px; border: none; font-size: 0.8rem; transition: 0.2s; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .btn-support:hover { background: rgba(255,255,255,0.25); }
         .btn-support:active { transform: scale(0.95); }
+        .btn-exchange { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1e293b; font-weight: 700; padding: 6px 16px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
+        .btn-exchange:active { transform: scale(0.95); }
+        .btn-exchange:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .card-modern { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .dan-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: #f8fafc; margin-bottom: 6px; transition: 0.2s; cursor: default; border: 2px solid transparent; flex-wrap: wrap; }
@@ -177,6 +180,26 @@
         .support-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
         .support-popup .close-btn:hover { color: #1f2937; }
 
+        .exchange-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: #fff;
+            border-radius: 24px;
+            padding: 24px;
+            z-index: 9998;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+        }
+        .exchange-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        .exchange-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
+        .exchange-popup .close-btn:hover { color: #1f2937; }
+
         .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
 
         /* Vocab Table Styles */
@@ -257,9 +280,10 @@
         <div class="flex items-center justify-between">
             <div><h1>📚 ศึกษา ต่างถิ่น</h1><div class="sub"> أُسْتَاذ · เรียนภาษาอาหรับ</div></div>
             <div class="flex items-center gap-2">
-                <button class="btn-settings" onclick="toggleSettings()" title="ตั้งค่า">⚙️</button>
+                <button class="btn-exchange" onclick="toggleExchange()">💎 <span id="diamondDisplay">0</span></button>
                 <button class="btn-support" onclick="toggleSupport()">☕ <span id="supportLabel">สนับสนุน</span></button>
                 <span id="starDisplay" class="text-sm font-bold">⭐ 0</span>
+                <button class="btn-settings" onclick="toggleSettings()" title="ตั้งค่า">⚙️</button>
                 <div id="userArea" class="flex items-center gap-2">
                     <span id="loginStatus" class="text-xs text-white/70">⏳</span>
                     <div id="userInfo" class="hidden flex items-center gap-2">
@@ -314,7 +338,7 @@
     <section id="sentenceTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
             <h2 class="font-bold text-gray-700 mb-2">🧩 ต่อประโยค</h2>
-            <p class="text-xs text-gray-400">เรียงคำให้ถูกต้อง • ได้ดาวเมื่อตอบถูก 3 ข้อติดกัน ⭐</p>
+            <p class="text-xs text-gray-400">เรียงคำให้ถูกต้อง • ได้เพชรเมื่อตอบถูกครบทุกข้อในด่าน 💎</p>
             <div id="sentenceLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
         </div>
         <div id="sentenceDanContainer" class="card-modern hidden">
@@ -337,7 +361,7 @@
     <section id="readingTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
             <h2 class="font-bold text-gray-700 mb-2">📖 อ่านบทความ</h2>
-            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ใช้ดาวปลดล็อกด่าน</p>
+            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ได้เพชรเมื่ออ่านครบทุกบทความในด่าน 💎</p>
             <div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
         </div>
         <div id="readingDanContainer" class="card-modern hidden">
@@ -392,18 +416,18 @@
     </section>
 
     <!-- ============================================================ -->
-    <!-- TAB: LEADERBOARD -->
+    <!-- TAB: LEADERBOARD (แสดงเพชร) -->
     <!-- ============================================================ -->
     <section id="leaderboardTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
-            <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด (ดาว)</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด (💎 เพชร)</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-gray-600">
                         <tr>
                             <th class="p-2 text-left">อันดับ</th>
                             <th class="p-2 text-left">ชื่อ</th>
-                            <th class="p-2 text-left">⭐ ดาว</th>
+                            <th class="p-2 text-left">💎 เพชร</th>
                             <th class="p-2 text-left">กำลังใจ</th>
                         </tr>
                     </thead>
@@ -417,7 +441,7 @@
     <!-- TAB: SHARE -->
     <!-- ============================================================ -->
     <section id="shareTab" class="tab-content hidden px-4 pb-6">
-        <div class="card-modern share-story-card"><div class="text-center"><p class="text-lg font-medium text-gray-700" id="shareMessage">ฉันกำลังเรียนภาษาอาหรับ!</p><div class="flex flex-wrap justify-center gap-2 mt-2"><span class="badge gold" id="shareLevelDisplay">🏰 Level 1</span><span class="badge green" id="shareDanDisplay">🎯 ด่าน 1</span><span class="badge" id="shareScoreDisplay">⭐ 0 คะแนน</span></div><div class="mt-3 p-3 bg-gray-50 rounded-xl text-left text-sm text-gray-600"><p>📖 <span id="shareReadingCount">0</span> บทความ</p><p>🧩 <span id="shareSentenceCount">0</span> ประโยค</p><p>📚 <span id="shareVocabCount">0</span> คำศัพท์</p></div><div class="mt-4 flex flex-wrap justify-center gap-2"><button onclick="shareToStory()" class="btn-primary bg-blue-600 hover:bg-blue-700 text-sm px-5 py-2 rounded-full">📱 แชร์สตอรี่</button><button onclick="shareToFriend()" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-sm px-5 py-2 rounded-full">👥 ชวนเพื่อน</button><a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-secondary text-sm px-5 py-2 rounded-full">🔗 เพจ</a></div></div></div>
+        <div class="card-modern share-story-card"><div class="text-center"><p class="text-lg font-medium text-gray-700" id="shareMessage">ฉันกำลังเรียนภาษาอาหรับ!</p><div class="flex flex-wrap justify-center gap-2 mt-2"><span class="badge gold" id="shareLevelDisplay">🏰 Level 1</span><span class="badge green" id="shareDanDisplay">🎯 ด่าน 1</span><span class="badge" id="shareScoreDisplay">⭐ 0 คะแนน</span></div><div class="mt-3 p-3 bg-gray-50 rounded-xl text-left text-sm text-gray-600"><p>📖 <span id="shareReadingCount">0</span> บทความ</p><p>🧩 <span id="shareSentenceCount">0</span> ประโยค</p><p>📚 <span id="shareVocabCount">0</span> คำศัพท์</p><p>💎 <span id="shareDiamondCount">0</span> เพชร</p></div><div class="mt-4 flex flex-wrap justify-center gap-2"><button onclick="shareToStory()" class="btn-primary bg-blue-600 hover:bg-blue-700 text-sm px-5 py-2 rounded-full">📱 แชร์สตอรี่</button><button onclick="shareToFriend()" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-sm px-5 py-2 rounded-full">👥 ชวนเพื่อน</button><a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-secondary text-sm px-5 py-2 rounded-full">🔗 เพจ</a></div></div></div>
     </section>
 
     <!-- ============================================================ -->
@@ -488,6 +512,28 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- EXCHANGE POPUP (12💎 = 100⭐) -->
+    <!-- ============================================================ -->
+    <div id="exchangePopup" class="exchange-popup">
+        <button class="close-btn" onclick="toggleExchange()">✕</button>
+        <div class="text-center">
+            <span class="text-5xl block mb-2">💎➡️⭐</span>
+            <h3 class="text-xl font-bold text-gray-800">แลกเพชรเป็นดาว</h3>
+            <p class="text-sm text-gray-500 mt-1">12 เพชร = 100 ดาว</p>
+        </div>
+        <div class="mt-4 p-4 bg-gray-50 rounded-xl">
+            <div class="flex justify-between text-sm">
+                <span>💎 เพชรของคุณ: <span id="exchangeDiamondDisplay" class="font-bold text-purple-600">0</span></span>
+                <span>⭐ ดาวที่จะได้รับ: <span id="exchangeStarDisplay" class="font-bold text-amber-600">0</span></span>
+            </div>
+            <button id="exchangeConfirmBtn" class="btn-primary w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl" onclick="confirmExchange()">
+                💎 แลก 12 เพชร → 100 ดาว
+            </button>
+            <p id="exchangeStatus" class="text-xs text-center text-gray-400 mt-2"></p>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- MODAL: แก้ไขชื่อ -->
     <!-- ============================================================ -->
     <div id="editNameModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -526,7 +572,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.2 — ปลดล็อก Level ด้วยดาว 100⭐ + ปลดล็อกด่าน -->
+    <!-- JAVASCRIPT v5.3 — ระบบเพชร + แลกดาว + ลีดเดอร์บอร์ดแสดงเพชร -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -542,6 +588,7 @@
             HINT_COST: 1,
             LEVEL_BONUS_STARS: 20,
             UNLOCK_LEVEL_COST: 100,
+            DIAMONDS_TO_STARS_RATE: 12,
         };
 
         // ==============================================================
@@ -552,6 +599,7 @@
         let currentRound = [], currentIndex = 0;
         let score = 0, streak = 0, combo = 1, lives = 0;
         let stars = 0;
+        let diamonds = 0;
         let mistakes = [], timerInterval = null, timeLeft = CONFIG.TIME_LIMIT;
         let isAnswered = false, gameEnded = false;
         let userEmail = null, userName = null, userAvatar = null, isLoggedIn = false;
@@ -701,6 +749,28 @@
             } catch(e) { /* ignore */ }
         }
 
+        function playDiamondSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                [880, 1108, 1318].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.12);
+                    }, i * 100);
+                });
+            } catch(e) { /* ignore */ }
+        }
+
         function vibrate(pattern) {
             if (!vibrationEnabled) return;
             try {
@@ -746,6 +816,49 @@
         }
 
         // ==============================================================
+        //  EXCHANGE SYSTEM (12💎 = 100⭐)
+        // ==============================================================
+        function toggleExchange() {
+            const popup = $('exchangePopup');
+            popup.classList.toggle('show');
+            if (popup.classList.contains('show')) {
+                $('exchangeDiamondDisplay').textContent = diamonds;
+                const canExchange = diamonds >= CONFIG.DIAMONDS_TO_STARS_RATE;
+                $('exchangeStarDisplay').textContent = canExchange ? '100' : '0';
+                $('exchangeConfirmBtn').disabled = !canExchange;
+                $('exchangeStatus').textContent = canExchange ? '✅ พร้อมแลก' : `❌ ต้องมี ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชรขึ้นไป`;
+            }
+        }
+
+        async function confirmExchange() {
+            if (diamonds < CONFIG.DIAMONDS_TO_STARS_RATE) {
+                alert(`💎 ไม่พอ! ต้องใช้ ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชร (มี ${diamonds} เพชร)`);
+                return;
+            }
+
+            if (!confirm(`แลก 12 เพชร เป็น 100 ดาว?`)) return;
+
+            try {
+                const res = await callAPI('exchange-diamonds', 'POST', { email: userEmail });
+                if (res.success) {
+                    diamonds = res.diamonds;
+                    stars = res.stars;
+                    updateDiamondDisplay();
+                    updateStarDisplay();
+                    playStarSound();
+                    vibrate([50, 80, 50]);
+                    alert('✅ แลกสำเร็จ! ได้ 100 ดาว');
+                    toggleExchange();
+                    renderLeaderboard();
+                } else {
+                    alert('❌ ' + (res.error || 'แลกไม่สำเร็จ'));
+                }
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+            }
+        }
+
+        // ==============================================================
         //  UNLOCK LEVEL WITH STARS (100⭐)
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
@@ -760,7 +873,7 @@
                 return;
             }
 
-            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level} ทั้งหมด? (ทุกด่านใน Level นี้จะเปิดให้เล่น)`)) {
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level}? (ด่านที่ 1 จะเปิดให้เล่น)`)) {
                 return;
             }
 
@@ -776,7 +889,7 @@
                     updateStarDisplay();
                     playStarSound();
                     vibrate([50, 80, 50]);
-                    alert(`✅ ปลดล็อก Level ${level} ทั้งหมดแล้ว!`);
+                    alert(`✅ ปลดล็อก Level ${level} (ด่านที่ 1) แล้ว!`);
 
                     await loadProgressFromBackend();
                     if (game === 'vocab') renderDans();
@@ -844,11 +957,16 @@
         }
 
         // ==============================================================
-        //  STAR SYSTEM
+        //  STAR & DIAMOND DISPLAY
         // ==============================================================
         function updateStarDisplay() {
             $('starDisplay').textContent = '⭐ ' + stars;
             $('supportStarDisplay').textContent = stars;
+        }
+
+        function updateDiamondDisplay() {
+            $('diamondDisplay').textContent = '💎 ' + diamonds;
+            $('shareDiamondCount').textContent = diamonds;
         }
 
         async function loadStarsFromBackend() {
@@ -860,6 +978,18 @@
                 debugLog('STARS', `โหลดดาวจากหลังบ้าน: ${stars}`);
             } catch(e) {
                 debugLog('STARS', 'โหลดดาวล้มเหลว:', e);
+            }
+        }
+
+        async function loadDiamondsFromBackend() {
+            if (!isLoggedIn || !userEmail) return;
+            try {
+                const res = await callAPI('user/diamonds', 'GET', null, { email: userEmail });
+                diamonds = res.diamonds || 0;
+                updateDiamondDisplay();
+                debugLog('DIAMONDS', `โหลดเพชรจากหลังบ้าน: ${diamonds}`);
+            } catch(e) {
+                debugLog('DIAMONDS', 'โหลดเพชรล้มเหลว:', e);
             }
         }
 
@@ -900,10 +1030,12 @@
                 callAPI('login', 'POST', { email: userEmail, displayName: userName })
                     .then(() => {
                         loadStarsFromBackend();
+                        loadDiamondsFromBackend();
                         loadAllData();
                     })
                     .catch(() => {
                         loadStarsFromBackend();
+                        loadDiamondsFromBackend();
                         loadAllData();
                     });
             } catch(e) { setStatus('⚠️ ข้อมูลไม่ถูกต้อง'); }
@@ -993,6 +1125,7 @@
                 await loadProgressFromBackend();
 
                 updateStarDisplay();
+                updateDiamondDisplay();
                 renderDans();
                 renderVocab();
                 renderLeaderboard();
@@ -1033,8 +1166,7 @@
 
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                // ตรวจสอบว่าปลดล็อก Level แล้ว (มี progress 0% ของด่านที่ 1)
-                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined;
+                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || level === 1;
                 const allPassed = levelData.every(d => {
                     const key = `${level}_${d.dan}`;
                     return vocabProgress[key] && vocabProgress[key] >= CONFIG.PASSING_SCORE;
@@ -1291,7 +1423,6 @@
                 combo = Math.min(combo+0.5,3);
                 consecutiveWrong=0;
                 if (currentFeature && currentFeature.streakBonus && streak>=3) { score += 5; setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
-                // ดาวจะถูกเพิ่มผ่าน backend เมื่อบันทึกคะแนน
             } else {
                 playWrongSound();
                 vibrate([50, 100, 50]);
@@ -1342,6 +1473,7 @@
                     time: Math.round((currentFeature?.timeLimit||CONFIG.TIME_LIMIT)*currentRound.length - timeLeft || 0)
                 }).then(() => {
                     loadStarsFromBackend();
+                    loadDiamondsFromBackend();
                     loadProgressFromBackend();
                     renderDans();
                     renderLeaderboard();
@@ -1445,7 +1577,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (ย่อ)
+        //  GAME 2: SENTENCE
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1664,8 +1796,6 @@
                 vibrate([30, 50, 30]);
                 sentenceConsecutiveCorrect++;
                 if (sentenceConsecutiveCorrect >= 3) {
-                    // ดาวจะเพิ่มผ่าน backend เมื่อบันทึกความคืบหน้า
-                    // จะเพิ่มใน endSentenceGame
                     result.innerHTML = `<p class="text-green-600 font-bold">✅ ถูกต้อง! (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
                     sentenceConsecutiveCorrect = 0;
                 } else {
@@ -1734,6 +1864,7 @@
                     passed: true
                 }).then(() => {
                     loadStarsFromBackend();
+                    loadDiamondsFromBackend();
                     loadProgressFromBackend();
                     renderSentenceDans();
                     renderSentenceLevels();
@@ -1756,7 +1887,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (ย่อ)
+        //  GAME 3: READING
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -2097,6 +2228,7 @@
                     passed: true
                 }).then(() => {
                     loadStarsFromBackend();
+                    loadDiamondsFromBackend();
                     loadProgressFromBackend();
                     renderReadingDans();
                     renderReadingLevels();
@@ -2374,7 +2506,7 @@
         }
 
         // ==============================================================
-        //  LEADERBOARD (แสดงดาว)
+        //  LEADERBOARD (แสดงเพชร)
         // ==============================================================
         async function renderLeaderboard() {
             try {
@@ -2388,13 +2520,13 @@
                 }
 
                 const messages = [
-                    "🏆 สุดยอด! เจ้าของดาวมากที่สุด!",
+                    "🏆 สุดยอด! เจ้าแห่งเพชร!",
                     "🥇 ยอดเยี่ยม! เก่งมาก!",
                     "🥈 เก่ง! ใกล้ถึงอันดับ 1 แล้ว",
                     "🥉 เยี่ยม! ติดท็อป 3",
                     "👍 ดีมาก! อยู่ท็อป 5",
                     "💪 แข็งแกร่ง! สู้ต่อไป",
-                    "🌟 เก่ง! มีดาวเยอะแล้ว",
+                    "🌟 เก่ง! มีเพชรเยอะแล้ว",
                     "🔥 ร้อนแรง! ยังต้องพัฒนาอีกนิด",
                     "📚 ขยัน! เรียนสม่ำเสมอ",
                     "🎯 มุ่งมั่น! ตั้งเป้าหมายสูง",
@@ -2417,7 +2549,7 @@
                     tr.innerHTML = `
                         <td class="p-2">${medal}</td>
                         <td class="p-2 font-medium">${item.displayName || item.email}</td>
-                        <td class="p-2 font-bold text-amber-600">⭐ ${item.stars}</td>
+                        <td class="p-2 font-bold text-purple-600">💎 ${item.diamonds}</td>
                         <td class="p-2 text-xs text-gray-500 italic">${msg}</td>
                     `;
                     tbody.appendChild(tr);
@@ -2442,10 +2574,11 @@
             $('shareReadingCount').textContent = tr;
             $('shareSentenceCount').textContent = ts;
             $('shareVocabCount').textContent = allVocab.length || 0;
+            $('shareDiamondCount').textContent = diamonds;
         }
 
         function shareToStory() {
-            const text = `📚 ศึกษา ต่างถิ่น\n${userName||'นักศึกษา'} กำลังเรียนภาษาอาหรับ!\n🏰 Level ${currentLevel} · 🎯 ด่าน ${currentDan}\n📖 อ่าน ${$('shareReadingCount').textContent} บทความ\n🧩 เรียน ${$('shareSentenceCount').textContent} ประโยค\n📚 รู้ ${$('shareVocabCount').textContent} คำศัพท์\n\nมาเรียนกันเถอะ! 🚀`;
+            const text = `📚 ศึกษา ต่างถิ่น\n${userName||'นักศึกษา'} กำลังเรียนภาษาอาหรับ!\n🏰 Level ${currentLevel} · 🎯 ด่าน ${currentDan}\n📖 อ่าน ${$('shareReadingCount').textContent} บทความ\n🧩 เรียน ${$('shareSentenceCount').textContent} ประโยค\n📚 รู้ ${$('shareVocabCount').textContent} คำศัพท์\n💎 มี ${diamonds} เพชร\n\nมาเรียนกันเถอะ! 🚀`;
             const url = encodeURIComponent(window.location.href);
             window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`, '_blank');
         }
@@ -2544,14 +2677,22 @@
                     supportPopup.classList.remove('show');
                 }
             }
+            const exchangePopup = $('exchangePopup');
+            if (exchangePopup.classList.contains('show')) {
+                const rect = exchangePopup.getBoundingClientRect();
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
+                if (!inside && !e.target.closest('.btn-exchange')) {
+                    exchangePopup.classList.remove('show');
+                }
+            }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.2 — ปลดล็อก Level ด้วยดาว 100⭐');
-        console.log('☕ Support: 100บ.=2500⭐, 200บ.=10000⭐ → m.me/548132778932419');
-        console.log('🔓 ปลดล็อก Level: 100⭐ (เปิดทุกด่าน)');
-        console.log('🔓 ปลดล็อกด่าน: 5-30⭐ (เข้าเล่นได้ ต้องเล่นจริงถึงผ่าน)');
-        console.log('⭐ ดาวเก็บในหลังบ้าน (ชีท ผู้เล่น)');
-        console.log('🏆 ลีดเดอร์บอร์ดแสดงจำนวนดาว');
+        console.log('🚀 ศึกษา ต่างถิ่น v5.3 — ระบบเพชร + แลกดาว');
+        console.log('💎 เพชร: ได้จากการเล่นครบทุกข้อในด่าน');
+        console.log('💎➡️⭐ แลก 12 เพชร = 100 ดาว');
+        console.log('🔓 ปลดล็อก Level: 100⭐ (เปิดด่านที่ 1)');
+        console.log('🔓 ปลดล็อกด่าน: 5-30⭐');
+        console.log('🏆 ลีดเดอร์บอร์ดแสดงเพชร');
     </script>
 </body>
 </html>

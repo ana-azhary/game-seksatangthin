@@ -176,18 +176,65 @@
         }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 
-        /* สีพื้นหลังตามหมวดหมู่คำศัพท์ */
-        .vocab-cat-noun { background-color: #dbeafe; }
-        .vocab-cat-verb { background-color: #fef3c7; }
-        .vocab-cat-adjective { background-color: #d1fae5; }
-        .vocab-cat-adverb { background-color: #fce4ec; }
-        .vocab-cat-preposition { background-color: #e0e7ff; }
-        .vocab-cat-pronoun { background-color: #f3e8ff; }
-        .vocab-cat-conjunction { background-color: #ffedd5; }
-        .vocab-cat-interjection { background-color: #fce7f3; }
-        .vocab-cat-phrase { background-color: #d1fae5; }
-        .vocab-cat-default { background-color: #f8fafc; }
+        /* ===== VOCAB TABLE STYLES ===== */
+        #vocabTable {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.85rem;
+        }
+        #vocabTable thead th {
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 700;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        #vocabTable thead th:nth-child(1) { background: #1e293b; min-width: 32px; text-align: center; }
+        #vocabTable thead th:nth-child(2) { background: #065f46; min-width: 80px; }
+        #vocabTable thead th:nth-child(3) { background: #0d9488; min-width: 90px; }
+        #vocabTable thead th:nth-child(4) { background: #0369a1; min-width: 60px; }
+        #vocabTable thead th:nth-child(5) { background: #0284c7; min-width: 60px; }
+        #vocabTable thead th:nth-child(6) { background: #0ea5e9; min-width: 60px; }
+        #vocabTable thead th:nth-child(7) { background: #7c3aed; min-width: 60px; }
+        #vocabTable thead th:nth-child(8) { background: #8b5cf6; min-width: 60px; }
+        #vocabTable thead th:nth-child(9) { background: #d97706; min-width: 80px; }
+        #vocabTable thead th:nth-child(10) { background: #b45309; min-width: 40px; text-align: center; }
 
+        #vocabTable tbody tr:nth-child(even) { background: #f8fafc; }
+        #vocabTable tbody tr:nth-child(odd) { background: #ffffff; }
+        #vocabTable tbody tr:hover { background: #dbeafe; }
+
+        #vocabTable tbody td {
+            padding: 5px 4px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+            font-size: 0.8rem;
+        }
+        #vocabTable tbody td:nth-child(1) { text-align: center; color: #6b7280; font-size: 0.7rem; background: #f1f5f9; }
+        #vocabTable tbody td:nth-child(2) { background: #fffbeb; }
+        #vocabTable tbody td:nth-child(3) { background: #f0fdf4; font-family: 'Noto Naskh Arabic', serif; font-size: 1.1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(4) { background: #eff6ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(5) { background: #eff6ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(6) { background: #eff6ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(7) { background: #f5f3ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(8) { background: #f5f3ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(9) { background: #fefce8; }
+        #vocabTable tbody td:nth-child(10) { background: #fef2f2; text-align: center; font-weight: 600; }
+
+        @media (max-width: 480px) {
+            #vocabTable thead th { font-size: 0.6rem; padding: 4px 3px; }
+            #vocabTable tbody td { font-size: 0.7rem; padding: 3px 2px; }
+            #vocabTable tbody td:nth-child(3) { font-size: 0.9rem; }
+            #vocabTable tbody td:nth-child(4),
+            #vocabTable tbody td:nth-child(5),
+            #vocabTable tbody td:nth-child(6),
+            #vocabTable tbody td:nth-child(7),
+            #vocabTable tbody td:nth-child(8) { font-size: 0.85rem; }
+        }
         @media (max-width: 480px) {
             .arabic { font-size: 1.2rem; line-height: 1.8rem; }
             .app-header h1 { font-size: 1.1rem; }
@@ -314,24 +361,24 @@
                     <select id="vocabLevelFilter" class="border border-gray-300 rounded-full px-3 py-1 text-sm" onchange="filterVocab()">
                         <option value="0">ทุก Level</option>
                     </select>
-                    <button id="exportCSV" class="btn-secondary text-sm py-1 px-3">⬇ CSV</button>
-                    <button id="exportPDF" class="btn-secondary text-sm py-1 px-3">⬇ PDF</button>
+                    <button id="exportCSV" class="btn-secondary text-sm py-1 px-3" onclick="exportCSV()">⬇ CSV</button>
+                    <button id="exportPDF" class="btn-secondary text-sm py-1 px-3" onclick="exportPDF()">⬇ PDF</button>
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table id="vocabTable" class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600">
+                <table id="vocabTable">
+                    <thead>
                         <tr>
-                            <th class="p-1 text-left">#</th>
-                            <th class="p-1 text-left">ไทย</th>
-                            <th class="p-1 text-left">อาหรับ</th>
-                            <th class="p-1 text-left">อดีต</th>
-                            <th class="p-1 text-left">ปัจจุบัน</th>
-                            <th class="p-1 text-left">คำสั่ง</th>
-                            <th class="p-1 text-left">เอกพจน์</th>
-                            <th class="p-1 text-left">พหูพจน์</th>
-                            <th class="p-1 text-left">หมวด</th>
-                            <th class="p-1 text-left">Level</th>
+                            <th>#</th>
+                            <th>ไทย</th>
+                            <th>อาหรับ</th>
+                            <th>อดีต</th>
+                            <th>ปัจจุบัน</th>
+                            <th>คำสั่ง</th>
+                            <th>เอกพจน์</th>
+                            <th>พหูพจน์</th>
+                            <th>หมวด</th>
+                            <th>Level</th>
                         </tr>
                     </thead>
                     <tbody id="vocabBody"></tbody>
@@ -431,7 +478,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v4.6 (แก้ไขตารางศัพท์มีสี, PDF ทำงาน, ลีดเดอร์ 20 คน) -->
+    <!-- JAVASCRIPT v4.5 (แก้ไข CSV/PDF, เสียง/สั่นเลือกด่าน, เสียงกลับ, ลีดเดอร์ 20 อันดับ) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -2018,23 +2065,8 @@
         }
 
         // ==============================================================
-        //  VOCAB (มีสีพื้นหลังตามหมวดหมู่)
+        //  VOCAB / LEADERBOARD / SHARE
         // ==============================================================
-        function getCategoryClass(category) {
-            if (!category) return 'vocab-cat-default';
-            const cat = category.trim().toLowerCase();
-            if (cat.includes('คำนาม') || cat.includes('นาม') || cat.includes('noun')) return 'vocab-cat-noun';
-            if (cat.includes('กริยา') || cat.includes('verb') || cat.includes('คำกริยา')) return 'vocab-cat-verb';
-            if (cat.includes('คุณศัพท์') || cat.includes('adj') || cat.includes('คำคุณศัพท์')) return 'vocab-cat-adjective';
-            if (cat.includes('วิเศษณ์') || cat.includes('adv') || cat.includes('คำวิเศษณ์')) return 'vocab-cat-adverb';
-            if (cat.includes('บุพบท') || cat.includes('prep') || cat.includes('คำบุพบท')) return 'vocab-cat-preposition';
-            if (cat.includes('สรรพนาม') || cat.includes('pron') || cat.includes('คำสรรพนาม')) return 'vocab-cat-pronoun';
-            if (cat.includes('สันธาน') || cat.includes('conj') || cat.includes('คำสันธาน')) return 'vocab-cat-conjunction';
-            if (cat.includes('อุทาน') || cat.includes('interj') || cat.includes('คำอุทาน')) return 'vocab-cat-interjection';
-            if (cat.includes('วลี') || cat.includes('phrase')) return 'vocab-cat-phrase';
-            return 'vocab-cat-default';
-        }
-
         function renderVocab() {
             const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
             const tbody = $('vocabBody');
@@ -2064,20 +2096,17 @@
 
             filtered.forEach((item, idx) => {
                 const tr = document.createElement('tr');
-                const category = item.หมวดหมู่ || '';
-                const catClass = getCategoryClass(category);
-                tr.className = catClass;
                 tr.innerHTML = `
-                    <td class="p-1">${idx + 1}</td>
-                    <td class="p-1">${item.คำศัพท์ไทย || ''}</td>
-                    <td class="p-1 arabic">${item.คำศัพท์อาหรับ || ''}</td>
-                    <td class="p-1 arabic">${item.รูปอดีต || ''}</td>
-                    <td class="p-1 arabic">${item.รูปปัจจุบัน || ''}</td>
-                    <td class="p-1 arabic">${item.รูปคำสั่ง || ''}</td>
-                    <td class="p-1 arabic">${item.เอกพจน์ || ''}</td>
-                    <td class="p-1 arabic">${item.พหูพจน์ || ''}</td>
-                    <td class="p-1">${category}</td>
-                    <td class="p-1">${item.level || ''}</td>
+                    <td>${idx + 1}</td>
+                    <td>${item.คำศัพท์ไทย || ''}</td>
+                    <td class="arabic">${item.คำศัพท์อาหรับ || ''}</td>
+                    <td class="arabic">${item.รูปอดีต || ''}</td>
+                    <td class="arabic">${item.รูปปัจจุบัน || ''}</td>
+                    <td class="arabic">${item.รูปคำสั่ง || ''}</td>
+                    <td class="arabic">${item.เอกพจน์ || ''}</td>
+                    <td class="arabic">${item.พหูพจน์ || ''}</td>
+                    <td>${item.หมวดหมู่ || ''}</td>
+                    <td>${item.level || ''}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -2086,7 +2115,7 @@
         function filterVocab() { renderVocab(); }
 
         // ==============================================================
-        //  EXPORT CSV & PDF (ปรับปรุงให้ทำงานได้จริง)
+        //  EXPORT CSV (ปรับปรุง)
         // ==============================================================
         function exportCSV() {
             try {
@@ -2095,8 +2124,10 @@
                 if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
                 if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
 
-                const headers = ['คำศัพท์ไทย', 'คำศัพท์อาหรับ', 'รูปอดีต', 'รูปปัจจุบัน', 'รูปคำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวดหมู่', 'Level'];
-                const rows = data.map(item => [
+                // กำหนดหัวตาราง
+                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                const rows = data.map((item, idx) => [
+                    idx + 1,
                     item.คำศัพท์ไทย || '',
                     item.คำศัพท์อาหรับ || '',
                     item.รูปอดีต || '',
@@ -2108,27 +2139,35 @@
                     item.level || ''
                 ]);
 
+                // สร้าง CSV ด้วย BOM
                 let csv = '\uFEFF' + headers.join(',') + '\n';
                 rows.forEach(row => {
-                    csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+                    const escaped = row.map(cell => {
+                        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                            return `"${cell.replace(/"/g, '""')}"`;
+                        }
+                        return cell;
+                    });
+                    csv += escaped.join(',') + '\n';
                 });
 
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `vocab_level${filterLevel || 'all'}.csv`;
+                link.download = `คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.csv`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
-                playKeyboardSound();
-                vibrate(30);
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message);
                 console.error(e);
             }
         }
 
+        // ==============================================================
+        //  EXPORT PDF (ใช้ html2canvas + jsPDF)
+        // ==============================================================
         function exportPDF() {
             try {
                 const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
@@ -2136,37 +2175,47 @@
                 if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
                 if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('landscape', 'mm', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                const margin = 10;
-                let y = 10;
-                const lineHeight = 7;
-                const fontSize = 8;
-                doc.setFontSize(fontSize);
+                // สร้างตาราง HTML ชั่วคราว
+                const wrapper = document.createElement('div');
+                wrapper.style.padding = '20px';
+                wrapper.style.background = '#ffffff';
+                wrapper.style.fontFamily = 'Noto Sans Thai, Noto Naskh Arabic, sans-serif';
 
-                const columns = ['ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
-                const colWidths = [20, 22, 16, 16, 16, 16, 16, 16, 12];
-                const totalWidth = colWidths.reduce((a, b) => a + b, 0);
-                const startX = (pageWidth - totalWidth) / 2;
+                const title = document.createElement('h2');
+                title.textContent = `📚 คำศัพท์ ศึกษา ต่างถิ่น ${filterLevel > 0 ? `(Level ${filterLevel})` : '(ทั้งหมด)'}`;
+                title.style.textAlign = 'center';
+                title.style.color = '#065f46';
+                title.style.marginBottom = '16px';
+                title.style.fontSize = '20px';
+                wrapper.appendChild(title);
 
-                doc.setFontSize(14);
-                doc.text(`คำศัพท์ (Level ${filterLevel || 'ทั้งหมด'})`, pageWidth / 2, y, { align: 'center' });
-                y += 8;
-                doc.setFontSize(fontSize);
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                table.style.fontSize = '12px';
+                table.style.border = '1px solid #d1d5db';
 
-                doc.setFont('helvetica', 'bold');
-                let x = startX;
-                columns.forEach((col, i) => {
-                    doc.text(col, x + 1, y);
-                    x += colWidths[i];
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                headers.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    th.style.background = '#065f46';
+                    th.style.color = '#fff';
+                    th.style.padding = '6px 8px';
+                    th.style.border = '1px solid #065f46';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
                 });
-                y += lineHeight;
-                doc.setFont('helvetica', 'normal');
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
 
+                const tbody = document.createElement('tbody');
                 data.forEach((item, idx) => {
-                    const row = [
+                    const tr = document.createElement('tr');
+                    const cells = [
+                        idx + 1,
                         item.คำศัพท์ไทย || '',
                         item.คำศัพท์อาหรับ || '',
                         item.รูปอดีต || '',
@@ -2177,31 +2226,58 @@
                         item.หมวดหมู่ || '',
                         item.level || ''
                     ];
+                    cells.forEach((cell, i) => {
+                        const td = document.createElement('td');
+                        td.textContent = cell;
+                        td.style.padding = '4px 6px';
+                        td.style.border = '1px solid #d1d5db';
+                        td.style.background = i % 2 === 0 ? '#f8fafc' : '#ffffff';
+                        if (i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
+                            td.style.fontFamily = 'Noto Naskh Arabic, serif';
+                            td.style.direction = 'rtl';
+                            td.style.fontSize = '1.1rem';
+                        }
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                wrapper.appendChild(table);
 
-                    if (y + lineHeight > pageHeight - margin) {
-                        doc.addPage();
-                        y = margin;
-                        doc.setFont('helvetica', 'bold');
-                        x = startX;
-                        columns.forEach((col, i) => {
-                            doc.text(col, x + 1, y);
-                            x += colWidths[i];
-                        });
-                        y += lineHeight;
-                        doc.setFont('helvetica', 'normal');
+                document.body.appendChild(wrapper);
+
+                html2canvas(wrapper, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    logging: false,
+                }).then(canvas => {
+                    document.body.removeChild(wrapper);
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('l', 'mm', 'a4');
+                    const imgWidth = 280;
+                    const pageHeight = 210;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft > 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
                     }
 
-                    x = startX;
-                    row.forEach((cell, i) => {
-                        doc.text(cell, x + 1, y);
-                        x += colWidths[i];
-                    });
-                    y += lineHeight;
+                    pdf.save(`คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.pdf`);
+                }).catch(err => {
+                    document.body.removeChild(wrapper);
+                    alert('ไม่สามารถสร้าง PDF ได้: ' + err.message);
                 });
 
-                doc.save(`vocab_level${filterLevel || 'all'}.pdf`);
-                playKeyboardSound();
-                vibrate(30);
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + e.message);
                 console.error(e);
@@ -2272,9 +2348,6 @@
                 });
             } catch(e) {
                 console.error('Leaderboard error:', e);
-                // แสดงข้อความแจ้งว่าดึงข้อมูลไม่ได้
-                const tbody = $('leaderboardBody');
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-4">⚠️ โหลดข้อมูลลีดเดอร์บอร์ดไม่สำเร็จ</td></tr>';
             }
         }
 
@@ -2372,9 +2445,6 @@
         $('vibrationToggle').checked = vibrationEnabled;
         $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
-        document.getElementById('exportCSV').addEventListener('click', exportCSV);
-        document.getElementById('exportPDF').addEventListener('click', exportPDF);
-
         document.addEventListener('click', function(e) {
             const popup = $('dictionaryPopup');
             if (popup.classList.contains('show')) {
@@ -2394,13 +2464,12 @@
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v4.6 — แก้ไขตารางศัพท์มีสี, PDF ทำงาน, ลีดเดอร์ 20 คน');
+        console.log('🚀 ศึกษา ต่างถิ่น v4.5 — แก้ไข CSV/PDF, เสียง/สั่นเลือกด่าน, เสียงกลับ, ลีดเดอร์ 20 อันดับ');
         console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐, ปลดล็อก Level 100⭐');
         console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
         console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที (มีเสียงและสั่น)');
         console.log('📤 ส่งออก CSV/PDF ตาม Level ที่เลือก');
         console.log('🏆 ลีดเดอร์บอร์ดแสดง 20 อันดับพร้อมกำลังใจจากอุสตะเฮง');
-        console.log('🎨 ตารางคำศัพท์มีสีพื้นหลังตามหมวดหมู่');
     </script>
 </body>
 </html>

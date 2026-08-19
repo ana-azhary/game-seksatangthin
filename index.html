@@ -732,6 +732,66 @@
         }
 
         // ==============================================================
+        //  NORMALIZE ARABIC WORD (Advanced)
+        // ==============================================================
+        function normalizeArabicWord(word) {
+            if (!word) return '';
+            let normalized = word;
+
+            // Remove diacritics and tanween
+            normalized = normalized.replace(/[ًٌٍَُِّْ]/g, '');
+
+            // Remove prefixes
+            normalized = normalized.replace(/^ال/g, '');
+            normalized = normalized.replace(/^وَال/g, '');
+            normalized = normalized.replace(/^فَال/g, '');
+            normalized = normalized.replace(/^بِال/g, '');
+            normalized = normalized.replace(/^لِل/g, '');
+            normalized = normalized.replace(/^كَال/g, '');
+            normalized = normalized.replace(/^(و|ف|ب|ل|ك)/, '');
+
+            // Remove possessive pronouns
+            normalized = normalized.replace(/ي$/g, '');
+            normalized = normalized.replace(/كَ$/g, '');
+            normalized = normalized.replace(/كِ$/g, '');
+            normalized = normalized.replace(/هُ$/g, '');
+            normalized = normalized.replace(/هَا$/g, '');
+            normalized = normalized.replace(/نَا$/g, '');
+            normalized = normalized.replace(/كُمْ$/g, '');
+            normalized = normalized.replace(/هُمْ$/g, '');
+            normalized = normalized.replace(/هِنَّ$/g, '');
+
+            // Remove subject pronouns
+            normalized = normalized.replace(/^أ/g, '');
+            normalized = normalized.replace(/^ن/g, '');
+            normalized = normalized.replace(/^ت/g, '');
+            normalized = normalized.replace(/^ي/g, '');
+
+            // Remove verb suffixes
+            normalized = normalized.replace(/ُون$/g, '');
+            normalized = normalized.replace(/ُونَ$/g, '');
+            normalized = normalized.replace(/َان$/g, '');
+            normalized = normalized.replace(/َانِ$/g, '');
+            normalized = normalized.replace(/ِين$/g, '');
+            normalized = normalized.replace(/ِينَ$/g, '');
+            normalized = normalized.replace(/نَ$/g, '');
+
+            // Remove noun suffixes
+            normalized = normalized.replace(/َة$/g, '');
+            normalized = normalized.replace(/َةٌ$/g, '');
+            normalized = normalized.replace(/َةٍ$/g, '');
+            normalized = normalized.replace(/َةً$/g, '');
+            normalized = normalized.replace(/َات$/g, '');
+            normalized = normalized.replace(/َاتٌ$/g, '');
+            normalized = normalized.replace(/َاتٍ$/g, '');
+
+            // Final cleanup
+            normalized = normalized.replace(/[َُِّ]$/g, '');
+
+            return normalized;
+        }
+
+        // ==============================================================
         //  LOAD ALL DATA
         // ==============================================================
         async function loadAllData() {
@@ -797,66 +857,6 @@
                 setStatus(`⚠️ ${e.message}`, '#dc2626');
                 alert('โหลดข้อมูลไม่สำเร็จ: ' + e.message);
             }
-        }
-
-        // ==============================================================
-        //  NORMALIZE ARABIC WORD (Advanced)
-        // ==============================================================
-        function normalizeArabicWord(word) {
-            if (!word) return '';
-            let normalized = word;
-
-            // Remove diacritics and tanween
-            normalized = normalized.replace(/[ًٌٍَُِّْ]/g, '');
-
-            // Remove prefixes
-            normalized = normalized.replace(/^ال/g, '');
-            normalized = normalized.replace(/^وَال/g, '');
-            normalized = normalized.replace(/^فَال/g, '');
-            normalized = normalized.replace(/^بِال/g, '');
-            normalized = normalized.replace(/^لِل/g, '');
-            normalized = normalized.replace(/^كَال/g, '');
-            normalized = normalized.replace(/^(و|ف|ب|ل|ك)/, '');
-
-            // Remove possessive pronouns
-            normalized = normalized.replace(/ي$/g, '');
-            normalized = normalized.replace(/كَ$/g, '');
-            normalized = normalized.replace(/كِ$/g, '');
-            normalized = normalized.replace(/هُ$/g, '');
-            normalized = normalized.replace(/هَا$/g, '');
-            normalized = normalized.replace(/نَا$/g, '');
-            normalized = normalized.replace(/كُمْ$/g, '');
-            normalized = normalized.replace(/هُمْ$/g, '');
-            normalized = normalized.replace(/هِنَّ$/g, '');
-
-            // Remove subject pronouns
-            normalized = normalized.replace(/^أ/g, '');
-            normalized = normalized.replace(/^ن/g, '');
-            normalized = normalized.replace(/^ت/g, '');
-            normalized = normalized.replace(/^ي/g, '');
-
-            // Remove verb suffixes
-            normalized = normalized.replace(/ُون$/g, '');
-            normalized = normalized.replace(/ُونَ$/g, '');
-            normalized = normalized.replace(/َان$/g, '');
-            normalized = normalized.replace(/َانِ$/g, '');
-            normalized = normalized.replace(/ِين$/g, '');
-            normalized = normalized.replace(/ِينَ$/g, '');
-            normalized = normalized.replace(/نَ$/g, '');
-
-            // Remove noun suffixes
-            normalized = normalized.replace(/َة$/g, '');
-            normalized = normalized.replace(/َةٌ$/g, '');
-            normalized = normalized.replace(/َةٍ$/g, '');
-            normalized = normalized.replace(/َةً$/g, '');
-            normalized = normalized.replace(/َات$/g, '');
-            normalized = normalized.replace(/َاتٌ$/g, '');
-            normalized = normalized.replace(/َاتٍ$/g, '');
-
-            // Final cleanup
-            normalized = normalized.replace(/[َُِّ]$/g, '');
-
-            return normalized;
         }
 
         // ==============================================================
@@ -1857,7 +1857,7 @@
             }).then(res => {
                 const data = res.data || [];
                 if (data.length === 0) {
-                    // Step 3: Try with root extraction (3 letters)
+                    // Step 3: Try with root extraction (3 letters) - only if word length >= 3
                     const root = normalizeArabicWord(word).substring(0, 3);
                     if (root.length >= 3) {
                         return callAPI('article-dictionary', 'GET', null, {
@@ -1871,79 +1871,89 @@
             }).then(res => {
                 const data = res.data || [];
                 if (data.length === 0) {
-                    // Step 4: Fallback - show not found message with suggestion
-                    document.getElementById('dictMeaning').textContent = '❌ ไม่พบข้อมูลคำนี้ในพจนานุกรม';
+                    // No match found - show friendly message with report button
+                    document.getElementById('dictMeaning').innerHTML = `
+                        ❌ ไม่พบข้อมูลคำนี้ในพจนานุกรม<br>
+                        <span class="text-sm text-gray-500">💡 กรุณากด "🚨 รายงานคำนี้" เพื่อช่วยเพิ่มข้อมูล</span>
+                    `;
                     document.getElementById('dictSynonyms').innerHTML = '<li class="text-gray-400">-</li>';
                     document.getElementById('dictAntonyms').innerHTML = '<li class="text-gray-400">-</li>';
                     document.getElementById('dictPluralSection').style.display = 'none';
                     document.getElementById('dictRoot').textContent = '-';
                     document.getElementById('reportWordBtn').dataset.word = word;
-                    // Suggest to report
-                    document.getElementById('dictMeaning').textContent += ' 💡 กรุณากด "รายงานคำนี้" เพื่อช่วยปรับปรุง';
+                    document.getElementById('reportWordBtn').textContent = '🚨 รายงานคำนี้';
+                    document.getElementById('reportWordBtn').disabled = false;
                     return;
                 }
-                const info = data[0];
-                document.getElementById('dictWord').textContent = info['คำศัพท์อาหรับ'] || word;
-                document.getElementById('dictReading').textContent = info['คำอ่าน'] ? `คำอ่าน: ${info['คำอ่าน']}` : '';
-                document.getElementById('dictMeaning').textContent = info['ความหมาย (ไทย)'] || 'ไม่พบความหมาย';
-
-                // Synonyms
-                const synList = document.getElementById('dictSynonyms');
-                synList.innerHTML = '';
-                const synonyms = [];
-                if (info['คำพ้องที่ 1'] && info['ความหมายคำพ้อง 1']) {
-                    synonyms.push({ word: info['คำพ้องที่ 1'], meaning: info['ความหมายคำพ้อง 1'] });
-                }
-                if (info['คำพ้องที่ 2'] && info['ความหมายคำพ้อง 2']) {
-                    synonyms.push({ word: info['คำพ้องที่ 2'], meaning: info['ความหมายคำพ้อง 2'] });
-                }
-                if (synonyms.length > 0) {
-                    synonyms.forEach(s => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<span class="arabic">${s.word}</span> = ${s.meaning}`;
-                        synList.appendChild(li);
-                    });
-                } else {
-                    synList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
-                }
-
-                // Antonyms
-                const antList = document.getElementById('dictAntonyms');
-                antList.innerHTML = '';
-                const antonyms = [];
-                if (info['คำตรงข้ามที่ 1'] && info['ความหมายคำตรงข้าม 1']) {
-                    antonyms.push({ word: info['คำตรงข้ามที่ 1'], meaning: info['ความหมายคำตรงข้าม 1'] });
-                }
-                if (info['คำตรงข้ามที่ 2'] && info['ความหมายคำตรงข้าม 2']) {
-                    antonyms.push({ word: info['คำตรงข้ามที่ 2'], meaning: info['ความหมายคำตรงข้าม 2'] });
-                }
-                if (antonyms.length > 0) {
-                    antonyms.forEach(a => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<span class="arabic">${a.word}</span> = ${a.meaning}`;
-                        antList.appendChild(li);
-                    });
-                } else {
-                    antList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
-                }
-
-                // Plural
-                const pluralSection = document.getElementById('dictPluralSection');
-                const pluralEl = document.getElementById('dictPlural');
-                if (info['พหูพจน์ (جمع)']) {
-                    pluralSection.style.display = 'block';
-                    pluralEl.textContent = info['พหูพจน์ (جمع)'];
-                } else {
-                    pluralSection.style.display = 'none';
-                }
-
-                // Root
-                document.getElementById('dictRoot').textContent = info['รากศัพท์'] || 'ไม่มีข้อมูล';
-
-                document.getElementById('reportWordBtn').dataset.word = word;
+                // Found data - display it
+                displayDictionaryData(data[0], word);
             }).catch(err => {
                 document.getElementById('dictMeaning').textContent = '⚠️ เกิดข้อผิดพลาด: ' + err.message;
             });
+        }
+
+        function displayDictionaryData(info, word) {
+            document.getElementById('dictWord').textContent = info['คำศัพท์อาหรับ'] || word;
+            document.getElementById('dictReading').textContent = info['คำอ่าน'] ? `คำอ่าน: ${info['คำอ่าน']}` : '';
+            document.getElementById('dictMeaning').textContent = info['ความหมาย (ไทย)'] || 'ไม่พบความหมาย';
+
+            // Synonyms
+            const synList = document.getElementById('dictSynonyms');
+            synList.innerHTML = '';
+            const synonyms = [];
+            if (info['คำพ้องที่ 1'] && info['ความหมายคำพ้อง 1']) {
+                synonyms.push({ word: info['คำพ้องที่ 1'], meaning: info['ความหมายคำพ้อง 1'] });
+            }
+            if (info['คำพ้องที่ 2'] && info['ความหมายคำพ้อง 2']) {
+                synonyms.push({ word: info['คำพ้องที่ 2'], meaning: info['ความหมายคำพ้อง 2'] });
+            }
+            if (synonyms.length > 0) {
+                synonyms.forEach(s => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="arabic">${s.word}</span> = ${s.meaning}`;
+                    synList.appendChild(li);
+                });
+            } else {
+                synList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
+            }
+
+            // Antonyms
+            const antList = document.getElementById('dictAntonyms');
+            antList.innerHTML = '';
+            const antonyms = [];
+            if (info['คำตรงข้ามที่ 1'] && info['ความหมายคำตรงข้าม 1']) {
+                antonyms.push({ word: info['คำตรงข้ามที่ 1'], meaning: info['ความหมายคำตรงข้าม 1'] });
+            }
+            if (info['คำตรงข้ามที่ 2'] && info['ความหมายคำตรงข้าม 2']) {
+                antonyms.push({ word: info['คำตรงข้ามที่ 2'], meaning: info['ความหมายคำตรงข้าม 2'] });
+            }
+            if (antonyms.length > 0) {
+                antonyms.forEach(a => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="arabic">${a.word}</span> = ${a.meaning}`;
+                    antList.appendChild(li);
+                });
+            } else {
+                antList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
+            }
+
+            // Plural
+            const pluralSection = document.getElementById('dictPluralSection');
+            const pluralEl = document.getElementById('dictPlural');
+            if (info['พหูพจน์ (جمع)']) {
+                pluralSection.style.display = 'block';
+                pluralEl.textContent = info['พหูพจน์ (جمع)'];
+            } else {
+                pluralSection.style.display = 'none';
+            }
+
+            // Root
+            document.getElementById('dictRoot').textContent = info['รากศัพท์'] || 'ไม่มีข้อมูล';
+
+            // Report button
+            document.getElementById('reportWordBtn').dataset.word = word;
+            document.getElementById('reportWordBtn').textContent = '🚨 รายงานคำนี้';
+            document.getElementById('reportWordBtn').disabled = false;
         }
 
         function closeDictionary() {
@@ -2261,14 +2271,14 @@
 
         debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.8) - 3 เกม + พจนานุกรม Normalize`);
 
-        // ปิด popup เมื่อคลิกภายนอก
+        // Close popup when clicking outside
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('dictionaryPopup');
             if (popup.classList.contains('show')) {
                 const rect = popup.getBoundingClientRect();
                 const isInside = (e.clientX >= rect.left && e.clientX <= rect.right &&
                                   e.clientY >= rect.top && e.clientY <= rect.bottom);
-                if (!isInside && e.target.closest('.reading-word') === null) {
+                if (!isInside && e.target.closest('.reading-word') === null && e.target.closest('.close-btn') === null) {
                     closeDictionary();
                 }
             }

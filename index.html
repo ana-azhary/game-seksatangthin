@@ -299,12 +299,32 @@
             <div class="flex flex-wrap justify-between items-center mb-3">
                 <h2 class="text-xl font-bold text-gray-800">📖 คำศัพท์ <span id="vocabCount" class="text-emerald-700">0</span></h2>
                 <div class="flex gap-2">
-                    <select id="vocabLevelFilter" class="border border-gray-300 rounded-full px-3 py-1 text-sm" onchange="filterVocab()"><option value="0">ทุก Level</option></select>
+                    <select id="vocabLevelFilter" class="border border-gray-300 rounded-full px-3 py-1 text-sm" onchange="filterVocab()">
+                        <option value="0">ทุก Level</option>
+                    </select>
                     <button id="exportCSV" class="btn-secondary text-sm py-1 px-3">⬇ CSV</button>
                     <button id="exportPDF" class="btn-secondary text-sm py-1 px-3">⬇ PDF</button>
                 </div>
             </div>
-            <div class="overflow-x-auto"><table id="vocabTable" class="w-full text-sm"><thead class="bg-gray-50 text-gray-600"><tr><th class="p-1 text-left">#</th><th class="p-1 text-left">ไทย</th><th class="p-1 text-left">อาหรับ</th><th class="p-1 text-left">อดีต</th><th class="p-1 text-left">ปัจจุบัน</th><th class="p-1 text-left">คำสั่ง</th><th class="p-1 text-left">เอกพจน์</th><th class="p-1 text-left">พหูพจน์</th><th class="p-1 text-left">หมวด</th><th class="p-1 text-left">Level</th></tr></thead><tbody id="vocabBody"></tbody></table></div>
+            <div class="overflow-x-auto">
+                <table id="vocabTable" class="w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-600">
+                        <tr>
+                            <th class="p-1 text-left">#</th>
+                            <th class="p-1 text-left">ไทย</th>
+                            <th class="p-1 text-left">อาหรับ</th>
+                            <th class="p-1 text-left">อดีต</th>
+                            <th class="p-1 text-left">ปัจจุบัน</th>
+                            <th class="p-1 text-left">คำสั่ง</th>
+                            <th class="p-1 text-left">เอกพจน์</th>
+                            <th class="p-1 text-left">พหูพจน์</th>
+                            <th class="p-1 text-left">หมวด</th>
+                            <th class="p-1 text-left">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocabBody"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
@@ -382,7 +402,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v4.4 -->
+    <!-- JAVASCRIPT v4.4 (อัปเดตการแสดงคำศัพท์ตาม Level) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -437,7 +457,6 @@
         let readingWordMap = {}, readingTranslationVisible = false;
         let currentArticleId = 0;
         let readingUnlockedDans = JSON.parse(localStorage.getItem('reading_unlocked') || '{}');
-        // article titles per dan
         let articleTitlesMap = {};
 
         const $ = id => document.getElementById(id);
@@ -759,9 +778,10 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY
+        //  GAME 1: VOCABULARY (ไม่เปลี่ยนแปลง)
         // ==============================================================
         function renderDans() {
+            // ใช้โค้ดเดิม (ไม่ต้องแก้ไข)
             const container = $('danList');
             container.innerHTML = '';
             if (!availableDans.length) { container.innerHTML = '<div class="text-sm text-gray-400">ยังไม่มีด่าน</div>'; return; }
@@ -777,7 +797,6 @@
                     const prevLevelDans = availableDans.filter(d => d.level === parseInt(level) - 1);
                     isUnlocked = prevLevelDans.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
                 }
-                // Check if level is unlocked by stars
                 const isUnlockedByStars = vocabUnlockedLevels[level] === true;
                 const isLevelUnlocked = isUnlocked || isUnlockedByStars;
                 const isLevelCompleted = allPassed;
@@ -866,9 +885,9 @@
         }
 
         function startGame() {
+            // ใช้โค้ดเดิม
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            // Check if level is unlocked by stars or by previous levels
             const levelUnlocked = vocabUnlockedLevels[currentLevel] === true || isDanUnlocked(availableDans.find(d => d.dan === currentDan));
             if (!levelUnlocked) {
                 alert('กรุณาปลดล็อก Level นี้ก่อน (ใช้ 100⭐ หรือทำด่านก่อนหน้าให้ครบ)');
@@ -882,9 +901,9 @@
         }
 
         async function loadDan(dan) {
+            // ใช้โค้ดเดิม
             const danInfo = availableDans.find(d => d.dan === dan);
             if (!danInfo) { alert('ไม่พบด่านนี้'); return; }
-            // Check if level is unlocked (by stars or progress)
             const levelUnlocked = vocabUnlockedLevels[danInfo.level] === true || isDanUnlocked(danInfo);
             if (!levelUnlocked && dan !== 1) {
                 alert('กรุณาปลดล็อก Level นี้ก่อน (ใช้ 100⭐ หรือทำด่านก่อนหน้าให้ครบ)');
@@ -905,6 +924,7 @@
         }
 
         function renderOverlayGame() {
+            // ใช้โค้ดเดิม
             const content = $('overlayContent');
             content.innerHTML = `
                 <div class="card-modern">
@@ -960,6 +980,7 @@
         }
 
         function renderQuestion() {
+            // ใช้โค้ดเดิม (ไม่ต้องแก้)
             if (currentIndex >= currentRound.length || gameEnded) { if (!gameEnded) endGame(); return; }
             const q = currentRound[currentIndex];
             isAnswered = false; clearInterval(timerInterval);
@@ -1016,15 +1037,14 @@
         }
 
         function selectAnswer(selectedIdx, q) {
+            // ใช้โค้ดเดิม
             if (isAnswered || gameEnded) return;
             isAnswered = true; clearInterval(timerInterval);
-
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const isCorrect = (selectedIdx === correctIdx);
             const btns = document.querySelectorAll('.option-btn');
             btns.forEach(b => b.classList.add('disabled'));
             btns.forEach(b => { const idx = parseInt(b.dataset.idx); if (idx === correctIdx) b.classList.add('correct'); if (idx === selectedIdx && !isCorrect) b.classList.add('wrong'); });
-
             if (isCorrect) {
                 playCorrectSound();
                 vibrate([30, 50, 30]);
@@ -1060,6 +1080,7 @@
         }
 
         function endGame() {
+            // ใช้โค้ดเดิม
             gameEnded = true; clearInterval(timerInterval);
             $('questionArea').classList.add('hidden');
             $('resultArea').classList.remove('hidden');
@@ -1177,7 +1198,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE
+        //  GAME 2: SENTENCE (ไม่เปลี่ยนแปลง)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1278,7 +1299,6 @@
         function startSentenceGame() {
             if (!currentSentenceDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            // Check level unlock
             const levelUnlocked = sentenceUnlockedLevels[currentSentenceLevel] === true || 
                 currentSentenceDan === sentenceDans[0] || 
                 (sentenceLevels.find(l => l.level === currentSentenceLevel)?.dans?.includes(currentSentenceDan - 1) && 
@@ -1480,7 +1500,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (ปลดล็อกด้วย Level x 5 ดาว, max 30)
+        //  GAME 3: READING (ไม่เปลี่ยนแปลง)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1525,7 +1545,6 @@
             $('readingSelectedLevel').textContent = level;
             $('readingDanContainer').classList.remove('hidden');
             $('readingNotStarted').classList.add('hidden');
-            // Fetch article titles for this level
             fetchArticleTitles(level);
             renderReadingDans();
         }
@@ -1565,7 +1584,6 @@
                 const item = document.createElement('div');
                 item.className = 'dan-item' + (done ? ' completed' : '') + (isLocked ? ' locked' : '') + (isSelected ? ' selected' : '');
 
-                // Show article titles if available
                 let titlesHtml = '';
                 if (articleTitlesMap[dan] && articleTitlesMap[dan].length > 0) {
                     titlesHtml = `<div class="sub-desc">📄 ${articleTitlesMap[dan].slice(0, 3).join(', ')}${articleTitlesMap[dan].length > 3 ? '…' : ''}</div>`;
@@ -1945,24 +1963,54 @@
         }
 
         // ==============================================================
-        //  VOCAB / LEADERBOARD / SHARE
+        //  VOCAB / LEADERBOARD / SHARE (ปรับปรุง VOCAB)
         // ==============================================================
         function renderVocab() {
             const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
             const tbody = $('vocabBody');
             tbody.innerHTML = '';
+
+            // กรองข้อมูลตาม level
             let filtered = allVocab;
-            if (filterLevel > 0) filtered = filtered.filter(item => parseInt(item.level) === filterLevel);
-            $('vocabCount').textContent = filtered.length;
+            if (filterLevel > 0) {
+                filtered = filtered.filter(item => parseInt(item.level) === filterLevel);
+            }
+            document.getElementById('vocabCount').textContent = filtered.length;
+
+            // อัปเดต dropdown: แสดงรายการ Level ที่มีอยู่
             const filterSelect = $('vocabLevelFilter');
             const currentVal = filterSelect.value;
-            filterSelect.innerHTML = '<option value="0">ทุก Level</option>';
+            // เก็บตัวเลือก "ทุก Level" ไว้
+            const allOption = filterSelect.querySelector('option[value="0"]');
+            filterSelect.innerHTML = '';
+            filterSelect.appendChild(allOption);
+
+            // หา Level ทั้งหมดที่มีในข้อมูล (ไม่ซ้ำ)
             const levels = [...new Set(allVocab.map(item => parseInt(item.level)).filter(l => l > 0))].sort((a,b)=>a-b);
-            levels.forEach(l => { const opt = document.createElement('option'); opt.value = l; opt.textContent = `Level ${l}`; filterSelect.appendChild(opt); });
-            filterSelect.value = currentVal;
+            levels.forEach(l => {
+                const count = allVocab.filter(item => parseInt(item.level) === l).length;
+                const opt = document.createElement('option');
+                opt.value = l;
+                opt.textContent = `Level ${l} (${count} คำ)`;
+                filterSelect.appendChild(opt);
+            });
+            filterSelect.value = currentVal || '0';
+
+            // แสดงข้อมูลที่กรองแล้ว
             filtered.forEach((item, idx) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-1">${idx+1}</td><td class="p-1">${item.คำศัพท์ไทย||''}</td><td class="p-1 arabic">${item.คำศัพท์อาหรับ||''}</td><td class="p-1 arabic">${item.รูปอดีต||''}</td><td class="p-1 arabic">${item.รูปปัจจุบัน||''}</td><td class="p-1 arabic">${item.รูปคำสั่ง||''}</td><td class="p-1 arabic">${item.เอกพจน์||''}</td><td class="p-1 arabic">${item.พหูพจน์||''}</td><td class="p-1">${item.หมวดหมู่||''}</td><td class="p-1">${item.level||''}</td>`;
+                tr.innerHTML = `
+                    <td class="p-1">${idx + 1}</td>
+                    <td class="p-1">${item.คำศัพท์ไทย || ''}</td>
+                    <td class="p-1 arabic">${item.คำศัพท์อาหรับ || ''}</td>
+                    <td class="p-1 arabic">${item.รูปอดีต || ''}</td>
+                    <td class="p-1 arabic">${item.รูปปัจจุบัน || ''}</td>
+                    <td class="p-1 arabic">${item.รูปคำสั่ง || ''}</td>
+                    <td class="p-1 arabic">${item.เอกพจน์ || ''}</td>
+                    <td class="p-1 arabic">${item.พหูพจน์ || ''}</td>
+                    <td class="p-1">${item.หมวดหมู่ || ''}</td>
+                    <td class="p-1">${item.level || ''}</td>
+                `;
                 tbody.appendChild(tr);
             });
         }
@@ -1973,7 +2021,6 @@
             try {
                 const res = await callAPI('leaderboard', 'GET');
                 const data = res.data || [];
-                // Group by email and pick highest score (to avoid duplicate names)
                 const grouped = {};
                 data.forEach(item => {
                     const key = item.email;
@@ -2109,6 +2156,7 @@
         console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐, ปลดล็อก Level 100⭐');
         console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
         console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที');
+        console.log('📚 คำศัพท์: แบ่งตาม Level อัตโนมัติ 100 คำต่อ Level (จากข้อมูลในชีท)');
     </script>
 </body>
 </html>

@@ -31,12 +31,15 @@
         .btn-gold:active { transform: scale(0.97); }
         .btn-danger { background: #dc2626; color: #fff; font-weight: 600; padding: 10px 24px; border-radius: 40px; border: none; font-size: 0.95rem; transition: 0.2s; cursor: pointer; }
         .btn-danger:active { transform: scale(0.97); }
+        .btn-unlock { background: #8b5cf6; color: #fff; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
+        .btn-unlock:active { transform: scale(0.95); }
+        .btn-unlock:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-settings { background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-settings:hover { background: rgba(255,255,255,0.3); }
         .btn-settings.active { background: rgba(255,255,255,0.4); }
 
         .card-modern { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .dan-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: #f8fafc; margin-bottom: 6px; transition: 0.2s; cursor: default; border: 2px solid transparent; }
+        .dan-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: #f8fafc; margin-bottom: 6px; transition: 0.2s; cursor: default; border: 2px solid transparent; flex-wrap: wrap; }
         .dan-item.completed { background: #ecfdf5; }
         .dan-item.locked { opacity: 0.5; filter: grayscale(0.3); }
         .dan-item.selected { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 0 0 2px rgba(13,148,136,0.2); }
@@ -44,11 +47,17 @@
         .dan-item .info { flex: 1; }
         .dan-item .info .name { font-weight: 600; font-size: 0.9rem; color: #1e293b; }
         .dan-item .info .desc { font-size: 0.7rem; color: #94a3b8; }
+        .dan-item .info .sub-desc { font-size: 0.65rem; color: #6b7280; margin-top: 2px; }
         .dan-item .status { font-size: 0.65rem; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
         .dan-item .status.done { background: #dcfce7; color: #16a34a; }
         .dan-item .status.pending { background: #fef3c7; color: #d97706; }
         .dan-item .status.locked-status { background: #f1f5f9; color: #94a3b8; }
         .dan-item .status.unlock-ready { background: #dbeafe; color: #2563eb; }
+
+        .level-card { margin-bottom: 12px; padding: 10px 12px; background: #f8fafc; border-radius: 12px; border-left: 4px solid #d1d5db; }
+        .level-card.unlocked { border-left-color: #3b82f6; background: #eff6ff; }
+        .level-card.completed { border-left-color: #16a34a; background: #f0fdf4; }
+        .level-card.locked { border-left-color: #9ca3af; opacity: 0.7; }
 
         .level-progress-bar { height: 4px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 6px 0 8px; }
         .level-progress-bar .fill { height: 100%; background: linear-gradient(90deg, #0d9488, #065f46); border-radius: 10px; transition: width 0.5s ease; }
@@ -142,8 +151,30 @@
         .settings-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
         .settings-popup .close-btn:hover { color: #1f2937; }
 
-        /* ตัวเลือกที่เลือกตอบจะมีสี */
         .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
+
+        .tooltip { position: relative; display: inline-block; cursor: pointer; }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 6px 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.7rem;
+            font-weight: normal;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 
         @media (max-width: 480px) {
             .arabic { font-size: 1.2rem; line-height: 1.8rem; }
@@ -151,6 +182,7 @@
             .tab-modern button { font-size: 0.65rem; padding: 6px 8px; }
             .game-overlay { padding: 12px 16px 80px; }
             .sentence-word { padding: 4px 10px; font-size: 0.9rem; }
+            .dan-item .info .sub-desc { font-size: 0.6rem; }
         }
     </style>
 </head>
@@ -205,11 +237,11 @@
         </div>
         <div class="mb-4" id="startGameContainer">
             <button id="startGameBtn" class="btn-start" onclick="startGame()">🚀 เริ่มฝึก</button>
-            <p class="text-xs text-gray-400 text-center mt-1">กดปุ่มเมื่อพร้อม</p>
+            <p class="text-xs text-gray-400 text-center mt-1">กดปุ่มเมื่อพร้อม หรือดับเบิลคลิกที่ด่าน</p>
         </div>
         <div id="gameNotStarted" class="card-modern text-center py-8 text-gray-400">
             <span class="text-4xl block mb-2">🌍</span>
-            <p>เลือกด่านและกด "เริ่มฝึก"</p>
+            <p>เลือกด่านและกด "เริ่มฝึก" หรือดับเบิลคลิก</p>
         </div>
     </section>
 
@@ -228,10 +260,11 @@
         </div>
         <div class="mb-4" id="sentenceStartContainer">
             <button id="sentenceStartBtn" class="btn-start" onclick="startSentenceGame()">🚀 เริ่มฝึก</button>
+            <p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่านเพื่อเริ่มได้</p>
         </div>
         <div id="sentenceNotStarted" class="card-modern text-center py-8 text-gray-400">
             <span class="text-4xl block mb-2">🧩</span>
-            <p>เลือก Level และด่าน แล้วกด "เริ่มฝึก"</p>
+            <p>เลือก Level และด่าน แล้วกด "เริ่มฝึก" หรือดับเบิลคลิก</p>
         </div>
     </section>
 
@@ -250,10 +283,11 @@
         </div>
         <div class="mb-4" id="readingStartContainer">
             <button id="readingStartBtn" class="btn-start" onclick="startReadingGame()">🚀 เริ่มฝึก</button>
+            <p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่านเพื่อเริ่มได้</p>
         </div>
         <div id="readingNotStarted" class="card-modern text-center py-8 text-gray-400">
             <span class="text-4xl block mb-2">📖</span>
-            <p>เลือก Level และด่าน แล้วกด "เริ่มฝึก"</p>
+            <p>เลือก Level และด่าน แล้วกด "เริ่มฝึก" หรือดับเบิลคลิก</p>
         </div>
     </section>
 
@@ -348,7 +382,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v4.3 -->
+    <!-- JAVASCRIPT v4.4 -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -363,6 +397,7 @@
             PAGE_URL: 'https://www.facebook.com/profile.php?id=100064382094369',
             HINT_COST: 1,
             LEVEL_BONUS_STARS: 20,
+            UNLOCK_LEVEL_COST: 100,
         };
 
         // ==============================================================
@@ -385,6 +420,11 @@
         let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
         let vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
 
+        // Unlocked levels (vocab, sentence, reading)
+        let vocabUnlockedLevels = JSON.parse(localStorage.getItem('vocab_unlocked_levels') || '{}');
+        let sentenceUnlockedLevels = JSON.parse(localStorage.getItem('sentence_unlocked_levels') || '{}');
+        let readingUnlockedLevels = JSON.parse(localStorage.getItem('reading_unlocked_levels') || '{}');
+
         // Sentence game
         let sentenceLevels = [], sentenceDans = [], currentSentenceLevel = 0, currentSentenceDan = 0;
         let sentenceQuestions = [], sentenceIndex = 0, sentenceTotalQuestions = 0;
@@ -397,6 +437,8 @@
         let readingWordMap = {}, readingTranslationVisible = false;
         let currentArticleId = 0;
         let readingUnlockedDans = JSON.parse(localStorage.getItem('reading_unlocked') || '{}');
+        // article titles per dan
+        let articleTitlesMap = {};
 
         const $ = id => document.getElementById(id);
 
@@ -407,10 +449,9 @@
         function setStatus(text, color) { const el = $('loginStatus'); if (el) { el.textContent = text; el.style.color = color || '#fff'; } }
 
         // ==============================================================
-        //  SOUND & VIBRATION (ปรับปรุง)
+        //  SOUND & VIBRATION
         // ==============================================================
         let audioCtx = null;
-
         function getAudioContext() {
             if (!audioCtx) {
                 try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -442,7 +483,6 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                // ดีเสียง "เย้ยยย" (ขึ้นสูง)
                 [523, 659, 784, 1047].forEach((freq, i) => {
                     setTimeout(() => {
                         const osc = ctx.createOscillator();
@@ -550,10 +590,32 @@
         }
 
         // ==============================================================
-        //  UNLOCK COST (Level x 5, max 30)
+        //  UNLOCK LEVEL
         // ==============================================================
-        function getUnlockCost(level) {
-            return Math.min(level * 5, 30);
+        function unlockLevel(game, level) {
+            if (stars < CONFIG.UNLOCK_LEVEL_COST) {
+                alert(`⭐ ไม่พอ! ต้องใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาว`);
+                return false;
+            }
+            if (confirm(`ใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาวเพื่อปลดล็อก Level ${level} ของเกม${game}?`)) {
+                if (spendStars(CONFIG.UNLOCK_LEVEL_COST)) {
+                    let key = '';
+                    let storage = {};
+                    if (game === 'vocab') { key = 'vocab_unlocked_levels'; storage = vocabUnlockedLevels; }
+                    else if (game === 'sentence') { key = 'sentence_unlocked_levels'; storage = sentenceUnlockedLevels; }
+                    else if (game === 'reading') { key = 'reading_unlocked_levels'; storage = readingUnlockedLevels; }
+                    storage[level] = true;
+                    localStorage.setItem(key, JSON.stringify(storage));
+                    if (game === 'vocab') { vocabUnlockedLevels = storage; renderDans(); }
+                    else if (game === 'sentence') { sentenceUnlockedLevels = storage; renderSentenceLevels(); loadSentenceLevel(currentSentenceLevel); }
+                    else if (game === 'reading') { readingUnlockedLevels = storage; renderReadingLevels(); loadReadingLevel(currentReadingLevel); }
+                    playCorrectSound();
+                    vibrate([30, 50, 30]);
+                    alert(`✅ ปลดล็อก Level ${level} เรียบร้อย!`);
+                    return true;
+                }
+            }
+            return false;
         }
 
         // ==============================================================
@@ -709,17 +771,27 @@
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
                 const allPassed = levelData.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
-                let isLevelUnlocked = false;
-                if (parseInt(level) === 1) isLevelUnlocked = true;
+                let isUnlocked = false;
+                if (parseInt(level) === 1) isUnlocked = true;
                 else {
                     const prevLevelDans = availableDans.filter(d => d.level === parseInt(level) - 1);
-                    isLevelUnlocked = prevLevelDans.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
+                    isUnlocked = prevLevelDans.every(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE);
                 }
+                // Check if level is unlocked by stars
+                const isUnlockedByStars = vocabUnlockedLevels[level] === true;
+                const isLevelUnlocked = isUnlocked || isUnlockedByStars;
+                const isLevelCompleted = allPassed;
+
                 const levelDiv = document.createElement('div');
-                levelDiv.className = 'mb-2';
+                levelDiv.className = 'level-card' + (isLevelCompleted ? ' completed' : (isLevelUnlocked ? ' unlocked' : ' locked'));
+
                 const header = document.createElement('div');
                 header.className = 'flex items-center justify-between text-sm font-semibold text-gray-700';
-                header.innerHTML = `<span>🏰 Level ${level}</span><span class="text-xs font-normal text-gray-400">${levelData.filter(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE).length}/${levelData.length}</span>`;
+                header.innerHTML = `
+                    <span>🏰 Level ${level}</span>
+                    <span class="text-xs font-normal text-gray-400">${levelData.filter(d => (userProgress[d.dan] || 0) >= CONFIG.PASSING_SCORE).length}/${levelData.length}</span>
+                    ${!isLevelUnlocked && !isLevelCompleted ? `<button class="btn-unlock ml-2" onclick="unlockLevel('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : ''}
+                `;
                 levelDiv.appendChild(header);
                 const bar = document.createElement('div');
                 bar.className = 'level-progress-bar';
@@ -734,7 +806,7 @@
                 levelData.forEach(d => {
                     const progress = userProgress[d.dan] || 0;
                     const isPassed = progress >= CONFIG.PASSING_SCORE;
-                    const unlocked = isDanUnlocked(d);
+                    const unlocked = isDanUnlocked(d) || isUnlockedByStars;
                     const isSelected = currentDan === d.dan && currentLevel === d.level;
                     const item = document.createElement('div');
                     item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
@@ -745,7 +817,6 @@
                     `;
                     if (unlocked) {
                         item.style.cursor = 'pointer';
-                        // Double click to start game
                         let clickCount = 0;
                         let clickTimer = null;
                         item.onclick = () => {
@@ -757,19 +828,17 @@
                                     currentLevel = d.level;
                                     renderDans();
                                     const msg = `📘 เลือก ด่าน ${d.dan} แล้ว กด "เริ่มฝึก" ครับ!`;
-                                    const el = document.querySelector('.ustadh-card .msg');
+                                    const el = document.querySelector('#gameTab .ustadh-card .msg');
                                     if (el) el.textContent = msg;
                                     $('gameNotStarted').classList.add('hidden');
                                     $('startGameContainer').classList.remove('hidden');
                                     vibrate(30);
                                     playKeyboardSound();
-                                    // scroll to start button
                                     document.getElementById('startGameContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }, 300);
                             } else if (clickCount >= 2) {
                                 clearTimeout(clickTimer);
                                 clickCount = 0;
-                                // double click = start game directly
                                 currentDan = d.dan;
                                 currentLevel = d.level;
                                 renderDans();
@@ -799,8 +868,10 @@
         function startGame() {
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            if (!isDanUnlocked(availableDans.find(d => d.dan === currentDan))) {
-                alert('กรุณาทำคะแนนให้ผ่านด่านก่อนหน้า (60%)');
+            // Check if level is unlocked by stars or by previous levels
+            const levelUnlocked = vocabUnlockedLevels[currentLevel] === true || isDanUnlocked(availableDans.find(d => d.dan === currentDan));
+            if (!levelUnlocked) {
+                alert('กรุณาปลดล็อก Level นี้ก่อน (ใช้ 100⭐ หรือทำด่านก่อนหน้าให้ครบ)');
                 return;
             }
             gameStarted = true;
@@ -813,7 +884,12 @@
         async function loadDan(dan) {
             const danInfo = availableDans.find(d => d.dan === dan);
             if (!danInfo) { alert('ไม่พบด่านนี้'); return; }
-            if (!isDanUnlocked(danInfo) && dan !== 1) { alert('กรุณาทำคะแนนให้ผ่านด่านก่อนหน้า (60%)'); return; }
+            // Check if level is unlocked (by stars or progress)
+            const levelUnlocked = vocabUnlockedLevels[danInfo.level] === true || isDanUnlocked(danInfo);
+            if (!levelUnlocked && dan !== 1) {
+                alert('กรุณาปลดล็อก Level นี้ก่อน (ใช้ 100⭐ หรือทำด่านก่อนหน้าให้ครบ)');
+                return;
+            }
             currentDan = dan; currentLevel = danInfo.level;
             currentFeature = getLevelFeature(currentLevel);
             lives = currentFeature.lives || 0; combo = 1; consecutiveWrong = 0; streak = 0;
@@ -910,7 +986,6 @@
                 btn.innerHTML = `<span class="arabic">${opt.text}</span> <span class="text-xs text-gray-400 font-mono">${letters[opt.idx]}</span>`;
                 btn.dataset.idx = opt.idx;
                 btn.onclick = () => {
-                    // เลือกตัวเลือกมีสี
                     document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected-option'));
                     btn.classList.add('selected-option');
                     playKeyboardSound();
@@ -1122,11 +1197,19 @@
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
                 const allDone = lv.dans.every(d => progress[lv.level] && progress[lv.level].includes(d));
-                const isUnlocked = lv.level === 1 || (sentenceLevels.find(l => l.level === lv.level - 1)?.dans.every(d => progress[lv.level - 1] && progress[lv.level - 1].includes(d)));
+                const isUnlocked = lv.level === 1 || (sentenceLevels.find(l => l.level === lv.level - 1)?.dans.every(d => progress[lv.level - 1] && progress[lv.level - 1].includes(d))) || sentenceUnlockedLevels[lv.level] === true;
                 if (allDone) { btn.textContent = `✅ Level ${lv.level}`; btn.className += ' bg-green-100'; }
                 else if (isUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
                 else { btn.textContent = `🔒 Level ${lv.level}`; btn.className += ' opacity-50'; }
-                btn.onclick = () => { if (isUnlocked) loadSentenceLevel(lv.level); else alert('กรุณาผ่าน Level ก่อนหน้าให้ครบ'); };
+                btn.onclick = () => { if (isUnlocked) loadSentenceLevel(lv.level); else {
+                    if (stars >= CONFIG.UNLOCK_LEVEL_COST) {
+                        if (confirm(`ใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาวเพื่อปลดล็อก Level ${lv.level}?`)) {
+                            unlockLevel('sentence', lv.level);
+                        }
+                    } else {
+                        alert(`⭐ ไม่พอ! ต้องใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาว หรือทำ Level ก่อนหน้าให้ครบ`);
+                    }
+                } };
                 container.appendChild(btn);
             });
         }
@@ -1146,9 +1229,10 @@
             const container = $('sentenceDanList');
             container.innerHTML = '';
             const progress = JSON.parse(localStorage.getItem('sentence_progress') || '{}');
+            const isLevelUnlocked = sentenceUnlockedLevels[currentSentenceLevel] === true;
             sentenceDans.forEach(dan => {
                 const done = progress[currentSentenceLevel] && progress[currentSentenceLevel].includes(dan);
-                const isUnlocked = dan === sentenceDans[0] || (progress[currentSentenceLevel] && progress[currentSentenceLevel].includes(dan - 1));
+                const isUnlocked = dan === sentenceDans[0] || (progress[currentSentenceLevel] && progress[currentSentenceLevel].includes(dan - 1)) || isLevelUnlocked;
                 const isSelected = currentSentenceDan === dan;
                 const item = document.createElement('div');
                 item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
@@ -1159,19 +1243,32 @@
                 `;
                 if (isUnlocked) {
                     item.style.cursor = 'pointer';
+                    let clickCount = 0;
+                    let clickTimer = null;
                     item.onclick = () => {
-                        currentSentenceDan = dan;
-                        renderSentenceDans();
-                        const msgEl = document.querySelector('#sentenceTab .ustadh-card .msg');
-                        if (msgEl) msgEl.textContent = `📘 เลือกด่าน ${dan} แล้ว กด "เริ่มฝึก" ครับ!`;
-                        $('sentenceDanContainer').classList.remove('hidden');
-                        $('sentenceNotStarted').classList.add('hidden');
-                        $('sentenceGameArea').classList.add('hidden');
-                        $('sentenceStartContainer').classList.remove('hidden');
-                        vibrate(30);
-                        playKeyboardSound();
-                        // scroll to start button
-                        document.getElementById('sentenceStartContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        clickCount++;
+                        if (clickCount === 1) {
+                            clickTimer = setTimeout(() => {
+                                clickCount = 0;
+                                currentSentenceDan = dan;
+                                renderSentenceDans();
+                                const msgEl = document.querySelector('#sentenceTab .ustadh-card .msg');
+                                if (msgEl) msgEl.textContent = `📘 เลือกด่าน ${dan} แล้ว กด "เริ่มฝึก" ครับ!`;
+                                $('sentenceDanContainer').classList.remove('hidden');
+                                $('sentenceNotStarted').classList.add('hidden');
+                                $('sentenceGameArea').classList.add('hidden');
+                                $('sentenceStartContainer').classList.remove('hidden');
+                                vibrate(30);
+                                playKeyboardSound();
+                                document.getElementById('sentenceStartContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 300);
+                        } else if (clickCount >= 2) {
+                            clearTimeout(clickTimer);
+                            clickCount = 0;
+                            currentSentenceDan = dan;
+                            renderSentenceDans();
+                            startSentenceGame();
+                        }
                     };
                 }
                 container.appendChild(item);
@@ -1181,6 +1278,15 @@
         function startSentenceGame() {
             if (!currentSentenceDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
+            // Check level unlock
+            const levelUnlocked = sentenceUnlockedLevels[currentSentenceLevel] === true || 
+                currentSentenceDan === sentenceDans[0] || 
+                (sentenceLevels.find(l => l.level === currentSentenceLevel)?.dans?.includes(currentSentenceDan - 1) && 
+                 (JSON.parse(localStorage.getItem('sentence_progress') || '{}')[currentSentenceLevel]?.includes(currentSentenceDan - 1)));
+            if (!levelUnlocked && currentSentenceDan !== sentenceDans[0]) {
+                alert('กรุณาปลดล็อก Level นี้ก่อน (ใช้ 100⭐ หรือทำด่านก่อนหน้าให้ครบ)');
+                return;
+            }
             $('sentenceStartContainer').classList.add('hidden');
             showGameOverlay();
             loadSentenceDan(currentSentenceLevel, currentSentenceDan);
@@ -1394,11 +1500,19 @@
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
                 const allDone = lv.dans.every(d => progress[lv.level] && progress[lv.level].includes(d));
-                const isUnlocked = lv.level === 1 || (readingLevels.find(l => l.level === lv.level - 1)?.dans.every(d => progress[lv.level - 1] && progress[lv.level - 1].includes(d)));
+                const isUnlocked = lv.level === 1 || (readingLevels.find(l => l.level === lv.level - 1)?.dans.every(d => progress[lv.level - 1] && progress[lv.level - 1].includes(d))) || readingUnlockedLevels[lv.level] === true;
                 if (allDone) { btn.textContent = `✅ Level ${lv.level}`; btn.className += ' bg-green-100'; }
                 else if (isUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
                 else { btn.textContent = `🔒 Level ${lv.level}`; btn.className += ' opacity-50'; }
-                btn.onclick = () => { if (isUnlocked) loadReadingLevel(lv.level); else alert('กรุณาผ่าน Level ก่อนหน้าให้ครบ'); };
+                btn.onclick = () => { if (isUnlocked) loadReadingLevel(lv.level); else {
+                    if (stars >= CONFIG.UNLOCK_LEVEL_COST) {
+                        if (confirm(`ใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาวเพื่อปลดล็อก Level ${lv.level}?`)) {
+                            unlockLevel('reading', lv.level);
+                        }
+                    } else {
+                        alert(`⭐ ไม่พอ! ต้องใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาว หรือทำ Level ก่อนหน้าให้ครบ`);
+                    }
+                } };
                 container.appendChild(btn);
             });
         }
@@ -1411,7 +1525,23 @@
             $('readingSelectedLevel').textContent = level;
             $('readingDanContainer').classList.remove('hidden');
             $('readingNotStarted').classList.add('hidden');
+            // Fetch article titles for this level
+            fetchArticleTitles(level);
             renderReadingDans();
+        }
+
+        async function fetchArticleTitles(level) {
+            try {
+                const res = await callAPI('articles', 'GET', null, { level: level });
+                const articles = res.data || [];
+                const map = {};
+                articles.forEach(art => {
+                    const dan = parseInt(art.dan);
+                    if (!map[dan]) map[dan] = [];
+                    map[dan].push(art['หัวข้อ'] || `บทความที่ ${art.id}`);
+                });
+                articleTitlesMap = map;
+            } catch(e) { console.error('Failed to fetch article titles:', e); }
         }
 
         function renderReadingDans() {
@@ -1419,10 +1549,11 @@
             container.innerHTML = '';
             const progress = JSON.parse(localStorage.getItem('reading_progress') || '{}');
             const unlocked = JSON.parse(localStorage.getItem('reading_unlocked') || '{}');
+            const isLevelUnlocked = readingUnlockedLevels[currentReadingLevel] === true;
 
             readingDans.forEach(dan => {
                 const done = progress[currentReadingLevel] && progress[currentReadingLevel].includes(dan);
-                const isUnlockedByDefault = dan === readingDans[0] || (progress[currentReadingLevel] && progress[currentReadingLevel].includes(dan - 1));
+                const isUnlockedByDefault = dan === readingDans[0] || (progress[currentReadingLevel] && progress[currentReadingLevel].includes(dan - 1)) || isLevelUnlocked;
                 const isUnlockedByStars = unlocked[dan] === true;
                 const isLocked = !done && !isUnlockedByStars && !isUnlockedByDefault;
 
@@ -1433,6 +1564,13 @@
 
                 const item = document.createElement('div');
                 item.className = 'dan-item' + (done ? ' completed' : '') + (isLocked ? ' locked' : '') + (isSelected ? ' selected' : '');
+
+                // Show article titles if available
+                let titlesHtml = '';
+                if (articleTitlesMap[dan] && articleTitlesMap[dan].length > 0) {
+                    titlesHtml = `<div class="sub-desc">📄 ${articleTitlesMap[dan].slice(0, 3).join(', ')}${articleTitlesMap[dan].length > 3 ? '…' : ''}</div>`;
+                }
+
                 let statusText = done ? '✅ อ่านแล้ว' : (isUnlockedByStars || isUnlockedByDefault ? '📖 พร้อมอ่าน' : `🔒 ใช้ ${cost}⭐`);
                 let statusClass = done ? 'done' : (isUnlockedByStars || isUnlockedByDefault ? 'pending' : 'unlock-ready');
 
@@ -1441,7 +1579,7 @@
                     statusText = `🔒 ใช้ ${cost}⭐ ปลดล็อก`;
                     statusClass = 'unlock-ready';
                     if (stars >= cost) {
-                        unlockBtn = `<button class="text-xs text-white bg-emerald-600 px-2 py-0.5 rounded-full" onclick="unlockReadingDan(${dan}, event)">🔓 ปลดล็อก</button>`;
+                        unlockBtn = `<button class="btn-unlock" onclick="unlockReadingDan(${dan}, event)">🔓 ปลดล็อก</button>`;
                     } else {
                         unlockBtn = `<span class="text-xs text-gray-400">⭐${stars}/${cost}</span>`;
                     }
@@ -1451,26 +1589,41 @@
                     <span class="icon">${done ? '✅' : (isUnlockedByStars || isUnlockedByDefault ? '📖' : '🔒')}</span>
                     <div class="info">
                         <div class="name">ด่าน ${dan}</div>
-                        <div class="desc">${done ? 'อ่านแล้ว' : (isUnlockedByStars || isUnlockedByDefault ? 'พร้อมอ่าน' : 'ล็อก (Level ${currentReadingLevel}x5⭐)')}</div>
+                        <div class="desc">${done ? 'อ่านแล้ว' : (isUnlockedByStars || isUnlockedByDefault ? 'พร้อมอ่าน' : 'ล็อก (Level x5⭐)')}</div>
+                        ${titlesHtml}
                     </div>
                     <span class="status ${statusClass}">${statusText}</span>
                     ${unlockBtn}
                 `;
                 if (!isLocked || isUnlockedByStars) {
                     item.style.cursor = 'pointer';
+                    let clickCount = 0;
+                    let clickTimer = null;
                     item.onclick = () => {
                         if (!isLocked || isUnlockedByStars) {
-                            currentReadingDan = dan;
-                            renderReadingDans();
-                            const msgEl = document.querySelector('#readingTab .ustadh-card .msg');
-                            if (msgEl) msgEl.textContent = `📖 เลือกด่าน ${dan} แล้ว กด "เริ่มฝึก" ครับ!`;
-                            $('readingDanContainer').classList.remove('hidden');
-                            $('readingNotStarted').classList.add('hidden');
-                            $('readingArticleArea').classList.add('hidden');
-                            $('readingStartContainer').classList.remove('hidden');
-                            vibrate(30);
-                            playKeyboardSound();
-                            document.getElementById('readingStartContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            clickCount++;
+                            if (clickCount === 1) {
+                                clickTimer = setTimeout(() => {
+                                    clickCount = 0;
+                                    currentReadingDan = dan;
+                                    renderReadingDans();
+                                    const msgEl = document.querySelector('#readingTab .ustadh-card .msg');
+                                    if (msgEl) msgEl.textContent = `📖 เลือกด่าน ${dan} แล้ว กด "เริ่มฝึก" ครับ!`;
+                                    $('readingDanContainer').classList.remove('hidden');
+                                    $('readingNotStarted').classList.add('hidden');
+                                    $('readingArticleArea').classList.add('hidden');
+                                    $('readingStartContainer').classList.remove('hidden');
+                                    vibrate(30);
+                                    playKeyboardSound();
+                                    document.getElementById('readingStartContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 300);
+                            } else if (clickCount >= 2) {
+                                clearTimeout(clickTimer);
+                                clickCount = 0;
+                                currentReadingDan = dan;
+                                renderReadingDans();
+                                startReadingGame();
+                            }
                         }
                     };
                 }
@@ -1498,6 +1651,10 @@
             }
         }
 
+        function getUnlockCost(level) {
+            return Math.min(level * 5, 30);
+        }
+
         function startReadingGame() {
             if (!currentReadingDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
@@ -1505,7 +1662,8 @@
             const progress = JSON.parse(localStorage.getItem('reading_progress') || '{}');
             const isDone = progress[currentReadingLevel] && progress[currentReadingLevel].includes(currentReadingDan);
             const isUnlocked = unlocked[currentReadingDan] || currentReadingDan === readingDans[0] ||
-                (progress[currentReadingLevel] && progress[currentReadingLevel].includes(currentReadingDan - 1));
+                (progress[currentReadingLevel] && progress[currentReadingLevel].includes(currentReadingDan - 1)) ||
+                readingUnlockedLevels[currentReadingLevel] === true;
 
             if (!isDone && !isUnlocked) {
                 alert(`🔒 ด่านนี้ยังไม่ได้ปลดล็อก ใช้ ${getUnlockCost(currentReadingLevel)}⭐ ปลดล็อกก่อน`);
@@ -1781,7 +1939,6 @@
             renderDans();
             renderSentenceDans();
             renderReadingDans();
-            // แสดงปุ่มเริ่มใหม่
             $('startGameContainer').classList.remove('hidden');
             $('sentenceStartContainer').classList.remove('hidden');
             $('readingStartContainer').classList.remove('hidden');
@@ -1816,10 +1973,20 @@
             try {
                 const res = await callAPI('leaderboard', 'GET');
                 const data = res.data || [];
+                // Group by email and pick highest score (to avoid duplicate names)
+                const grouped = {};
+                data.forEach(item => {
+                    const key = item.email;
+                    if (!grouped[key] || item.score > grouped[key].score) {
+                        grouped[key] = item;
+                    }
+                });
+                const uniqueData = Object.values(grouped);
+                uniqueData.sort((a, b) => b.score - a.score);
                 const tbody = $('leaderboardBody');
                 tbody.innerHTML = '';
-                if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-4">ยังไม่มีคะแนน</td></tr>'; return; }
-                data.forEach((item, idx) => {
+                if (!uniqueData.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray-400 py-4">ยังไม่มีคะแนน</td></tr>'; return; }
+                uniqueData.forEach((item, idx) => {
                     const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
                     const tr = document.createElement('tr');
                     tr.innerHTML = `<td class="p-2">${medal}</td><td class="p-2 font-medium">${item.displayName || item.email}</td><td class="p-2">${item.level}</td><td class="p-2 font-bold text-emerald-700">${item.score}</td><td class="p-2">${item.percent}%</td>`;
@@ -1909,7 +2076,6 @@
         // ==============================================================
         //  INIT
         // ==============================================================
-        // ตรวจสอบ AudioContext ครั้งแรก (เพื่อให้เบราว์เซอร์อนุญาต)
         document.addEventListener('click', () => {
             getAudioContext();
         }, { once: true });
@@ -1939,8 +2105,8 @@
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v4.3 — เรียนภาษาอาหรับ');
-        console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐');
+        console.log('🚀 ศึกษา ต่างถิ่น v4.4 — เรียนภาษาอาหรับ');
+        console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐, ปลดล็อก Level 100⭐');
         console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
         console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที');
     </script>

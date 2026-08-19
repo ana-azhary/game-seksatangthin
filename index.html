@@ -176,6 +176,18 @@
         }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 
+        /* สีพื้นหลังตามหมวดหมู่คำศัพท์ */
+        .vocab-cat-noun { background-color: #dbeafe; }
+        .vocab-cat-verb { background-color: #fef3c7; }
+        .vocab-cat-adjective { background-color: #d1fae5; }
+        .vocab-cat-adverb { background-color: #fce4ec; }
+        .vocab-cat-preposition { background-color: #e0e7ff; }
+        .vocab-cat-pronoun { background-color: #f3e8ff; }
+        .vocab-cat-conjunction { background-color: #ffedd5; }
+        .vocab-cat-interjection { background-color: #fce7f3; }
+        .vocab-cat-phrase { background-color: #d1fae5; }
+        .vocab-cat-default { background-color: #f8fafc; }
+
         @media (max-width: 480px) {
             .arabic { font-size: 1.2rem; line-height: 1.8rem; }
             .app-header h1 { font-size: 1.1rem; }
@@ -419,7 +431,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v4.5 (แก้ไข CSV/PDF, เสียง/สั่นเลือกด่าน, เสียงกลับ, ลีดเดอร์ 20 อันดับ) -->
+    <!-- JAVASCRIPT v4.6 (แก้ไขตารางศัพท์มีสี, PDF ทำงาน, ลีดเดอร์ 20 คน) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -519,7 +531,6 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                // เสียงพลิกกระดาษ: ใช้ noise-like หรือ sweep สั้นๆ
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sawtooth';
@@ -897,8 +908,8 @@
                                 currentDan = d.dan;
                                 currentLevel = d.level;
                                 renderDans();
-                                playKeyboardSound(); // เสียงเลือกด่าน
-                                vibrate(30); // สั่น
+                                playKeyboardSound();
+                                vibrate(30);
                                 startGame();
                             }
                         };
@@ -923,7 +934,7 @@
         }
 
         function startGame() {
-            playKeyboardSound(); // เสียงเริ่มเกม
+            playKeyboardSound();
             vibrate(30);
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
@@ -1994,7 +2005,7 @@
         // ==============================================================
         function showGameOverlay() { $('gameOverlay').classList.add('show'); }
         function closeGameOverlay() {
-            playPageFlipSound(); // เสียงพลิกกระดาษ
+            playPageFlipSound();
             vibrate(30);
             $('gameOverlay').classList.remove('show');
             $('overlayContent').innerHTML = '';
@@ -2007,8 +2018,23 @@
         }
 
         // ==============================================================
-        //  VOCAB / LEADERBOARD / SHARE
+        //  VOCAB (มีสีพื้นหลังตามหมวดหมู่)
         // ==============================================================
+        function getCategoryClass(category) {
+            if (!category) return 'vocab-cat-default';
+            const cat = category.trim().toLowerCase();
+            if (cat.includes('คำนาม') || cat.includes('นาม') || cat.includes('noun')) return 'vocab-cat-noun';
+            if (cat.includes('กริยา') || cat.includes('verb') || cat.includes('คำกริยา')) return 'vocab-cat-verb';
+            if (cat.includes('คุณศัพท์') || cat.includes('adj') || cat.includes('คำคุณศัพท์')) return 'vocab-cat-adjective';
+            if (cat.includes('วิเศษณ์') || cat.includes('adv') || cat.includes('คำวิเศษณ์')) return 'vocab-cat-adverb';
+            if (cat.includes('บุพบท') || cat.includes('prep') || cat.includes('คำบุพบท')) return 'vocab-cat-preposition';
+            if (cat.includes('สรรพนาม') || cat.includes('pron') || cat.includes('คำสรรพนาม')) return 'vocab-cat-pronoun';
+            if (cat.includes('สันธาน') || cat.includes('conj') || cat.includes('คำสันธาน')) return 'vocab-cat-conjunction';
+            if (cat.includes('อุทาน') || cat.includes('interj') || cat.includes('คำอุทาน')) return 'vocab-cat-interjection';
+            if (cat.includes('วลี') || cat.includes('phrase')) return 'vocab-cat-phrase';
+            return 'vocab-cat-default';
+        }
+
         function renderVocab() {
             const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
             const tbody = $('vocabBody');
@@ -2038,6 +2064,9 @@
 
             filtered.forEach((item, idx) => {
                 const tr = document.createElement('tr');
+                const category = item.หมวดหมู่ || '';
+                const catClass = getCategoryClass(category);
+                tr.className = catClass;
                 tr.innerHTML = `
                     <td class="p-1">${idx + 1}</td>
                     <td class="p-1">${item.คำศัพท์ไทย || ''}</td>
@@ -2047,7 +2076,7 @@
                     <td class="p-1 arabic">${item.รูปคำสั่ง || ''}</td>
                     <td class="p-1 arabic">${item.เอกพจน์ || ''}</td>
                     <td class="p-1 arabic">${item.พหูพจน์ || ''}</td>
-                    <td class="p-1">${item.หมวดหมู่ || ''}</td>
+                    <td class="p-1">${category}</td>
                     <td class="p-1">${item.level || ''}</td>
                 `;
                 tbody.appendChild(tr);
@@ -2057,7 +2086,7 @@
         function filterVocab() { renderVocab(); }
 
         // ==============================================================
-        //  EXPORT CSV & PDF (ปรับปรุงให้ทำงานได้ดียิ่งขึ้น)
+        //  EXPORT CSV & PDF (ปรับปรุงให้ทำงานได้จริง)
         // ==============================================================
         function exportCSV() {
             try {
@@ -2079,7 +2108,7 @@
                     item.level || ''
                 ]);
 
-                let csv = '\uFEFF' + headers.join(',') + '\n'; // BOM สำหรับ UTF-8
+                let csv = '\uFEFF' + headers.join(',') + '\n';
                 rows.forEach(row => {
                     csv += row.map(cell => `"${cell}"`).join(',') + '\n';
                 });
@@ -2092,6 +2121,8 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(link.href);
+                playKeyboardSound();
+                vibrate(30);
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message);
                 console.error(e);
@@ -2169,6 +2200,8 @@
                 });
 
                 doc.save(`vocab_level${filterLevel || 'all'}.pdf`);
+                playKeyboardSound();
+                vibrate(30);
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + e.message);
                 console.error(e);
@@ -2239,6 +2272,9 @@
                 });
             } catch(e) {
                 console.error('Leaderboard error:', e);
+                // แสดงข้อความแจ้งว่าดึงข้อมูลไม่ได้
+                const tbody = $('leaderboardBody');
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-4">⚠️ โหลดข้อมูลลีดเดอร์บอร์ดไม่สำเร็จ</td></tr>';
             }
         }
 
@@ -2336,7 +2372,6 @@
         $('vibrationToggle').checked = vibrationEnabled;
         $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
-        // ผูก event ปุ่มส่งออก CSV/PDF
         document.getElementById('exportCSV').addEventListener('click', exportCSV);
         document.getElementById('exportPDF').addEventListener('click', exportPDF);
 
@@ -2359,12 +2394,13 @@
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v4.5 — แก้ไข CSV/PDF, เสียง/สั่นเลือกด่าน, เสียงกลับ, ลีดเดอร์ 20 อันดับ');
+        console.log('🚀 ศึกษา ต่างถิ่น v4.6 — แก้ไขตารางศัพท์มีสี, PDF ทำงาน, ลีดเดอร์ 20 คน');
         console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐, ปลดล็อก Level 100⭐');
         console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
         console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที (มีเสียงและสั่น)');
         console.log('📤 ส่งออก CSV/PDF ตาม Level ที่เลือก');
         console.log('🏆 ลีดเดอร์บอร์ดแสดง 20 อันดับพร้อมกำลังใจจากอุสตะเฮง');
+        console.log('🎨 ตารางคำศัพท์มีสีพื้นหลังตามหมวดหมู่');
     </script>
 </body>
 </html>

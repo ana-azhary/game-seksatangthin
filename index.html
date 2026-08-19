@@ -34,6 +34,9 @@
         .btn-unlock { background: #8b5cf6; color: #fff; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
         .btn-unlock:active { transform: scale(0.95); }
         .btn-unlock:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-unlock-level { background: #7c3aed; color: #fff; font-weight: 700; padding: 6px 16px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
+        .btn-unlock-level:active { transform: scale(0.95); }
+        .btn-unlock-level:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-settings { background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-settings:hover { background: rgba(255,255,255,0.3); }
         .btn-settings.active { background: rgba(255,255,255,0.4); }
@@ -393,16 +396,14 @@
     <!-- ============================================================ -->
     <section id="leaderboardTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
-            <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด (ดาว)</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-gray-600">
                         <tr>
                             <th class="p-2 text-left">อันดับ</th>
                             <th class="p-2 text-left">ชื่อ</th>
-                            <th class="p-2 text-left">ด่าน</th>
-                            <th class="p-2 text-left">คะแนน</th>
-                            <th class="p-2 text-left">%</th>
+                            <th class="p-2 text-left">⭐ ดาว</th>
                             <th class="p-2 text-left">กำลังใจ</th>
                         </tr>
                     </thead>
@@ -525,7 +526,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.1 — แก้ไข Support & Unlock -->
+    <!-- JAVASCRIPT v5.2 — ปลดล็อก Level ด้วยดาว 100⭐ + ปลดล็อกด่าน -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -540,6 +541,7 @@
             PAGE_URL: 'https://www.facebook.com/profile.php?id=100064382094369',
             HINT_COST: 1,
             LEVEL_BONUS_STARS: 20,
+            UNLOCK_LEVEL_COST: 100,
         };
 
         // ==============================================================
@@ -744,6 +746,51 @@
         }
 
         // ==============================================================
+        //  UNLOCK LEVEL WITH STARS (100⭐)
+        // ==============================================================
+        async function unlockLevelWithStars(game, level) {
+            if (!isLoggedIn || !userEmail) {
+                alert('กรุณาเข้าสู่ระบบก่อน');
+                return;
+            }
+
+            const cost = CONFIG.UNLOCK_LEVEL_COST;
+            if (stars < cost) {
+                alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`);
+                return;
+            }
+
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level} ทั้งหมด? (ทุกด่านใน Level นี้จะเปิดให้เล่น)`)) {
+                return;
+            }
+
+            try {
+                const res = await callAPI('unlock-level', 'POST', {
+                    email: userEmail,
+                    game: game,
+                    level: level
+                });
+
+                if (res.success) {
+                    stars = res.newStars;
+                    updateStarDisplay();
+                    playStarSound();
+                    vibrate([50, 80, 50]);
+                    alert(`✅ ปลดล็อก Level ${level} ทั้งหมดแล้ว!`);
+
+                    await loadProgressFromBackend();
+                    if (game === 'vocab') renderDans();
+                    else if (game === 'sentence') renderSentenceDans();
+                    else if (game === 'reading') renderReadingDans();
+                } else {
+                    alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้'));
+                }
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+            }
+        }
+
+        // ==============================================================
         //  UNLOCK DAN WITH STARS
         // ==============================================================
         async function unlockDanWithStars(game, level, dan) {
@@ -758,7 +805,7 @@
                 return;
             }
 
-            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อกด่าน ${dan} (Level ${level})?`)) {
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อกด่าน ${dan}? (ยังต้องเล่นจริงถึงจะผ่าน)`)) {
                 return;
             }
 
@@ -775,7 +822,7 @@
                     updateStarDisplay();
                     playStarSound();
                     vibrate([50, 80, 50]);
-                    alert(`✅ ปลดล็อกด่าน ${dan} สำเร็จ!`);
+                    alert(`✅ ปลดล็อกด่าน ${dan} เพื่อเข้าเล่นแล้ว!`);
 
                     await loadProgressFromBackend();
                     if (game === 'vocab') renderDans();
@@ -790,10 +837,10 @@
         }
 
         function calculateUnlockCost(level, dan) {
-            const baseCost = 10;
-            const levelCost = (level - 1) * 10;
-            const danCost = dan * 2;
-            return Math.min(baseCost + levelCost + danCost, 100);
+            const baseCost = 5;
+            const levelCost = (level - 1) * 3;
+            const danCost = dan;
+            return Math.min(baseCost + levelCost + danCost, 30);
         }
 
         // ==============================================================
@@ -814,24 +861,6 @@
             } catch(e) {
                 debugLog('STARS', 'โหลดดาวล้มเหลว:', e);
             }
-        }
-
-        function addStarsLocal(n) {
-            // ใช้ localStorage ชั่วคราว (รอ backend sync)
-            let current = parseInt(localStorage.getItem('arabic_stars_temp')) || 0;
-            current += n;
-            localStorage.setItem('arabic_stars_temp', current);
-            stars = current;
-            updateStarDisplay();
-            playStarSound();
-        }
-
-        function spendStarsLocal(n) {
-            if (stars < n) return false;
-            stars -= n;
-            localStorage.setItem('arabic_stars_temp', stars);
-            updateStarDisplay();
-            return true;
         }
 
         // ==============================================================
@@ -891,7 +920,6 @@
             localStorage.removeItem('id_token');
             localStorage.removeItem('user_email');
             localStorage.removeItem('user_name');
-            localStorage.removeItem('arabic_stars_temp');
             isLoggedIn = false;
             userEmail = null;
             userName = null;
@@ -993,7 +1021,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY (ปรับปรุงปุ่มปลดล็อก)
+        //  GAME 1: VOCABULARY
         // ==============================================================
         function renderDans() {
             const container = $('danList');
@@ -1002,35 +1030,27 @@
             const grouped = {};
             availableDans.forEach(d => { if (!grouped[d.level]) grouped[d.level] = []; grouped[d.level].push(d); });
             const sortedLevels = Object.keys(grouped).sort((a,b)=>a-b);
+
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
+                // ตรวจสอบว่าปลดล็อก Level แล้ว (มี progress 0% ของด่านที่ 1)
+                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined;
                 const allPassed = levelData.every(d => {
                     const key = `${level}_${d.dan}`;
                     return vocabProgress[key] && vocabProgress[key] >= CONFIG.PASSING_SCORE;
                 });
-                const isUnlocked = level === 1 || (levelData.every(d => {
-                    const prevLevel = level - 1;
-                    const prevKey = `${prevLevel}_${d.dan}`;
-                    if (d.dan === 1) {
-                        const prevLevelDans = availableDans.filter(dd => dd.level === prevLevel);
-                        return prevLevelDans.every(pd => {
-                            const pk = `${prevLevel}_${pd.dan}`;
-                            return vocabProgress[pk] && vocabProgress[pk] >= CONFIG.PASSING_SCORE;
-                        });
-                    }
-                    return true;
-                }));
-
                 const isLevelCompleted = allPassed;
 
                 const levelDiv = document.createElement('div');
-                levelDiv.className = 'level-card' + (isLevelCompleted ? ' completed' : (isUnlocked ? ' unlocked' : ' locked'));
+                levelDiv.className = 'level-card' + (isLevelCompleted ? ' completed' : (isLevelUnlocked ? ' unlocked' : ' locked'));
 
                 const header = document.createElement('div');
                 header.className = 'flex items-center justify-between text-sm font-semibold text-gray-700';
                 header.innerHTML = `
                     <span>🏰 Level ${level}</span>
                     <span class="text-xs font-normal text-gray-400">${levelData.filter(d => { const k = `${level}_${d.dan}`; return vocabProgress[k] && vocabProgress[k] >= CONFIG.PASSING_SCORE; }).length}/${levelData.length}</span>
+                    ${!isLevelUnlocked ? `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก Level (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : ''}
+                    ${isLevelCompleted ? '<span class="text-xs text-green-600 font-medium">✅ ผ่านหมด</span>' : ''}
                 `;
                 levelDiv.appendChild(header);
                 const bar = document.createElement('div');
@@ -1047,7 +1067,7 @@
                     const key = `${level}_${d.dan}`;
                     const progress = vocabProgress[key] || 0;
                     const isPassed = progress >= CONFIG.PASSING_SCORE;
-                    const unlocked = isUnlocked || (level === 1 && d.dan === 1) || (vocabProgress[`${level}_${d.dan-1}`] >= CONFIG.PASSING_SCORE);
+                    const unlocked = isLevelUnlocked || (level === 1 && d.dan === 1) || (vocabProgress[`${level}_${d.dan-1}`] >= CONFIG.PASSING_SCORE);
                     const isSelected = currentDan === d.dan && currentLevel === d.level;
                     const cost = calculateUnlockCost(level, d.dan);
                     const canUnlock = !isPassed && !unlocked && stars >= cost;
@@ -1271,10 +1291,7 @@
                 combo = Math.min(combo+0.5,3);
                 consecutiveWrong=0;
                 if (currentFeature && currentFeature.streakBonus && streak>=3) { score += 5; setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
-                if (streak >= 5) {
-                    addStarsLocal(1);
-                    if (streak===5) setTeacherMessage('🔥 ติด 5 ข้อ! ได้ดาว');
-                }
+                // ดาวจะถูกเพิ่มผ่าน backend เมื่อบันทึกคะแนน
             } else {
                 playWrongSound();
                 vibrate([50, 100, 50]);
@@ -1373,10 +1390,8 @@
 
         function useHint(q) {
             if (stars < CONFIG.HINT_COST || isAnswered) return;
-            if (!spendStarsLocal(CONFIG.HINT_COST)) {
-                alert(`⭐ ไม่พอ! ต้องใช้ ${CONFIG.HINT_COST} ดาว`);
-                return;
-            }
+            stars -= CONFIG.HINT_COST;
+            updateStarDisplay();
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const btns = document.querySelectorAll('.option-btn');
             let removed = 0;
@@ -1388,7 +1403,8 @@
 
         function useSkip() {
             if (stars < 3 || isAnswered) return;
-            if (!spendStarsLocal(3)) { alert('⭐ ไม่พอ! ต้องใช้ 3 ดาว'); return; }
+            stars -= 3;
+            updateStarDisplay();
             setTeacherMessage('⏭️ ข้ามข้อนี้ไป');
             playKeyboardSound();
             vibrate(30);
@@ -1429,7 +1445,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE
+        //  GAME 2: SENTENCE (ย่อ)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1447,19 +1463,26 @@
             sentenceLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
+                const isLevelUnlocked = sentenceProgress[`${lv.level}_1`] !== undefined || lv.level === 1;
                 const allDone = lv.dans.every(d => {
                     const key = `${lv.level}_${d}`;
                     return sentenceProgress[key] === true;
                 });
-                const isUnlocked = lv.level === 1 || (lv.dans.every(d => {
-                    const prevLevel = lv.level - 1;
-                    const prevKey = `${prevLevel}_${d}`;
-                    return sentenceProgress[prevKey] === true;
-                }));
                 if (allDone) { btn.textContent = `✅ Level ${lv.level}`; btn.className += ' bg-green-100'; }
-                else if (isUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
+                else if (isLevelUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
                 else { btn.textContent = `🔒 Level ${lv.level}`; btn.className += ' opacity-50'; }
-                btn.onclick = () => { if (isUnlocked) loadSentenceLevel(lv.level); };
+                btn.onclick = () => {
+                    if (isLevelUnlocked) loadSentenceLevel(lv.level);
+                    else {
+                        if (stars >= CONFIG.UNLOCK_LEVEL_COST) {
+                            if (confirm(`ใช้ ${CONFIG.UNLOCK_LEVEL_COST}⭐ ปลดล็อก Level ${lv.level}?`)) {
+                                unlockLevelWithStars('sentence', lv.level);
+                            }
+                        } else {
+                            alert(`⭐ ไม่พอ! ต้องใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาว`);
+                        }
+                    }
+                };
                 container.appendChild(btn);
             });
         }
@@ -1478,10 +1501,11 @@
         function renderSentenceDans() {
             const container = $('sentenceDanList');
             container.innerHTML = '';
+            const isLevelUnlocked = sentenceProgress[`${currentSentenceLevel}_1`] !== undefined || currentSentenceLevel === 1;
             sentenceDans.forEach(dan => {
                 const key = `${currentSentenceLevel}_${dan}`;
                 const done = sentenceProgress[key] === true;
-                const isUnlocked = dan === sentenceDans[0] || (sentenceProgress[`${currentSentenceLevel}_${dan-1}`] === true);
+                const isUnlocked = isLevelUnlocked || dan === sentenceDans[0] || (sentenceProgress[`${currentSentenceLevel}_${dan-1}`] === true);
                 const isSelected = currentSentenceDan === dan;
                 const cost = calculateUnlockCost(currentSentenceLevel, dan);
                 const canUnlock = !done && !isUnlocked && stars >= cost;
@@ -1640,8 +1664,9 @@
                 vibrate([30, 50, 30]);
                 sentenceConsecutiveCorrect++;
                 if (sentenceConsecutiveCorrect >= 3) {
-                    addStarsLocal(1);
-                    result.innerHTML = `<p class="text-green-600 font-bold">✅ ถูกต้อง! +⭐1 (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
+                    // ดาวจะเพิ่มผ่าน backend เมื่อบันทึกความคืบหน้า
+                    // จะเพิ่มใน endSentenceGame
+                    result.innerHTML = `<p class="text-green-600 font-bold">✅ ถูกต้อง! (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
                     sentenceConsecutiveCorrect = 0;
                 } else {
                     result.innerHTML = `<p class="text-green-600 font-bold">✅ ถูกต้อง! (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
@@ -1666,7 +1691,8 @@
         function sentenceReveal() {
             if (stars < 1) { alert('⭐ ไม่พอ! ต้องมี 1 ดาว'); return; }
             if (sentenceGameCompleted) return;
-            if (!spendStarsLocal(1)) { alert('⭐ ไม่พอ!'); return; }
+            stars -= 1;
+            updateStarDisplay();
             const q = sentenceQuestions[sentenceIndex];
             const correct = q['คำตอบที่ถูกต้อง'] || q['ประโยคอาหรับ (แยกคำ)'];
             const result = $('sentenceResult');
@@ -1707,6 +1733,7 @@
                     dan: currentSentenceDan,
                     passed: true
                 }).then(() => {
+                    loadStarsFromBackend();
                     loadProgressFromBackend();
                     renderSentenceDans();
                     renderSentenceLevels();
@@ -1729,7 +1756,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING
+        //  GAME 3: READING (ย่อ)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1747,19 +1774,26 @@
             readingLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
+                const isLevelUnlocked = readingProgress[`${lv.level}_1`] !== undefined || lv.level === 1;
                 const allDone = lv.dans.every(d => {
                     const key = `${lv.level}_${d}`;
                     return readingProgress[key] === true;
                 });
-                const isUnlocked = lv.level === 1 || (lv.dans.every(d => {
-                    const prevLevel = lv.level - 1;
-                    const prevKey = `${prevLevel}_${d}`;
-                    return readingProgress[prevKey] === true;
-                }));
                 if (allDone) { btn.textContent = `✅ Level ${lv.level}`; btn.className += ' bg-green-100'; }
-                else if (isUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
+                else if (isLevelUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
                 else { btn.textContent = `🔒 Level ${lv.level}`; btn.className += ' opacity-50'; }
-                btn.onclick = () => { if (isUnlocked) loadReadingLevel(lv.level); };
+                btn.onclick = () => {
+                    if (isLevelUnlocked) loadReadingLevel(lv.level);
+                    else {
+                        if (stars >= CONFIG.UNLOCK_LEVEL_COST) {
+                            if (confirm(`ใช้ ${CONFIG.UNLOCK_LEVEL_COST}⭐ ปลดล็อก Level ${lv.level}?`)) {
+                                unlockLevelWithStars('reading', lv.level);
+                            }
+                        } else {
+                            alert(`⭐ ไม่พอ! ต้องใช้ ${CONFIG.UNLOCK_LEVEL_COST} ดาว`);
+                        }
+                    }
+                };
                 container.appendChild(btn);
             });
         }
@@ -1793,10 +1827,11 @@
         function renderReadingDans() {
             const container = $('readingDanList');
             container.innerHTML = '';
+            const isLevelUnlocked = readingProgress[`${currentReadingLevel}_1`] !== undefined || currentReadingLevel === 1;
             readingDans.forEach(dan => {
                 const key = `${currentReadingLevel}_${dan}`;
                 const done = readingProgress[key] === true;
-                const isUnlocked = dan === readingDans[0] || (readingProgress[`${currentReadingLevel}_${dan-1}`] === true);
+                const isUnlocked = isLevelUnlocked || dan === readingDans[0] || (readingProgress[`${currentReadingLevel}_${dan-1}`] === true);
                 const cost = calculateUnlockCost(currentReadingLevel, dan);
                 const canUnlock = !done && !isUnlocked && stars >= cost;
                 const isSelected = currentReadingDan === dan;
@@ -1855,12 +1890,6 @@
             vibrate(30);
             if (!currentReadingDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            const isDone = readingProgress[`${currentReadingLevel}_${currentReadingDan}`] === true;
-            const isUnlocked = currentReadingDan === readingDans[0] || (readingProgress[`${currentReadingLevel}_${currentReadingDan-1}`] === true);
-            if (!isDone && !isUnlocked) {
-                alert('🔒 ด่านนี้ยังไม่ได้ปลดล็อก');
-                return;
-            }
             $('readingStartContainer').classList.add('hidden');
             showGameOverlay();
             loadReadingDan(currentReadingLevel, currentReadingDan);
@@ -2067,6 +2096,7 @@
                     dan: currentReadingDan,
                     passed: true
                 }).then(() => {
+                    loadStarsFromBackend();
                     loadProgressFromBackend();
                     renderReadingDans();
                     renderReadingLevels();
@@ -2344,63 +2374,50 @@
         }
 
         // ==============================================================
-        //  LEADERBOARD
+        //  LEADERBOARD (แสดงดาว)
         // ==============================================================
         async function renderLeaderboard() {
             try {
                 const res = await callAPI('leaderboard', 'GET');
                 const data = res.data || [];
-                const grouped = {};
-                data.forEach(item => {
-                    const key = item.email;
-                    if (!grouped[key] || item.score > grouped[key].score) {
-                        grouped[key] = item;
-                    }
-                });
-                const uniqueData = Object.values(grouped);
-                uniqueData.sort((a, b) => b.score - a.score);
-                const top20 = uniqueData.slice(0, 20);
-
                 const tbody = $('leaderboardBody');
                 tbody.innerHTML = '';
-                if (!top20.length) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-400 py-4">ยังไม่มีคะแนน</td></tr>';
+                if (!data.length) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-4">ยังไม่มีผู้เล่น</td></tr>';
                     return;
                 }
 
                 const messages = [
-                    "🏆 สุดยอด! คุณคือตำนานแห่งการเรียนภาษาอาหรับ!",
-                    "🥇 ยอดเยี่ยมมาก! รักษามาตรฐานนี้ไว้ให้นาน",
-                    "🥈 เก่งมาก! ใกล้ถึงอันดับ 1 แล้ว สู้ต่อไป!",
-                    "🥉 เยี่ยม! ติดท็อป 3 ได้แล้ว ภูมิใจในตัวเอง",
-                    "👍 ดีมาก! อยู่ท็อป 5 ถือว่าเก่งแล้ว",
-                    "💪 แข็งแกร่ง! อย่าหยุดพัฒนาตัวเอง",
-                    "🌟 เก่ง! ทุกความพยายามมีค่า",
-                    "🔥 ร้อนแรง! ยังต้องพัฒนาอีกนิดเพื่อท็อป 5",
-                    "📚 ขยัน! การเรียนอย่างสม่ำเสมอคือกุญแจสู่ความสำเร็จ",
-                    "🎯 มุ่งมั่น! ตั้งเป้าให้สูง แล้วไปให้ถึง",
+                    "🏆 สุดยอด! เจ้าของดาวมากที่สุด!",
+                    "🥇 ยอดเยี่ยม! เก่งมาก!",
+                    "🥈 เก่ง! ใกล้ถึงอันดับ 1 แล้ว",
+                    "🥉 เยี่ยม! ติดท็อป 3",
+                    "👍 ดีมาก! อยู่ท็อป 5",
+                    "💪 แข็งแกร่ง! สู้ต่อไป",
+                    "🌟 เก่ง! มีดาวเยอะแล้ว",
+                    "🔥 ร้อนแรง! ยังต้องพัฒนาอีกนิด",
+                    "📚 ขยัน! เรียนสม่ำเสมอ",
+                    "🎯 มุ่งมั่น! ตั้งเป้าหมายสูง",
                     "⏳ อย่าท้อ! ทุกคนเริ่มจากจุดนี้",
                     "✨ มีไฟ! การฝึกฝนทำให้เก่ง",
                     "🌀 สู้ๆ! อุปสรรคคือบันไดสู่ความสำเร็จ",
-                    "🌱 เติบโต! ทุกวันคือโอกาสเรียนรู้ใหม่",
-                    "📈 ก้าวหน้า! อย่าเปรียบเทียบกับใคร เปรียบกับตัวเองเมื่อวาน",
+                    "🌱 เติบโต! ทุกวันคือโอกาสเรียนรู้",
+                    "📈 ก้าวหน้า! อย่าเปรียบเทียบกับใคร",
                     "💡 ฉลาด! การเรียนรู้ไม่มีที่สิ้นสุด",
                     "🎓 นักเรียนดี! เป็นแบบอย่างให้คนอื่น",
                     "👏 ปรบมือให้ความมุ่งมั่น!",
                     "⭐ เป็นดาวเด่น! อย่าหยุดแค่นี้",
-                    "🌈 สู้ต่อไป! อนาคตสดใสแน่นอน",
+                    "🌈 สู้ต่อไป! อนาคตสดใส",
                 ];
 
-                top20.forEach((item, idx) => {
+                data.forEach((item, idx) => {
                     const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
                     const tr = document.createElement('tr');
                     const msg = messages[idx % messages.length];
                     tr.innerHTML = `
                         <td class="p-2">${medal}</td>
                         <td class="p-2 font-medium">${item.displayName || item.email}</td>
-                        <td class="p-2">${item.level}</td>
-                        <td class="p-2 font-bold text-emerald-700">${item.score}</td>
-                        <td class="p-2">${item.percent}%</td>
+                        <td class="p-2 font-bold text-amber-600">⭐ ${item.stars}</td>
                         <td class="p-2 text-xs text-gray-500 italic">${msg}</td>
                     `;
                     tbody.appendChild(tr);
@@ -2502,12 +2519,6 @@
         $('vibrationToggle').checked = vibrationEnabled;
         $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
-        const tempStars = parseInt(localStorage.getItem('arabic_stars_temp')) || 0;
-        if (tempStars > 0) {
-            stars = tempStars;
-            updateStarDisplay();
-        }
-
         document.addEventListener('click', function(e) {
             const popup = $('dictionaryPopup');
             if (popup.classList.contains('show')) {
@@ -2535,10 +2546,12 @@
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.1 — แยก Support + ปุ่มปลดล็อก');
+        console.log('🚀 ศึกษา ต่างถิ่น v5.2 — ปลดล็อก Level ด้วยดาว 100⭐');
         console.log('☕ Support: 100บ.=2500⭐, 200บ.=10000⭐ → m.me/548132778932419');
-        console.log('🔓 ปลดล็อกด่านด้วยดาว: ทำงานได้แล้ว (10-100⭐ ตาม Level/Dan)');
+        console.log('🔓 ปลดล็อก Level: 100⭐ (เปิดทุกด่าน)');
+        console.log('🔓 ปลดล็อกด่าน: 5-30⭐ (เข้าเล่นได้ ต้องเล่นจริงถึงผ่าน)');
         console.log('⭐ ดาวเก็บในหลังบ้าน (ชีท ผู้เล่น)');
+        console.log('🏆 ลีดเดอร์บอร์ดแสดงจำนวนดาว');
     </script>
 </body>
 </html>

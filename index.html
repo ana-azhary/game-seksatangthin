@@ -1887,43 +1887,88 @@
         // ==============================================================
         //  REPORT WORD (ปรับปรุงให้รองรับหลายประเภท)
         // ==============================================================
-        function reportWord() {
-            const word = document.getElementById('reportWordBtn').dataset.word;
-            if (!word) {
-                alert('ไม่พบคำที่ต้องการรายงาน');
-                return;
+// ==============================================================
+//  REPORT WORD (ปรับปรุงให้ตรวจสอบข้อมูลก่อนส่ง)
+// ==============================================================
+function reportWord() {
+    const word = document.getElementById('reportWordBtn').dataset.word;
+    if (!word) {
+        alert('ไม่พบคำที่ต้องการรายงาน');
+        return;
+    }
+
+    // ตรวจสอบว่า login หรือยัง
+    if (!userEmail) {
+        alert('กรุณาเข้าสู่ระบบก่อนรายงาน');
+        return;
+    }
+
+    // ดึงประเภทการรายงาน
+    const selectedReportType = document.querySelector('input[name="reportType"]:checked');
+    const reportType = selectedReportType ? selectedReportType.value : 'สงสัยความหมาย';
+
+    const meaning = document.getElementById('dictMeaning').textContent || '';
+    const articleId = currentArticleId || 0;
+    const level = currentReadingLevel || 0;
+    const dan = currentReadingDan || 0;
+
+    // ตรวจสอบว่ามีข้อมูลครบ
+    if (!word) {
+        alert('ไม่พบคำที่ต้องการรายงาน');
+        return;
+    }
+
+    console.log('📤 Sending report:', {
+        userEmail,
+        word,
+        reportType,
+        articleId,
+        level,
+        dan,
+        meaning
+    });
+
+    if (confirm(`🚨 รายงานคำนี้: "${word}"\nประเภท: ${reportType}\nArticle ID: ${articleId}\n\n(ข้อมูลนี้จะช่วยให้ทีมงานปรับปรุงพจนานุกรมให้ถูกต้อง)`)) {
+        // ใช้ fetch โดยตรงเพื่อ debug
+        const url = new URL(CONFIG.WORKER_URL);
+        url.pathname = '/report-word';
+
+        const token = localStorage.getItem('id_token');
+
+        fetch(url.toString(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? 'Bearer ' + token : ''
+            },
+            body: JSON.stringify({
+                userEmail: userEmail,
+                userName: userName || userEmail.split('@')[0],
+                level: level,
+                dan: dan,
+                articleId: articleId,
+                word: word,
+                meaning: meaning,
+                reportType: reportType,
+                note: `รายงานจากบทความ ID ${articleId}`
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ รายงานคำนี้เรียบร้อยแล้ว ขอบคุณที่ช่วยพัฒนาพจนานุกรมครับ 🙏');
+                document.getElementById('reportWordBtn').textContent = '✅ รายงานแล้ว';
+                document.getElementById('reportWordBtn').disabled = true;
+                document.getElementById('reportWordBtn').className = 'text-sm py-1 px-4 rounded-full mt-2 w-full bg-green-600 text-white';
+            } else {
+                alert('❌ รายงานล้มเหลว: ' + (data.error || 'ไม่ทราบสาเหตุ'));
             }
-
-            // ดึงประเภทการรายงานจาก radio button
-            const selectedReportType = document.querySelector('input[name="reportType"]:checked');
-            const reportType = selectedReportType ? selectedReportType.value : 'สงสัยความหมาย';
-
-            const meaning = document.getElementById('dictMeaning').textContent || '';
-            const articleId = currentArticleId || 0;
-            const level = currentReadingLevel || 0;
-            const dan = currentReadingDan || 0;
-
-            if (confirm(`🚨 รายงานคำนี้: "${word}"\nประเภท: ${reportType}\nArticle ID: ${articleId}\n\n(ข้อมูลนี้จะช่วยให้ทีมงานปรับปรุงพจนานุกรมให้ถูกต้อง)`)) {
-                callAPI('report-word', 'POST', {
-                    userEmail: userEmail,
-                    userName: userName,
-                    level: level,
-                    dan: dan,
-                    articleId: articleId,
-                    word: word,
-                    meaning: meaning,
-                    reportType: reportType,
-                    note: `รายงานจากบทความ ID ${articleId}`
-                }).then(() => {
-                    alert('✅ รายงานคำนี้เรียบร้อยแล้ว ขอบคุณที่ช่วยพัฒนาพจนานุกรมครับ 🙏');
-                    document.getElementById('reportWordBtn').textContent = '✅ รายงานแล้ว';
-                    document.getElementById('reportWordBtn').disabled = true;
-                    document.getElementById('reportWordBtn').className = 'text-sm py-1 px-4 rounded-full mt-2 w-full bg-green-600 text-white';
-                }).catch(err => {
-                    alert('❌ รายงานล้มเหลว: ' + err.message);
-                });
-            }
-        }
+        })
+        .catch(err => {
+            alert('❌ รายงานล้มเหลว: ' + err.message);
+        });
+    }
+}
 
         // ==============================================================
         //  VOCABULARY

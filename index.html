@@ -106,7 +106,7 @@
 
         .share-card { background: linear-gradient(135deg, #065f46, #0d9488); color: white; border-radius: 20px; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
 
-        /* word popup dictionary */
+        /* dictionary popup */
         .dictionary-popup {
             position: fixed;
             bottom: 20px;
@@ -198,25 +198,18 @@
                     <span class="text-xs text-gray-400 ml-2">(ต้องผ่าน 60% เพื่อปลดล็อกด่านถัดไป)</span>
                     <span id="levelFeatureBadge" class="feature-badge text-xs"></span>
                 </h2>
-                <div id="danList" class="flex flex-wrap flex-col gap-2">
-                    <!-- JS -->
-                </div>
+                <div id="danList" class="flex flex-wrap flex-col gap-2"></div>
                 <p id="danStatus" class="text-sm text-gray-500 mt-2"></p>
             </div>
-
             <div id="startGameContainer" class="text-center mb-6">
-                <button id="startGameBtn" class="btn-gold text-xl px-12 py-4 shadow-lg hover:shadow-xl transition-all" onclick="startGame()">
-                    🚀 เริ่มเล่น
-                </button>
+                <button id="startGameBtn" class="btn-gold text-xl px-12 py-4 shadow-lg hover:shadow-xl transition-all" onclick="startGame()">🚀 เริ่มเล่น</button>
                 <p class="text-sm text-gray-500 mt-2">กดปุ่มเมื่อพร้อม แล้วอุสตะเฮงจะพาคุณไปสู่บทเรียน!</p>
             </div>
-
             <div id="gameArea" class="card p-5 md:p-7 hidden">
                 <div class="flex items-start gap-3 mb-5">
                     <div class="ustadh-avatar">👳</div>
                     <div id="teacherMessage" class="ustadh-bubble text-sm md:text-base">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ</div>
                 </div>
-
                 <div class="flex flex-wrap justify-between items-center text-sm text-gray-600 mb-2">
                     <div class="flex items-center gap-3 flex-wrap">
                         <span id="progressText" class="font-medium">ข้อ 0 / 0</span>
@@ -227,7 +220,6 @@
                     <span id="timerText" class="bg-gray-100 px-4 py-1.5 rounded-full">⏳ 20 วินาที</span>
                 </div>
                 <div class="timer-bar mb-5"><div id="timerFill" class="timer-fill" style="width:100%"></div></div>
-
                 <div id="questionArea">
                     <div class="text-center mb-4">
                         <span id="qCategory" class="inline-block text-xs text-gray-400 bg-gray-50 px-4 py-1 rounded-full">หมวด</span>
@@ -253,7 +245,6 @@
                     </div>
                 </div>
             </div>
-
             <div id="gameNotStarted" class="card p-8 text-center text-gray-500">
                 <span class="text-5xl block mb-3">🌍</span>
                 <p class="text-lg font-medium">กรุณาเข้าสู่ระบบและเลือกด่าน</p>
@@ -273,7 +264,6 @@
                 <div id="sentenceLevelContainer" class="flex flex-wrap gap-2 mt-2"></div>
                 <p id="sentenceLevelStatus" class="text-sm text-gray-500 mt-2"></p>
             </div>
-
             <div id="sentenceDanContainer" class="card p-4 md:p-5 mb-6 hidden">
                 <h3 class="text-md font-semibold text-gray-700 mb-3 flex items-center gap-2">
                     <span>🎯</span> ด่านใน Level <span id="sentenceSelectedLevel">1</span>
@@ -281,7 +271,6 @@
                 </h3>
                 <div id="sentenceDanList" class="flex flex-wrap gap-2"></div>
             </div>
-
             <div id="sentenceGameArea" class="card p-5 md:p-7 hidden">
                 <div class="flex items-start gap-3 mb-5">
                     <div class="ustadh-avatar">👳</div>
@@ -316,7 +305,6 @@
                     <button class="btn-primary mt-5" onclick="loadSentenceDan(currentSentenceLevel, currentSentenceDan)">🔄 เล่นอีกครั้ง</button>
                 </div>
             </div>
-
             <div id="sentenceNotStarted" class="card p-8 text-center text-gray-500">
                 <span class="text-4xl block mb-3">🧩</span>
                 <p class="text-lg font-medium">เลือก Level เพื่อเริ่มเกมต่อประโยค</p>
@@ -335,28 +323,23 @@
                 <div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-2"></div>
                 <p id="readingLevelStatus" class="text-sm text-gray-500 mt-2"></p>
             </div>
-
             <div id="readingDanContainer" class="card p-4 md:p-5 mb-6 hidden">
                 <h3 class="text-md font-semibold text-gray-700 mb-3 flex items-center gap-2">
                     <span>🎯</span> ด่านใน Level <span id="readingSelectedLevel">1</span>
                 </h3>
                 <div id="readingDanList" class="flex flex-wrap gap-2"></div>
             </div>
-
             <div id="readingArticleArea" class="card p-5 md:p-7 hidden">
                 <div class="flex items-start gap-3 mb-5">
                     <div class="ustadh-avatar">👳</div>
                     <div id="readingTeacher" class="ustadh-bubble text-sm md:text-base">มาเริ่มอ่านบทความภาษาอาหรับกันครับ!</div>
                 </div>
-
                 <div id="readingArticleContent">
                     <div class="flex flex-wrap justify-between items-center mb-2">
                         <span id="readingArticleTitle" class="text-lg font-bold text-emerald-900"></span>
                         <span id="readingArticleInfo" class="text-xs text-gray-400"></span>
                     </div>
-                    <div id="readingArticleBody" class="bg-white p-4 rounded-xl border border-gray-200 text-right arabic text-lg leading-[2.8rem] min-h-[150px]">
-                        <!-- บทความจะแสดงที่นี่ (RTL) -->
-                    </div>
+                    <div id="readingArticleBody" class="bg-white p-4 rounded-xl border border-gray-200 text-right arabic text-lg leading-[2.8rem] min-h-[150px]"></div>
                     <div id="readingTranslation" class="mt-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200 hidden">
                         <p class="text-sm font-medium text-emerald-800 mb-2">📝 คำแปลภาษาไทย:</p>
                         <p id="readingTranslationText" class="text-gray-700"></p>
@@ -374,7 +357,6 @@
                     <button class="btn-primary mt-5" onclick="loadReadingDan(currentReadingLevel, currentReadingDan)">🔄 อ่านอีกครั้ง</button>
                 </div>
             </div>
-
             <div id="readingNotStarted" class="card p-8 text-center text-gray-500">
                 <span class="text-4xl block mb-3">📖</span>
                 <p class="text-lg font-medium">เลือก Level เพื่อเริ่มอ่านบทความ</p>
@@ -399,18 +381,7 @@
                 <div class="overflow-x-auto rounded-xl border border-gray-200">
                     <table id="vocabTable" class="w-full text-sm">
                         <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="p-2 text-left">#</th>
-                                <th class="p-2 text-left">ไทย</th>
-                                <th class="p-2 text-left">อาหรับ</th>
-                                <th class="p-2 text-left">อดีต</th>
-                                <th class="p-2 text-left">ปัจจุบัน</th>
-                                <th class="p-2 text-left">คำสั่ง</th>
-                                <th class="p-2 text-left">เอกพจน์</th>
-                                <th class="p-2 text-left">พหูพจน์</th>
-                                <th class="p-2 text-left">หมวด</th>
-                                <th class="p-2 text-left">Level</th>
-                            </tr>
+                            <tr><th class="p-2 text-left">#</th><th class="p-2 text-left">ไทย</th><th class="p-2 text-left">อาหรับ</th><th class="p-2 text-left">อดีต</th><th class="p-2 text-left">ปัจจุบัน</th><th class="p-2 text-left">คำสั่ง</th><th class="p-2 text-left">เอกพจน์</th><th class="p-2 text-left">พหูพจน์</th><th class="p-2 text-left">หมวด</th><th class="p-2 text-left">Level</th></tr>
                         </thead>
                         <tbody id="vocabBody" class="divide-y divide-gray-100"></tbody>
                     </table>
@@ -426,15 +397,7 @@
                 <h2 class="text-xl font-bold text-gray-800 mb-4">🏆 ลีดเดอร์บอร์ด</h2>
                 <div class="overflow-x-auto rounded-xl border border-gray-200">
                     <table class="w-full text-sm">
-                        <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="p-2 text-left">อันดับ</th>
-                                <th class="p-2 text-left">ชื่อ</th>
-                                <th class="p-2 text-left">ด่าน</th>
-                                <th class="p-2 text-left">คะแนน</th>
-                                <th class="p-2 text-left">%</th>
-                            </tr>
-                        </thead>
+                        <thead class="bg-gray-50 text-gray-600"><tr><th class="p-2 text-left">อันดับ</th><th class="p-2 text-left">ชื่อ</th><th class="p-2 text-left">ด่าน</th><th class="p-2 text-left">คะแนน</th><th class="p-2 text-left">%</th></tr></thead>
                         <tbody id="leaderboardBody" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
@@ -448,9 +411,7 @@
             <div class="card p-5 md:p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">📤 แชร์ความสำเร็จ</h2>
                 <div id="shareCard" class="share-card text-center">
-                    <div class="flex justify-center mb-4">
-                        <span class="text-6xl">📚</span>
-                    </div>
+                    <div class="flex justify-center mb-4"><span class="text-6xl">📚</span></div>
                     <h3 class="text-2xl font-bold" id="shareTitle">ศึกษา ต่างถิ่น</h3>
                     <p class="text-lg mt-2" id="shareMessage">ฉันกำลังเรียนภาษาอาหรับกับอุสตะเฮง!</p>
                     <div class="mt-4 flex flex-wrap justify-center gap-3">
@@ -503,6 +464,10 @@
                 <p class="text-sm font-semibold text-gray-700">📚 พหูพจน์ (جمع):</p>
                 <p id="dictPlural" class="text-sm text-gray-600"></p>
             </div>
+            <div class="mt-2 border-t border-gray-200 pt-3">
+                <p class="text-sm font-semibold text-gray-700">📖 รากศัพท์ (مادة):</p>
+                <p id="dictRoot" class="text-sm text-gray-600"></p>
+            </div>
             <div class="mt-3 border-t border-gray-200 pt-3">
                 <button id="reportWordBtn" class="btn-danger text-sm py-1 px-4 rounded-full" onclick="reportWord()">🚨 รายงานคำนี้</button>
             </div>
@@ -528,7 +493,7 @@
         };
 
         // ==============================================================
-        //  LEVEL FEATURES (ท่องศัพท์)
+        //  LEVEL FEATURES
         // ==============================================================
         const LEVEL_FEATURES = {
             1: { name: 'ปกติ', timeLimit: 20, lives: 0, combo: false, hardMode: false,
@@ -835,7 +800,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY (เหมือนเดิม)
+        //  GAME 1: VOCABULARY
         // ==============================================================
         function renderDans() {
             const container = document.getElementById('danList');
@@ -1770,7 +1735,6 @@
             readingTranslationVisible = false;
             document.getElementById('readingShowTranslationBtn').textContent = '📝 ดูคำแปล';
 
-            // โหลดพจนานุกรมของบทความนี้
             loadArticleDictionary(currentArticleId);
         }
 
@@ -1789,7 +1753,6 @@
                         plural: w['พหูพจน์ (جمع)'] || '',
                         root: w['รากศัพท์'] || '',
                     };
-                    // เก็บคำพ้องและคำตรงข้ามแยก
                     if (w['คำพ้องที่ 1'] && w['ความหมายคำพ้อง 1']) {
                         readingWordMap[key].synonyms.push({ word: w['คำพ้องที่ 1'], meaning: w['ความหมายคำพ้อง 1'] });
                     }
@@ -1819,7 +1782,6 @@
             document.getElementById('dictReading').textContent = data.reading ? `คำอ่าน: ${data.reading}` : '';
             document.getElementById('dictMeaning').textContent = data.meaning || 'ไม่พบความหมาย';
 
-            // คำพ้อง
             const synList = document.getElementById('dictSynonyms');
             synList.innerHTML = '';
             if (data.synonyms && data.synonyms.length > 0) {
@@ -1832,7 +1794,6 @@
                 synList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
             }
 
-            // คำตรงข้าม
             const antList = document.getElementById('dictAntonyms');
             antList.innerHTML = '';
             if (data.antonyms && data.antonyms.length > 0) {
@@ -1845,20 +1806,19 @@
                 antList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>';
             }
 
-            // พหูพจน์
             const pluralSection = document.getElementById('dictPluralSection');
             const pluralEl = document.getElementById('dictPlural');
+            const rootEl = document.getElementById('dictRoot');
             if (data.plural) {
                 pluralSection.style.display = 'block';
                 pluralEl.textContent = data.plural;
             } else {
                 pluralSection.style.display = 'none';
             }
+            rootEl.textContent = data.root || 'ไม่มีข้อมูล';
 
-            // แสดง popup
             const popup = document.getElementById('dictionaryPopup');
             popup.classList.add('show');
-            // เก็บคำปัจจุบันเพื่อใช้รายงาน
             document.getElementById('reportWordBtn').dataset.word = word;
         }
 
@@ -2175,7 +2135,7 @@
             setTimeout(() => { setStatus('🔑 คลิกเพื่อเข้าสู่ระบบ', '#6b7280'); }, 2000);
         }
 
-        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.6) - 3 เกม + พจนานุกรม`);
+        debugLog('SYSTEM', `🚀 ระบบพร้อมใช้งาน (v3.7) - 3 เกม + พจนานุกรม Normalize`);
         debugLog('SYSTEM', `📱 Worker: ${CONFIG.WORKER_URL}`);
 
         // ปิด popup เมื่อคลิกภายนอก

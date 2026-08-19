@@ -419,7 +419,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v4.4 (ปรับปรุงเฉพาะ Export CSV/PDF และ Leaderboard) -->
+    <!-- JAVASCRIPT v4.5 (แก้ไข CSV/PDF, เสียง/สั่นเลือกด่าน, เสียงกลับ, ลีดเดอร์ 20 อันดับ) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -511,6 +511,26 @@
                 gain.connect(ctx.destination);
                 osc.start();
                 osc.stop(ctx.currentTime + 0.06);
+            } catch(e) { /* ignore */ }
+        }
+
+        function playPageFlipSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                // เสียงพลิกกระดาษ: ใช้ noise-like หรือ sweep สั้นๆ
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
             } catch(e) { /* ignore */ }
         }
 
@@ -795,7 +815,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY (ไม่เปลี่ยนแปลง)
+        //  GAME 1: VOCABULARY
         // ==============================================================
         function renderDans() {
             const container = $('danList');
@@ -877,6 +897,8 @@
                                 currentDan = d.dan;
                                 currentLevel = d.level;
                                 renderDans();
+                                playKeyboardSound(); // เสียงเลือกด่าน
+                                vibrate(30); // สั่น
                                 startGame();
                             }
                         };
@@ -901,6 +923,8 @@
         }
 
         function startGame() {
+            playKeyboardSound(); // เสียงเริ่มเกม
+            vibrate(30);
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
             const levelUnlocked = vocabUnlockedLevels[currentLevel] === true || isDanUnlocked(availableDans.find(d => d.dan === currentDan));
@@ -1208,7 +1232,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (ไม่เปลี่ยนแปลง)
+        //  GAME 2: SENTENCE
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1298,6 +1322,8 @@
                             clickCount = 0;
                             currentSentenceDan = dan;
                             renderSentenceDans();
+                            playKeyboardSound();
+                            vibrate(30);
                             startSentenceGame();
                         }
                     };
@@ -1307,6 +1333,8 @@
         }
 
         function startSentenceGame() {
+            playKeyboardSound();
+            vibrate(30);
             if (!currentSentenceDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
             const levelUnlocked = sentenceUnlockedLevels[currentSentenceLevel] === true || 
@@ -1510,7 +1538,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (ไม่เปลี่ยนแปลง)
+        //  GAME 3: READING
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1650,6 +1678,8 @@
                                 clickCount = 0;
                                 currentReadingDan = dan;
                                 renderReadingDans();
+                                playKeyboardSound();
+                                vibrate(30);
                                 startReadingGame();
                             }
                         }
@@ -1684,6 +1714,8 @@
         }
 
         function startReadingGame() {
+            playKeyboardSound();
+            vibrate(30);
             if (!currentReadingDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
             const unlocked = JSON.parse(localStorage.getItem('reading_unlocked') || '{}');
@@ -1962,6 +1994,8 @@
         // ==============================================================
         function showGameOverlay() { $('gameOverlay').classList.add('show'); }
         function closeGameOverlay() {
+            playPageFlipSound(); // เสียงพลิกกระดาษ
+            vibrate(30);
             $('gameOverlay').classList.remove('show');
             $('overlayContent').innerHTML = '';
             renderDans();
@@ -1973,7 +2007,7 @@
         }
 
         // ==============================================================
-        //  VOCAB / LEADERBOARD / SHARE (ปรับปรุง VOCAB)
+        //  VOCAB / LEADERBOARD / SHARE
         // ==============================================================
         function renderVocab() {
             const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
@@ -2023,77 +2057,17 @@
         function filterVocab() { renderVocab(); }
 
         // ==============================================================
-        //  EXPORT CSV & PDF (ฟังก์ชันใหม่)
+        //  EXPORT CSV & PDF (ปรับปรุงให้ทำงานได้ดียิ่งขึ้น)
         // ==============================================================
         function exportCSV() {
-            const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
-            let data = allVocab;
-            if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
-            if (data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
 
-            const headers = ['คำศัพท์ไทย', 'คำศัพท์อาหรับ', 'รูปอดีต', 'รูปปัจจุบัน', 'รูปคำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวดหมู่', 'Level'];
-            const rows = data.map(item => [
-                item.คำศัพท์ไทย || '',
-                item.คำศัพท์อาหรับ || '',
-                item.รูปอดีต || '',
-                item.รูปปัจจุบัน || '',
-                item.รูปคำสั่ง || '',
-                item.เอกพจน์ || '',
-                item.พหูพจน์ || '',
-                item.หมวดหมู่ || '',
-                item.level || ''
-            ]);
-
-            let csv = headers.join(',') + '\n';
-            rows.forEach(row => {
-                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `vocab_level${filterLevel || 'all'}.csv`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        }
-
-        function exportPDF() {
-            const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
-            let data = allVocab;
-            if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
-            if (data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', 'a4');
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 10;
-            let y = 10;
-            const lineHeight = 7;
-            const fontSize = 8;
-            doc.setFontSize(fontSize);
-
-            const columns = ['ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
-            const colWidths = [20, 22, 16, 16, 16, 16, 16, 16, 12];
-            const totalWidth = colWidths.reduce((a, b) => a + b, 0);
-            const startX = (pageWidth - totalWidth) / 2;
-
-            doc.setFontSize(14);
-            doc.text(`คำศัพท์ (Level ${filterLevel || 'ทั้งหมด'})`, pageWidth / 2, y, { align: 'center' });
-            y += 8;
-            doc.setFontSize(fontSize);
-
-            doc.setFont('helvetica', 'bold');
-            let x = startX;
-            columns.forEach((col, i) => {
-                doc.text(col, x + 1, y);
-                x += colWidths[i];
-            });
-            y += lineHeight;
-            doc.setFont('helvetica', 'normal');
-
-            data.forEach((item, idx) => {
-                const row = [
+                const headers = ['คำศัพท์ไทย', 'คำศัพท์อาหรับ', 'รูปอดีต', 'รูปปัจจุบัน', 'รูปคำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวดหมู่', 'Level'];
+                const rows = data.map(item => [
                     item.คำศัพท์ไทย || '',
                     item.คำศัพท์อาหรับ || '',
                     item.รูปอดีต || '',
@@ -2103,34 +2077,106 @@
                     item.พหูพจน์ || '',
                     item.หมวดหมู่ || '',
                     item.level || ''
-                ];
+                ]);
 
-                if (y + lineHeight > pageHeight - margin) {
-                    doc.addPage();
-                    y = margin;
-                    doc.setFont('helvetica', 'bold');
-                    x = startX;
-                    columns.forEach((col, i) => {
-                        doc.text(col, x + 1, y);
-                        x += colWidths[i];
-                    });
-                    y += lineHeight;
-                    doc.setFont('helvetica', 'normal');
-                }
+                let csv = '\uFEFF' + headers.join(',') + '\n'; // BOM สำหรับ UTF-8
+                rows.forEach(row => {
+                    csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+                });
 
-                x = startX;
-                row.forEach((cell, i) => {
-                    doc.text(cell, x + 1, y);
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `vocab_level${filterLevel || 'all'}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch(e) {
+                alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        function exportPDF() {
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('landscape', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 10;
+                let y = 10;
+                const lineHeight = 7;
+                const fontSize = 8;
+                doc.setFontSize(fontSize);
+
+                const columns = ['ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                const colWidths = [20, 22, 16, 16, 16, 16, 16, 16, 12];
+                const totalWidth = colWidths.reduce((a, b) => a + b, 0);
+                const startX = (pageWidth - totalWidth) / 2;
+
+                doc.setFontSize(14);
+                doc.text(`คำศัพท์ (Level ${filterLevel || 'ทั้งหมด'})`, pageWidth / 2, y, { align: 'center' });
+                y += 8;
+                doc.setFontSize(fontSize);
+
+                doc.setFont('helvetica', 'bold');
+                let x = startX;
+                columns.forEach((col, i) => {
+                    doc.text(col, x + 1, y);
                     x += colWidths[i];
                 });
                 y += lineHeight;
-            });
+                doc.setFont('helvetica', 'normal');
 
-            doc.save(`vocab_level${filterLevel || 'all'}.pdf`);
+                data.forEach((item, idx) => {
+                    const row = [
+                        item.คำศัพท์ไทย || '',
+                        item.คำศัพท์อาหรับ || '',
+                        item.รูปอดีต || '',
+                        item.รูปปัจจุบัน || '',
+                        item.รูปคำสั่ง || '',
+                        item.เอกพจน์ || '',
+                        item.พหูพจน์ || '',
+                        item.หมวดหมู่ || '',
+                        item.level || ''
+                    ];
+
+                    if (y + lineHeight > pageHeight - margin) {
+                        doc.addPage();
+                        y = margin;
+                        doc.setFont('helvetica', 'bold');
+                        x = startX;
+                        columns.forEach((col, i) => {
+                            doc.text(col, x + 1, y);
+                            x += colWidths[i];
+                        });
+                        y += lineHeight;
+                        doc.setFont('helvetica', 'normal');
+                    }
+
+                    x = startX;
+                    row.forEach((cell, i) => {
+                        doc.text(cell, x + 1, y);
+                        x += colWidths[i];
+                    });
+                    y += lineHeight;
+                });
+
+                doc.save(`vocab_level${filterLevel || 'all'}.pdf`);
+            } catch(e) {
+                alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + e.message);
+                console.error(e);
+            }
         }
 
         // ==============================================================
-        //  LEADERBOARD (ปรับปรุง: 20 อันดับ + กำลังใจ)
+        //  LEADERBOARD (แสดง 20 อันดับ + กำลังใจ)
         // ==============================================================
         async function renderLeaderboard() {
             try {
@@ -2290,7 +2336,7 @@
         $('vibrationToggle').checked = vibrationEnabled;
         $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
-        // 绑定导出按钮事件
+        // ผูก event ปุ่มส่งออก CSV/PDF
         document.getElementById('exportCSV').addEventListener('click', exportCSV);
         document.getElementById('exportPDF').addEventListener('click', exportPDF);
 
@@ -2313,11 +2359,10 @@
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v4.4 — เรียนภาษาอาหรับ');
+        console.log('🚀 ศึกษา ต่างถิ่น v4.5 — แก้ไข CSV/PDF, เสียง/สั่นเลือกด่าน, เสียงกลับ, ลีดเดอร์ 20 อันดับ');
         console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐, ปลดล็อก Level 100⭐');
         console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
-        console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที');
-        console.log('📚 คำศัพท์: แบ่งตาม Level อัตโนมัติ 100 คำต่อ Level (จากข้อมูลในชีท)');
+        console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที (มีเสียงและสั่น)');
         console.log('📤 ส่งออก CSV/PDF ตาม Level ที่เลือก');
         console.log('🏆 ลีดเดอร์บอร์ดแสดง 20 อันดับพร้อมกำลังใจจากอุสตะเฮง');
     </script>

@@ -37,7 +37,8 @@
         .btn-settings { background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-settings:hover { background: rgba(255,255,255,0.3); }
         .btn-settings.active { background: rgba(255,255,255,0.4); }
-        .btn-support { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1e293b; font-weight: 700; padding: 6px 16px; border-radius: 40px; border: none; font-size: 0.8rem; transition: 0.2s; cursor: pointer; }
+        .btn-support { background: rgba(255,255,255,0.15); color: #fff; font-weight: 600; padding: 4px 12px; border-radius: 40px; border: none; font-size: 0.8rem; transition: 0.2s; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .btn-support:hover { background: rgba(255,255,255,0.25); }
         .btn-support:active { transform: scale(0.95); }
 
         .card-modern { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
@@ -153,8 +154,6 @@
         .settings-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
         .settings-popup .close-btn:hover { color: #1f2937; }
 
-        .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
-
         .support-popup {
             position: fixed;
             top: 50%;
@@ -174,6 +173,8 @@
         .support-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
         .support-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
         .support-popup .close-btn:hover { color: #1f2937; }
+
+        .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
 
         /* Vocab Table Styles */
         #vocabTable {
@@ -251,10 +252,11 @@
     <!-- HEADER -->
     <header class="app-header">
         <div class="flex items-center justify-between">
-            <div><h1>📚 ศึกษา ต่างถิ่น</h1><div class="sub"> أُسْتَاذ إبراهيم الفطاني · เรียนภาษาอาหรับ</div></div>
+            <div><h1>📚 ศึกษา ต่างถิ่น</h1><div class="sub"> أُسْتَاذ · เรียนภาษาอาหรับ</div></div>
             <div class="flex items-center gap-2">
                 <button class="btn-settings" onclick="toggleSettings()" title="ตั้งค่า">⚙️</button>
-                <button class="btn-support" onclick="toggleSupport()">⭐ <span id="starDisplay">0</span></button>
+                <button class="btn-support" onclick="toggleSupport()">☕ <span id="supportLabel">สนับสนุน</span></button>
+                <span id="starDisplay" class="text-sm font-bold">⭐ 0</span>
                 <div id="userArea" class="flex items-center gap-2">
                     <span id="loginStatus" class="text-xs text-white/70">⏳</span>
                     <div id="userInfo" class="hidden flex items-center gap-2">
@@ -332,7 +334,7 @@
     <section id="readingTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
             <h2 class="font-bold text-gray-700 mb-2">📖 อ่านบทความ</h2>
-            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ใช้ดาวปลดล็อกด่าน (Level x 5⭐)</p>
+            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ใช้ดาวปลดล็อกด่าน</p>
             <div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
         </div>
         <div id="readingDanContainer" class="card-modern hidden">
@@ -350,7 +352,7 @@
     </section>
 
     <!-- ============================================================ -->
-    <!-- TAB: VOCAB / LEADERBOARD / SHARE -->
+    <!-- TAB: VOCAB -->
     <!-- ============================================================ -->
     <section id="vocabTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
@@ -386,6 +388,9 @@
         </div>
     </section>
 
+    <!-- ============================================================ -->
+    <!-- TAB: LEADERBOARD -->
+    <!-- ============================================================ -->
     <section id="leaderboardTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern">
             <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด</h2>
@@ -407,6 +412,9 @@
         </div>
     </section>
 
+    <!-- ============================================================ -->
+    <!-- TAB: SHARE -->
+    <!-- ============================================================ -->
     <section id="shareTab" class="tab-content hidden px-4 pb-6">
         <div class="card-modern share-story-card"><div class="text-center"><p class="text-lg font-medium text-gray-700" id="shareMessage">ฉันกำลังเรียนภาษาอาหรับ!</p><div class="flex flex-wrap justify-center gap-2 mt-2"><span class="badge gold" id="shareLevelDisplay">🏰 Level 1</span><span class="badge green" id="shareDanDisplay">🎯 ด่าน 1</span><span class="badge" id="shareScoreDisplay">⭐ 0 คะแนน</span></div><div class="mt-3 p-3 bg-gray-50 rounded-xl text-left text-sm text-gray-600"><p>📖 <span id="shareReadingCount">0</span> บทความ</p><p>🧩 <span id="shareSentenceCount">0</span> ประโยค</p><p>📚 <span id="shareVocabCount">0</span> คำศัพท์</p></div><div class="mt-4 flex flex-wrap justify-center gap-2"><button onclick="shareToStory()" class="btn-primary bg-blue-600 hover:bg-blue-700 text-sm px-5 py-2 rounded-full">📱 แชร์สตอรี่</button><button onclick="shareToFriend()" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-sm px-5 py-2 rounded-full">👥 ชวนเพื่อน</button><a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-secondary text-sm px-5 py-2 rounded-full">🔗 เพจ</a></div></div></div>
     </section>
@@ -443,22 +451,39 @@
     <!-- ============================================================ -->
     <div id="supportPopup" class="support-popup">
         <button class="close-btn" onclick="toggleSupport()">✕</button>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">⭐ สนับสนุนการศึกษา</h3>
-        <p class="text-sm text-gray-500 mb-4">รับดาวเพิ่มเพื่อปลดล็อกด่านและสนับสนุนเว็บไซต์</p>
-        <div class="space-y-3">
-            <button onclick="buyStars(100)" class="w-full btn-primary bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-xl flex justify-between items-center">
-                <span>💰 100 บาท</span>
-                <span class="text-lg font-bold">⭐ +2,000 ดาว</span>
-            </button>
-            <button onclick="buyStars(200)" class="w-full btn-primary bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl flex justify-between items-center">
-                <span>💰 200 บาท</span>
-                <span class="text-lg font-bold">⭐ +10,000 ดาว</span>
-            </button>
+        <div class="text-center">
+            <span class="text-5xl block mb-2">☕</span>
+            <h3 class="text-xl font-bold text-gray-800">สนับสนุนนักพัฒนา</h3>
+            <p class="text-sm text-gray-500 mt-1">ขอบคุณที่ช่วยให้เราพัฒนาเว็บไซต์ต่อไป 🙏</p>
         </div>
-        <p class="text-xs text-gray-400 mt-4 text-center">⭐ ดาวจะถูกเพิ่มในบัญชีของคุณทันที</p>
-        <div class="mt-3 p-3 bg-gray-50 rounded-xl text-center text-sm text-gray-600">
-            ดาวปัจจุบัน: <span id="supportStarDisplay" class="font-bold text-amber-600">0</span> ⭐
+        <div class="mt-4 space-y-3">
+            <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-lg">100 บาท</span>
+                        <span class="text-xs text-gray-500 block">รับทันที 2,500 ⭐</span>
+                    </div>
+                    <button onclick="openSupport('100')" class="btn-primary bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-full text-sm">
+                        ☕ สนับสนุน
+                    </button>
+                </div>
+            </div>
+            <div class="bg-amber-100 rounded-xl p-4 border border-amber-300">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-lg">200 บาท</span>
+                        <span class="text-xs text-gray-500 block">รับทันที 10,000 ⭐</span>
+                    </div>
+                    <button onclick="openSupport('200')" class="btn-primary bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-full text-sm">
+                        ☕ สนับสนุน
+                    </button>
+                </div>
+            </div>
         </div>
+        <div class="mt-4 p-3 bg-gray-50 rounded-xl text-center text-sm text-gray-600">
+            ⭐ ดาวปัจจุบัน: <span id="supportStarDisplay" class="font-bold text-amber-600">0</span>
+        </div>
+        <p class="text-xs text-gray-400 text-center mt-3">กดสนับสนุน → พูดคุยกับแอดมิน → โอนเงิน → รับดาวทันที</p>
     </div>
 
     <!-- ============================================================ -->
@@ -500,7 +525,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.0 — ใช้ Backend เต็มรูปแบบ -->
+    <!-- JAVASCRIPT v5.1 — แก้ไข Support & Unlock -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -524,7 +549,7 @@
         let currentDan = 0, currentLevel = 0;
         let currentRound = [], currentIndex = 0;
         let score = 0, streak = 0, combo = 1, lives = 0;
-        let stars = 0; // ดาวจากหลังบ้าน
+        let stars = 0;
         let mistakes = [], timerInterval = null, timeLeft = CONFIG.TIME_LIMIT;
         let isAnswered = false, gameEnded = false;
         let userEmail = null, userName = null, userAvatar = null, isLoggedIn = false;
@@ -710,36 +735,72 @@
             }
         }
 
-        async function buyStars(amount) {
-            if (!isLoggedIn || !userEmail) {
-                alert('กรุณาเข้าสู่ระบบก่อน');
-                return;
-            }
-            const starAmount = amount === 100 ? 2000 : 10000;
-            if (confirm(`💰 สนับสนุน ${amount} บาท รับ ${starAmount} ดาว?`)) {
-                try {
-                    const res = await callAPI('support/stars', 'POST', { email: userEmail, amount: amount });
-                    if (res.success) {
-                        alert(`✅ ขอบคุณที่สนับสนุน! คุณได้รับ ${starAmount} ดาว (รวม ${res.stars} ดาว)`);
-                        stars = res.stars;
-                        updateStarDisplay();
-                        $('supportStarDisplay').textContent = stars;
-                        playStarSound();
-                        vibrate([50, 80, 50, 80, 50]);
-                    } else {
-                        alert('❌ ' + (res.error || 'ไม่สามารถเติมดาวได้'));
-                    }
-                } catch(e) {
-                    alert('❌ เกิดข้อผิดพลาด: ' + e.message);
-                }
+        function openSupport(amount) {
+            const msg = `☕ สนับสนุน ${amount} บาท รับ ${amount === '100' ? '2,500' : '10,000'} ดาว\n\nคลิก "ตกลง" เพื่อไปพูดคุยกับแอดมิน`;
+            if (confirm(msg)) {
+                window.open('https://m.me/548132778932419', '_blank');
+                alert('✅ ขอบคุณที่สนับสนุน!\nกรุณาพูดคุยกับแอดมินเพื่อยืนยันและรับดาวครับ 🙏');
             }
         }
 
         // ==============================================================
-        //  STAR SYSTEM (จากหลังบ้าน)
+        //  UNLOCK DAN WITH STARS
+        // ==============================================================
+        async function unlockDanWithStars(game, level, dan) {
+            if (!isLoggedIn || !userEmail) {
+                alert('กรุณาเข้าสู่ระบบก่อน');
+                return;
+            }
+
+            const cost = calculateUnlockCost(level, dan);
+            if (stars < cost) {
+                alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`);
+                return;
+            }
+
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อกด่าน ${dan} (Level ${level})?`)) {
+                return;
+            }
+
+            try {
+                const res = await callAPI('unlock-dan', 'POST', {
+                    email: userEmail,
+                    game: game,
+                    level: level,
+                    dan: dan
+                });
+
+                if (res.success) {
+                    stars = res.newStars;
+                    updateStarDisplay();
+                    playStarSound();
+                    vibrate([50, 80, 50]);
+                    alert(`✅ ปลดล็อกด่าน ${dan} สำเร็จ!`);
+
+                    await loadProgressFromBackend();
+                    if (game === 'vocab') renderDans();
+                    else if (game === 'sentence') renderSentenceDans();
+                    else if (game === 'reading') renderReadingDans();
+                } else {
+                    alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้'));
+                }
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+            }
+        }
+
+        function calculateUnlockCost(level, dan) {
+            const baseCost = 10;
+            const levelCost = (level - 1) * 10;
+            const danCost = dan * 2;
+            return Math.min(baseCost + levelCost + danCost, 100);
+        }
+
+        // ==============================================================
+        //  STAR SYSTEM
         // ==============================================================
         function updateStarDisplay() {
-            $('starDisplay').textContent = stars;
+            $('starDisplay').textContent = '⭐ ' + stars;
             $('supportStarDisplay').textContent = stars;
         }
 
@@ -755,42 +816,14 @@
             }
         }
 
-        async function addStarsBackend(n) {
-            if (n <= 0 || !isLoggedIn) return;
-            try {
-                // ใช้ support/stars เพื่อเพิ่ม (แต่เราส่ง amount=0 เพื่อให้เพิ่มเฉพาะดาว)
-                // หรือใช้ /user/stars/update (ต้องเพิ่มใน Worker)
-                // วิธีที่ง่าย: ใช้ support/stars โดย amount=0 แต่เพิ่มดาว
-                // แต่ Worker V4.0 รองรับเฉพาะ support/stars ที่มี amount 100/200
-                // เราใช้วิธีบันทึกผ่าน scores + progress แทน
-                // แต่ในกรณีนี้ เราใช้ support/stars เฉพาะการเติมเงิน
-                // สำหรับการได้ดาวจากเกม เราใช้วิธีบันทึกผ่าน progress
-                // ใน Worker V4.0 มี POST /progress ที่บันทึกความคืบหน้าและอาจได้ดาว
-                // แต่เราต้องสร้าง endpoint สำหรับเพิ่มดาวโดยตรง
-                // ใช้ callAPI ไปที่ '/user/stars/add' (ต้องเพิ่มใน Worker)
-                // เนื่องจาก Worker V4.0 ยังไม่มี endpoint นี้ เราจะใช้ support/stars แทน
-                // โดยส่ง amount=0 และ stars=n
-                // แต่ Worker V4.0 support/stars รับ amount เท่านั้น
-                // เราจะใช้วิธีอื่น: เรียก /support/stars โดย amount=0 และเพิ่ม stars ใน body
-                // แต่ Worker V4.0 ไม่รองรับ
-                // ทางเลือก: ใช้ support/stars กับ amount=1 (1 บาท) แล้วคูณ
-                // ไม่มีวิธีที่ clean เราเลยจะใช้ localStorage ระหว่างรออัปเดต Worker
-                // หลังจากเล่นจบ เราจะบันทึกคะแนนและ progress แล้ว Worker จะเพิ่มดาวให้
-                // ใน Worker V4.0, การบันทึก progress จะไม่เพิ่มดาวโดยอัตโนมัติ
-                // เราต้องเพิ่ม endpoint ใน Worker
-                // ระหว่างนี้เราใช้ localStorage เป็นการชั่วคราว
-                // แต่เพื่อให้ใช้งานได้จริง เราจะใช้ localStorage ก่อน
-                let current = parseInt(localStorage.getItem('arabic_stars_temp')) || 0;
-                current += n;
-                localStorage.setItem('arabic_stars_temp', current);
-                stars = current;
-                updateStarDisplay();
-                // เมื่อ login จะโหลดจากหลังบ้าน
-                // อันนี้คือ fallback
-                debugLog('STARS', `+${n} ดาว (local) รวม ${stars}`);
-            } catch(e) {
-                debugLog('STARS', 'เพิ่มดาวล้มเหลว:', e);
-            }
+        function addStarsLocal(n) {
+            // ใช้ localStorage ชั่วคราว (รอ backend sync)
+            let current = parseInt(localStorage.getItem('arabic_stars_temp')) || 0;
+            current += n;
+            localStorage.setItem('arabic_stars_temp', current);
+            stars = current;
+            updateStarDisplay();
+            playStarSound();
         }
 
         function spendStarsLocal(n) {
@@ -929,7 +962,6 @@
                     });
                 });
 
-                // โหลดความคืบหน้าจากหลังบ้าน
                 await loadProgressFromBackend();
 
                 updateStarDisplay();
@@ -961,7 +993,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY
+        //  GAME 1: VOCABULARY (ปรับปรุงปุ่มปลดล็อก)
         // ==============================================================
         function renderDans() {
             const container = $('danList');
@@ -972,7 +1004,6 @@
             const sortedLevels = Object.keys(grouped).sort((a,b)=>a-b);
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                // ตรวจสอบความคืบหน้าจากหลังบ้าน
                 const allPassed = levelData.every(d => {
                     const key = `${level}_${d.dan}`;
                     return vocabProgress[key] && vocabProgress[key] >= CONFIG.PASSING_SCORE;
@@ -980,7 +1011,6 @@
                 const isUnlocked = level === 1 || (levelData.every(d => {
                     const prevLevel = level - 1;
                     const prevKey = `${prevLevel}_${d.dan}`;
-                    // ถ้าเป็นด่านแรกของ level นี้ ให้ตรวจสอบ level ก่อนหน้าทั้งหมด
                     if (d.dan === 1) {
                         const prevLevelDans = availableDans.filter(dd => dd.level === prevLevel);
                         return prevLevelDans.every(pd => {
@@ -1019,12 +1049,21 @@
                     const isPassed = progress >= CONFIG.PASSING_SCORE;
                     const unlocked = isUnlocked || (level === 1 && d.dan === 1) || (vocabProgress[`${level}_${d.dan-1}`] >= CONFIG.PASSING_SCORE);
                     const isSelected = currentDan === d.dan && currentLevel === d.level;
+                    const cost = calculateUnlockCost(level, d.dan);
+                    const canUnlock = !isPassed && !unlocked && stars >= cost;
+
                     const item = document.createElement('div');
-                    item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
+                    item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                    let statusHtml = `<span class="status ${isPassed ? 'done' : (unlocked ? 'pending' : 'locked-status')}">${isPassed ? '✅ เล่นแล้ว' : (unlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>`;
+                    if (!isPassed && !unlocked && canUnlock) {
+                        statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('vocab', ${level}, ${d.dan})">🔓 ใช้ ${cost}⭐</button>`;
+                    } else if (!isPassed && !unlocked && !canUnlock) {
+                        statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
+                    }
                     item.innerHTML = `
                         <span class="icon">${isPassed ? '✅' : (unlocked ? '📘' : '🔒')}</span>
                         <div class="info"><div class="name">ด่าน ${d.dan}</div><div class="desc">${d.questionCount} คำถาม</div></div>
-                        <span class="status ${isPassed ? 'done' : (unlocked ? 'pending' : 'locked-status')}">${isPassed ? '✅ เล่นแล้ว' : (unlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>
+                        ${statusHtml}
                     `;
                     if (unlocked) {
                         item.style.cursor = 'pointer';
@@ -1233,7 +1272,6 @@
                 consecutiveWrong=0;
                 if (currentFeature && currentFeature.streakBonus && streak>=3) { score += 5; setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
                 if (streak >= 5) {
-                    // ได้ดาว (เพิ่มใน localStorage ชั่วคราว)
                     addStarsLocal(1);
                     if (streak===5) setTeacherMessage('🔥 ติด 5 ข้อ! ได้ดาว');
                 }
@@ -1390,17 +1428,8 @@
             return f;
         }
 
-        function addStarsLocal(n) {
-            let current = parseInt(localStorage.getItem('arabic_stars_temp')) || 0;
-            current += n;
-            localStorage.setItem('arabic_stars_temp', current);
-            stars = current;
-            updateStarDisplay();
-            playStarSound();
-        }
-
         // ==============================================================
-        //  GAME 2: SENTENCE (ย่อ)
+        //  GAME 2: SENTENCE
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1418,7 +1447,6 @@
             sentenceLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
-                // ใช้ progress จากหลังบ้าน
                 const allDone = lv.dans.every(d => {
                     const key = `${lv.level}_${d}`;
                     return sentenceProgress[key] === true;
@@ -1455,12 +1483,21 @@
                 const done = sentenceProgress[key] === true;
                 const isUnlocked = dan === sentenceDans[0] || (sentenceProgress[`${currentSentenceLevel}_${dan-1}`] === true);
                 const isSelected = currentSentenceDan === dan;
+                const cost = calculateUnlockCost(currentSentenceLevel, dan);
+                const canUnlock = !done && !isUnlocked && stars >= cost;
+
                 const item = document.createElement('div');
-                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
+                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                let statusHtml = `<span class="status ${done ? 'done' : (isUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>`;
+                if (!done && !isUnlocked && canUnlock) {
+                    statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('sentence', ${currentSentenceLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
+                } else if (!done && !isUnlocked && !canUnlock) {
+                    statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
+                }
                 item.innerHTML = `
                     <span class="icon">${done ? '✅' : (isUnlocked ? '📘' : '🔒')}</span>
                     <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : 'ล็อก')}</div></div>
-                    <span class="status ${done ? 'done' : (isUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>
+                    ${statusHtml}
                 `;
                 if (isUnlocked) {
                     item.style.cursor = 'pointer';
@@ -1662,7 +1699,6 @@
             $('sentenceQuestionArea').classList.add('hidden');
             $('sentenceGameOver').classList.remove('hidden');
             $('sentenceFinalStreak').textContent = sentenceConsecutiveCorrect;
-            // บันทึกความคืบหน้าไปหลังบ้าน
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
                     email: userEmail,
@@ -1693,7 +1729,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (ย่อ)
+        //  GAME 3: READING
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1761,18 +1797,26 @@
                 const key = `${currentReadingLevel}_${dan}`;
                 const done = readingProgress[key] === true;
                 const isUnlocked = dan === readingDans[0] || (readingProgress[`${currentReadingLevel}_${dan-1}`] === true);
-                const cost = Math.min(currentReadingLevel * 5, 30);
+                const cost = calculateUnlockCost(currentReadingLevel, dan);
+                const canUnlock = !done && !isUnlocked && stars >= cost;
                 const isSelected = currentReadingDan === dan;
+
                 const item = document.createElement('div');
-                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
+                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                let statusHtml = `<span class="status ${done ? 'done' : (isUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ อ่านแล้ว' : (isUnlocked ? '📖 พร้อมอ่าน' : '🔒 ล็อก')}</span>`;
+                if (!done && !isUnlocked && canUnlock) {
+                    statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('reading', ${currentReadingLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
+                } else if (!done && !isUnlocked && !canUnlock) {
+                    statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
+                }
                 item.innerHTML = `
                     <span class="icon">${done ? '✅' : (isUnlocked ? '📖' : '🔒')}</span>
                     <div class="info">
                         <div class="name">ด่าน ${dan}</div>
-                        <div class="desc">${done ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : `ล็อก (Level x5 = ${cost}⭐)`) }</div>
+                        <div class="desc">${done ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : 'ล็อก')}</div>
                         ${articleTitlesMap[dan] && articleTitlesMap[dan].length > 0 ? `<div class="sub-desc">📄 ${articleTitlesMap[dan].slice(0, 2).join(', ')}${articleTitlesMap[dan].length > 2 ? '…' : ''}</div>` : ''}
                     </div>
-                    <span class="status ${done ? 'done' : (isUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ อ่านแล้ว' : (isUnlocked ? '📖 พร้อมอ่าน' : `🔒 ${cost}⭐`)}</span>
+                    ${statusHtml}
                 `;
                 if (isUnlocked) {
                     item.style.cursor = 'pointer';
@@ -2376,7 +2420,6 @@
             $('shareDanDisplay').textContent = `🎯 ด่าน ${dan}`;
             $('shareScoreDisplay').textContent = `⭐ ${score} คะแนน`;
             $('shareMessage').textContent = `${userName || 'นักศึกษา'} กำลังเรียนภาษาอาหรับกับอุสตะเฮง!`;
-            // อ่านจาก progress
             let tr = Object.keys(readingProgress).length;
             let ts = Object.keys(sentenceProgress).length;
             $('shareReadingCount').textContent = tr;
@@ -2459,7 +2502,6 @@
         $('vibrationToggle').checked = vibrationEnabled;
         $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
-        // ตรวจสอบ stars temp
         const tempStars = parseInt(localStorage.getItem('arabic_stars_temp')) || 0;
         if (tempStars > 0) {
             stars = tempStars;
@@ -2493,11 +2535,10 @@
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.0 — Backend เต็มรูปแบบ');
-        console.log('⭐ ระบบดาว: เก็บในหลังบ้าน, สนับสนุน 100บ.=2000⭐, 200บ.=10000⭐');
-        console.log('📊 ความคืบหน้า: เก็บในหลังบ้านทุกเกม');
-        console.log('🏆 ลีดเดอร์บอร์ด: คำนวณจากคะแนนจริง');
-        console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
+        console.log('🚀 ศึกษา ต่างถิ่น v5.1 — แยก Support + ปุ่มปลดล็อก');
+        console.log('☕ Support: 100บ.=2500⭐, 200บ.=10000⭐ → m.me/548132778932419');
+        console.log('🔓 ปลดล็อกด่านด้วยดาว: ทำงานได้แล้ว (10-100⭐ ตาม Level/Dan)');
+        console.log('⭐ ดาวเก็บในหลังบ้าน (ชีท ผู้เล่น)');
     </script>
 </body>
 </html>

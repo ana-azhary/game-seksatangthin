@@ -14,12 +14,53 @@
         * { font-family: 'Noto Sans Thai', sans-serif; }
         .arabic { font-family: 'Noto Naskh Arabic', serif; font-size: 1.5rem; line-height: 2.2rem; }
 
-        .app-container { max-width: 480px; margin: 0 auto; background: #f8fafc; min-height: 100vh; }
-        @media (min-width: 640px) { .app-container { border-radius: 32px; margin: 16px auto; min-height: calc(100vh - 32px); box-shadow: 0 20px 60px rgba(0,0,0,0.08); } }
+        .app-container { max-width: 480px; margin: 0 auto; background: #f8fafc; min-height: 100vh; padding-bottom: 70px; position: relative; }
+        @media (min-width: 640px) { .app-container { border-radius: 32px; margin: 16px auto; min-height: calc(100vh - 32px); box-shadow: 0 20px 60px rgba(0,0,0,0.08); padding-bottom: 80px; } }
 
-        .app-header { background: linear-gradient(135deg, #065f46, #0d9488); color: #fff; padding: 12px 16px 10px; border-radius: 0 0 28px 28px; position: sticky; top: 0; z-index: 50; }
-        .app-header h1 { font-size: 1.2rem; font-weight: 700; }
-        .app-header .sub { font-size: 0.65rem; opacity: 0.8; }
+        .app-header { background: linear-gradient(135deg, #065f46, #0d9488); color: #fff; padding: 10px 16px 8px; border-radius: 0 0 28px 28px; position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; }
+        .app-header .brand h1 { font-size: 1.2rem; font-weight: 700; line-height: 1.2; }
+        .app-header .brand .sub { font-size: 0.65rem; opacity: 0.8; }
+        .app-header .right-icons { display: flex; align-items: center; gap: 4px; }
+        .app-header .right-icons .btn-icon { background: rgba(255,255,255,0.15); border: none; border-radius: 50%; width: 32px; height: 32px; color: #fff; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .app-header .right-icons .btn-icon:hover { background: rgba(255,255,255,0.25); }
+        .app-header .right-icons .btn-icon .badge { position: absolute; top: -4px; right: -4px; background: #f59e0b; color: #1e293b; font-size: 0.6rem; font-weight: 700; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+        .app-header .right-icons .g_id_signin { visibility: hidden; }
+        .app-header .right-icons .g_id_signin.gsi-loaded { visibility: visible; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #fff; display: flex; justify-content: space-around; align-items: center; padding: 6px 0 10px; border-top: 1px solid #e5e7eb; box-shadow: 0 -4px 12px rgba(0,0,0,0.04); z-index: 60; border-radius: 20px 20px 0 0; }
+        @media (min-width: 640px) { .bottom-nav { border-radius: 20px 20px 32px 32px; max-width: 480px; } }
+        .bottom-nav .nav-item { display: flex; flex-direction: column; align-items: center; background: transparent; border: none; font-size: 0.6rem; color: #94a3b8; cursor: pointer; padding: 4px 8px; transition: 0.2s; position: relative; }
+        .bottom-nav .nav-item .icon { font-size: 1.2rem; line-height: 1.4; }
+        .bottom-nav .nav-item .label { font-size: 0.5rem; font-weight: 600; margin-top: 2px; }
+        .bottom-nav .nav-item.active { color: #065f46; }
+        .bottom-nav .nav-item .badge-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #dc2626; border-radius: 50%; }
+
+        .card-modern { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+
+        .dan-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: #f8fafc; margin-bottom: 6px; transition: 0.2s; border: 2px solid transparent; flex-wrap: wrap; }
+        .dan-item.completed { background: #ecfdf5; }
+        .dan-item.locked { opacity: 0.5; filter: grayscale(0.3); }
+        .dan-item.selected { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 0 0 2px rgba(13,148,136,0.2); }
+        .dan-item .icon { font-size: 1.1rem; width: 26px; text-align: center; }
+        .dan-item .info { flex: 1; }
+        .dan-item .info .name { font-weight: 600; font-size: 0.85rem; color: #1e293b; }
+        .dan-item .info .desc { font-size: 0.65rem; color: #94a3b8; }
+        .dan-item .status { font-size: 0.6rem; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
+        .dan-item .status.done { background: #dcfce7; color: #16a34a; }
+        .dan-item .status.pending { background: #fef3c7; color: #d97706; }
+        .dan-item .status.locked-status { background: #f1f5f9; color: #94a3b8; }
+
+        .level-card { margin-bottom: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 12px; border-left: 4px solid #d1d5db; }
+        .level-card.unlocked { border-left-color: #3b82f6; background: #eff6ff; }
+        .level-card.completed { border-left-color: #16a34a; background: #f0fdf4; }
+        .level-card.locked { border-left-color: #9ca3af; opacity: 0.7; }
+
+        .level-progress-bar { height: 4px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 6px 0 8px; }
+        .level-progress-bar .fill { height: 100%; background: linear-gradient(90deg, #0d9488, #065f46); border-radius: 10px; transition: width 0.5s ease; }
+
+        .ustadh-card { background: linear-gradient(135deg, #064e3b, #065f46); border-radius: 16px; padding: 12px 16px; color: #fef3c7; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .ustadh-card .avatar { font-size: 2rem; flex-shrink: 0; }
+        .ustadh-card .msg { font-size: 0.85rem; line-height: 1.5; }
 
         .btn-start { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; padding: 14px 32px; border-radius: 40px; border: none; font-size: 1.1rem; width: 100%; transition: 0.2s; cursor: pointer; }
         .btn-start:active { transform: scale(0.97); }
@@ -31,57 +72,15 @@
         .btn-gold:active { transform: scale(0.97); }
         .btn-danger { background: #dc2626; color: #fff; font-weight: 600; padding: 10px 24px; border-radius: 40px; border: none; font-size: 0.95rem; transition: 0.2s; cursor: pointer; }
         .btn-danger:active { transform: scale(0.97); }
-        .btn-unlock { background: #8b5cf6; color: #fff; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
-        .btn-unlock:active { transform: scale(0.95); }
+        .btn-unlock { background: #8b5cf6; color: #fff; font-weight: 600; padding: 3px 10px; border-radius: 20px; border: none; font-size: 0.65rem; transition: 0.2s; cursor: pointer; }
         .btn-unlock:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-unlock-level { background: #7c3aed; color: #fff; font-weight: 700; padding: 6px 16px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
-        .btn-unlock-level:active { transform: scale(0.95); }
+        .btn-unlock-level { background: #7c3aed; color: #fff; font-weight: 700; padding: 4px 12px; border-radius: 20px; border: none; font-size: 0.65rem; transition: 0.2s; cursor: pointer; }
         .btn-unlock-level:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-settings { background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-settings:hover { background: rgba(255,255,255,0.3); }
-        .btn-settings.active { background: rgba(255,255,255,0.4); }
-        .btn-support { background: rgba(255,255,255,0.15); color: #fff; font-weight: 600; padding: 4px 12px; border-radius: 40px; border: none; font-size: 0.8rem; transition: 0.2s; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .btn-support:hover { background: rgba(255,255,255,0.25); }
-        .btn-support:active { transform: scale(0.95); }
-        .btn-exchange { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1e293b; font-weight: 700; padding: 6px 16px; border-radius: 20px; border: none; font-size: 0.75rem; transition: 0.2s; cursor: pointer; }
-        .btn-exchange:active { transform: scale(0.95); }
-        .btn-exchange:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-facebook { background: #1877f2; color: #fff; padding: 6px 14px; border-radius: 20px; border: none; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
-        .btn-facebook:hover { background: #166fe5; }
 
-        .card-modern { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .dan-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; background: #f8fafc; margin-bottom: 6px; transition: 0.2s; cursor: default; border: 2px solid transparent; flex-wrap: wrap; }
-        .dan-item.completed { background: #ecfdf5; }
-        .dan-item.locked { opacity: 0.5; filter: grayscale(0.3); }
-        .dan-item.selected { border-color: #0d9488; background: #f0fdfa; box-shadow: 0 0 0 2px rgba(13,148,136,0.2); }
-        .dan-item .icon { font-size: 1.1rem; width: 26px; text-align: center; }
-        .dan-item .info { flex: 1; }
-        .dan-item .info .name { font-weight: 600; font-size: 0.9rem; color: #1e293b; }
-        .dan-item .info .desc { font-size: 0.7rem; color: #94a3b8; }
-        .dan-item .info .sub-desc { font-size: 0.65rem; color: #6b7280; margin-top: 2px; }
-        .dan-item .status { font-size: 0.65rem; padding: 2px 10px; border-radius: 20px; font-weight: 600; }
-        .dan-item .status.done { background: #dcfce7; color: #16a34a; }
-        .dan-item .status.pending { background: #fef3c7; color: #d97706; }
-        .dan-item .status.locked-status { background: #f1f5f9; color: #94a3b8; }
-        .dan-item .status.unlock-ready { background: #dbeafe; color: #2563eb; }
-
-        .level-card { margin-bottom: 12px; padding: 10px 12px; background: #f8fafc; border-radius: 12px; border-left: 4px solid #d1d5db; }
-        .level-card.unlocked { border-left-color: #3b82f6; background: #eff6ff; }
-        .level-card.completed { border-left-color: #16a34a; background: #f0fdf4; }
-        .level-card.locked { border-left-color: #9ca3af; opacity: 0.7; }
-
-        .level-progress-bar { height: 4px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 6px 0 8px; }
-        .level-progress-bar .fill { height: 100%; background: linear-gradient(90deg, #0d9488, #065f46); border-radius: 10px; transition: width 0.5s ease; }
-
-        .tab-modern { display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 16px; margin-bottom: 16px; overflow-x: auto; }
-        .tab-modern button { flex: 1; padding: 8px 12px; border: none; border-radius: 12px; font-weight: 600; font-size: 0.75rem; color: #64748b; background: transparent; transition: 0.2s; cursor: pointer; white-space: nowrap; }
-        .tab-modern button.active { background: #fff; color: #065f46; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .tab-modern button:active { transform: scale(0.96); }
-
-        .ustadh-card { background: linear-gradient(135deg, #064e3b, #065f46); border-radius: 16px; padding: 12px 16px; color: #fef3c7; display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .ustadh-card .avatar { font-size: 2rem; flex-shrink: 0; }
-        .ustadh-card .msg { font-size: 0.85rem; line-height: 1.5; }
-        .ustadh-card .msg strong { color: #fbbf24; }
+        .game-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 999; display: none; flex-direction: column; overflow-y: auto; padding: 16px 20px 100px; }
+        .game-overlay.show { display: flex; }
+        .game-overlay .close-btn { position: sticky; top: 0; background: white; padding: 8px 0; margin-bottom: 12px; font-size: 1.2rem; font-weight: 600; color: #1e293b; border-bottom: 1px solid #e5e7eb; cursor: pointer; display: flex; align-items: center; gap: 8px; z-index: 10; }
+        .game-overlay .close-btn span { font-size: 1.5rem; }
 
         .sentence-word { display: inline-block; padding: 6px 14px; margin: 3px; background: #fff; border-radius: 10px; border: 2px solid #d1d5db; cursor: pointer; transition: 0.2s; font-size: 1rem; direction: rtl; unicode-bidi: plaintext; }
         .sentence-word:hover:not(.placed) { border-color: #0d9488; background: #f0fdfa; }
@@ -91,457 +90,164 @@
         .reading-word:hover { background: #fef3c7; }
         .reading-word.active-word { background: #fbbf24; color: #1e293b; font-weight: 700; }
 
-        .game-overlay {
-            position: fixed;
-            inset: 0;
-            background: #f8fafc;
-            z-index: 999;
-            display: none;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 16px 20px 100px;
-        }
-        .game-overlay.show { display: flex; }
-        .game-overlay .close-btn {
-            position: sticky;
-            top: 0;
-            background: white;
-            padding: 8px 0;
-            margin-bottom: 12px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e293b;
-            border-bottom: 1px solid #e5e7eb;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 10;
-        }
-        .game-overlay .close-btn span { font-size: 1.5rem; }
+        .option-btn { border: 2px solid #e5e7eb; border-radius: 16px; padding: 12px 14px; background: white; transition: all 0.15s; text-align: right; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .option-btn:active { transform: scale(0.97); }
+        .option-btn.correct { border-color: #16a34a; background: #dcfce7; }
+        .option-btn.wrong { border-color: #dc2626; background: #fee2e2; }
+        .option-btn.disabled { opacity: 0.6; pointer-events: none; }
+        .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
+        .option-btn.hard-mode { border-width: 3px; border-color: #dc2626; background: #fef2f2; }
 
-        .dictionary-popup {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            width: 92%;
-            max-width: 480px;
-            background: #fff;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 20px;
-            z-index: 9999;
-            transition: 0.4s ease;
-            opacity: 0;
-            pointer-events: none;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
+        .dictionary-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); width: 92%; max-width: 480px; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 20px; z-index: 9999; transition: 0.4s ease; opacity: 0; pointer-events: none; max-height: 85vh; overflow-y: auto; }
         .dictionary-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
         .dictionary-popup .close-btn { position: sticky; top: 0; float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: #fff; padding: 0 4px; z-index: 10; }
         .dictionary-popup .close-btn:hover { color: #1f2937; }
 
-        .settings-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: #fff;
-            border-radius: 24px;
-            padding: 24px;
-            z-index: 9998;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s ease;
-        }
-        .settings-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-        .settings-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
-        .settings-popup .close-btn:hover { color: #1f2937; }
+        .extra-info-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: #fff; border-radius: 24px; padding: 24px; z-index: 9999; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 90%; max-width: 400px; opacity: 0; pointer-events: none; transition: 0.3s ease; text-align: center; }
+        .extra-info-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        .extra-info-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
 
-        .support-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: #fff;
-            border-radius: 24px;
-            padding: 24px;
-            z-index: 9998;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s ease;
-        }
-        .support-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-        .support-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
-        .support-popup .close-btn:hover { color: #1f2937; }
+        .settings-popup, .support-popup, .exchange-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: #fff; border-radius: 24px; padding: 24px; z-index: 9998; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 90%; max-width: 400px; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+        .settings-popup.show, .support-popup.show, .exchange-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        .settings-popup .close-btn, .support-popup .close-btn, .exchange-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
 
-        .exchange-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: #fff;
-            border-radius: 24px;
-            padding: 24px;
-            z-index: 9998;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s ease;
-        }
-        .exchange-popup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-        .exchange-popup .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: none; border: none; }
-        .exchange-popup .close-btn:hover { color: #1f2937; }
+        .timer-bar { height: 6px; background: #e5e7eb; border-radius: 20px; overflow: hidden; }
+        .timer-fill { height: 100%; background: #0d9488; border-radius: 20px; transition: width 1s linear; }
+        .timer-fill.danger { background: #dc2626; }
+        .timer-fill.warning { background: #f59e0b; }
 
-        .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
-
-        /* Vocab Table Styles */
-        #vocabTable {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 0.85rem;
-        }
-        #vocabTable thead th {
-            padding: 8px 6px;
-            text-align: left;
-            font-weight: 700;
-            color: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-        #vocabTable thead th:nth-child(1) { background: #1e293b; min-width: 32px; text-align: center; }
-        #vocabTable thead th:nth-child(2) { background: #065f46; min-width: 80px; }
-        #vocabTable thead th:nth-child(3) { background: #0d9488; min-width: 90px; }
-        #vocabTable thead th:nth-child(4) { background: #0369a1; min-width: 60px; }
-        #vocabTable thead th:nth-child(5) { background: #0284c7; min-width: 60px; }
-        #vocabTable thead th:nth-child(6) { background: #0ea5e9; min-width: 60px; }
-        #vocabTable thead th:nth-child(7) { background: #7c3aed; min-width: 60px; }
-        #vocabTable thead th:nth-child(8) { background: #8b5cf6; min-width: 60px; }
-        #vocabTable thead th:nth-child(9) { background: #d97706; min-width: 80px; }
-        #vocabTable thead th:nth-child(10) { background: #b45309; min-width: 40px; text-align: center; }
-
+        #vocabTable { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
+        #vocabTable thead th { padding: 6px 4px; text-align: left; font-weight: 700; color: #fff; position: sticky; top: 0; z-index: 5; font-size: 0.7rem; white-space: nowrap; }
+        #vocabTable thead th:nth-child(1) { background: #1e293b; min-width: 28px; text-align: center; }
+        #vocabTable thead th:nth-child(2) { background: #065f46; }
+        #vocabTable thead th:nth-child(3) { background: #0d9488; }
+        #vocabTable thead th:nth-child(4) { background: #0369a1; }
+        #vocabTable thead th:nth-child(5) { background: #0284c7; }
+        #vocabTable thead th:nth-child(6) { background: #0ea5e9; }
+        #vocabTable thead th:nth-child(7) { background: #7c3aed; }
+        #vocabTable thead th:nth-child(8) { background: #8b5cf6; }
+        #vocabTable thead th:nth-child(9) { background: #d97706; }
+        #vocabTable thead th:nth-child(10) { background: #b45309; text-align: center; }
         #vocabTable tbody tr:nth-child(even) { background: #f8fafc; }
         #vocabTable tbody tr:nth-child(odd) { background: #ffffff; }
         #vocabTable tbody tr:hover { background: #dbeafe; }
-
-        #vocabTable tbody td {
-            padding: 5px 4px;
-            border-bottom: 1px solid #e5e7eb;
-            vertical-align: middle;
-            font-size: 0.8rem;
+        #vocabTable tbody td { padding: 4px 3px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; font-size: 0.75rem; }
+        #vocabTable tbody td:nth-child(1) { text-align: center; color: #6b7280; font-size: 0.65rem; background: #f1f5f9; }
+        #vocabTable tbody td:nth-child(3) { font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(4), #vocabTable tbody td:nth-child(5), #vocabTable tbody td:nth-child(6) { font-family: 'Noto Naskh Arabic', serif; font-size: 0.95rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(7), #vocabTable tbody td:nth-child(8) { font-family: 'Noto Naskh Arabic', serif; font-size: 0.95rem; direction: rtl; text-align: right; }
+        #vocabTable tbody td:nth-child(10) { text-align: center; font-weight: 600; }
+        @media (max-width: 480px) {
+            #vocabTable thead th { font-size: 0.55rem; padding: 3px 2px; }
+            #vocabTable tbody td { font-size: 0.65rem; padding: 3px 2px; }
+            #vocabTable tbody td:nth-child(3) { font-size: 0.85rem; }
+            #vocabTable tbody td:nth-child(4), #vocabTable tbody td:nth-child(5), #vocabTable tbody td:nth-child(6) { font-size: 0.8rem; }
+            #vocabTable tbody td:nth-child(7), #vocabTable tbody td:nth-child(8) { font-size: 0.8rem; }
         }
-        #vocabTable tbody td:nth-child(1) { text-align: center; color: #6b7280; font-size: 0.7rem; background: #f1f5f9; }
-        #vocabTable tbody td:nth-child(2) { background: #fffbeb; }
-        #vocabTable tbody td:nth-child(3) { background: #f0fdf4; font-family: 'Noto Naskh Arabic', serif; font-size: 1.1rem; direction: rtl; text-align: right; }
-        #vocabTable tbody td:nth-child(4) { background: #eff6ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
-        #vocabTable tbody td:nth-child(5) { background: #eff6ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
-        #vocabTable tbody td:nth-child(6) { background: #eff6ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
-        #vocabTable tbody td:nth-child(7) { background: #f5f3ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
-        #vocabTable tbody td:nth-child(8) { background: #f5f3ff; font-family: 'Noto Naskh Arabic', serif; font-size: 1rem; direction: rtl; text-align: right; }
-        #vocabTable tbody td:nth-child(9) { background: #fefce8; }
-        #vocabTable tbody td:nth-child(10) { background: #fef2f2; text-align: center; font-weight: 600; }
 
         @media (max-width: 480px) {
-            #vocabTable thead th { font-size: 0.6rem; padding: 4px 3px; }
-            #vocabTable tbody td { font-size: 0.7rem; padding: 3px 2px; }
-            #vocabTable tbody td:nth-child(3) { font-size: 0.9rem; }
-            #vocabTable tbody td:nth-child(4),
-            #vocabTable tbody td:nth-child(5),
-            #vocabTable tbody td:nth-child(6),
-            #vocabTable tbody td:nth-child(7),
-            #vocabTable tbody td:nth-child(8) { font-size: 0.85rem; }
-        }
-        @media (max-width: 480px) {
+            .app-header .brand h1 { font-size: 1rem; }
+            .app-header .brand .sub { font-size: 0.55rem; }
+            .bottom-nav .nav-item .label { font-size: 0.45rem; }
+            .bottom-nav .nav-item .icon { font-size: 1.1rem; }
             .arabic { font-size: 1.2rem; line-height: 1.8rem; }
-            .app-header h1 { font-size: 1.1rem; }
-            .tab-modern button { font-size: 0.65rem; padding: 6px 8px; }
             .game-overlay { padding: 12px 16px 80px; }
             .sentence-word { padding: 4px 10px; font-size: 0.9rem; }
-            .dan-item .info .sub-desc { font-size: 0.6rem; }
+            .option-btn { font-size: 1rem; padding: 10px 12px; }
         }
+        @media (min-width: 640px) { .bottom-nav { max-width: 480px; } }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 10px; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div class="app-container" id="app">
+<div id="app" class="app-container">
 
     <!-- HEADER -->
     <header class="app-header">
-        <div class="flex items-center justify-between">
-            <div><h1>📚 ศึกษา ต่างถิ่น</h1><div class="sub"> أُسْتَاذ · เรียนภาษาอาหรับ</div></div>
-            <div class="flex items-center gap-1 md:gap-2">
-                <button class="btn-exchange" onclick="toggleExchange()">💎 <span id="diamondDisplay">0</span></button>
-                <span id="starDisplay" class="text-sm font-bold whitespace-nowrap">⭐ 0</span>
-                <button class="btn-support" onclick="toggleSupport()" title="สนับสนุน">☕</button>
-                <a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-facebook" title="ไปเพจศึกษา ต่างถิ่น">📘 f</a>
-                <button class="btn-settings" onclick="toggleSettings()" title="ตั้งค่า">⚙️</button>
-                <div id="userArea" class="flex items-center gap-1 md:gap-2">
-                    <span id="loginStatus" class="text-xs text-white/70">⏳</span>
-                    <div id="userInfo" class="hidden flex items-center gap-1 md:gap-2">
-                        <img id="avatarImg" class="w-7 h-7 rounded-full border-2 border-white/30" src="" alt="" />
-                        <span id="userName" class="text-sm font-medium cursor-pointer hover:text-yellow-200 whitespace-nowrap max-w-[60px] md:max-w-[100px] truncate" onclick="openEditName()">✏️</span>
-                    </div>
-                    <div id="loginButton" class="g_id_signin" data-type="standard" data-size="medium" data-theme="outline" data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
-                    <button id="logoutBtn" class="hidden text-xs text-white/70 hover:text-white underline">ออก</button>
-                </div>
-            </div>
+        <div class="brand">
+            <h1>📚 ศึกษา ต่างถิ่น</h1>
+            <span class="sub">أُسْتَاذ · เรียนภาษาอาหรับ</span>
         </div>
-        <div class="flex justify-between mt-1 text-xs text-white/60">
-            <span id="levelDisplayHeader">Level 1</span>
-            <span id="soundStatus">🔊</span>
+        <div class="right-icons">
+            <button class="btn-icon" onclick="toggleExchange()" title="แลกเพชร">💎 <span id="diamondDisplay" class="badge">0</span></button>
+            <span id="starDisplay" style="font-weight:700; font-size:0.9rem;">⭐ 0</span>
+            <button class="btn-icon" onclick="toggleSupport()" title="สนับสนุน">☕</button>
+            <a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-icon" title="เพจ"><span style="font-size:1rem;">f</span></a>
+            <button class="btn-icon" onclick="toggleSettings()" title="ตั้งค่า">⚙️</button>
+            <div id="userArea" style="display:flex; align-items:center; gap:4px;">
+                <span id="loginStatus" style="font-size:0.7rem; opacity:0.8;">⏳</span>
+                <div id="userInfo" class="hidden" style="display:flex; align-items:center; gap:4px;">
+                    <img id="avatarImg" class="w-7 h-7 rounded-full border-2 border-white/30" src="" alt="" />
+                    <span id="userName" class="text-sm font-medium cursor-pointer hover:text-yellow-200 max-w-[50px] truncate" onclick="openEditName()">✏️</span>
+                </div>
+                <div id="loginButton" class="g_id_signin" data-type="standard" data-size="medium" data-theme="outline" data-text="signin_with" data-shape="pill" data-logo_alignment="left"></div>
+                <button id="logoutBtn" class="hidden text-xs text-white/70 hover:text-white underline">ออก</button>
+            </div>
         </div>
     </header>
 
-    <!-- TABS -->
-    <div class="px-4 pt-3">
-        <div class="tab-modern">
-            <button class="tab-btn active" data-tab="gameTab">🎯 ท่องศัพท์</button>
-            <button class="tab-btn" data-tab="sentenceTab">🧩 ประโยค</button>
-            <button class="tab-btn" data-tab="readingTab">📖 บทความ</button>
-            <button class="tab-btn" data-tab="vocabTab">📚 คำศัพท์</button>
-            <button class="tab-btn" data-tab="leaderboardTab">🏆 ลีดเดอร์</button>
-            <button class="tab-btn" data-tab="shareTab">📤 แชร์</button>
-        </div>
-    </div>
+    <!-- CONTENT -->
+    <div id="pageContent" class="px-4 pt-3 pb-20"></div>
 
-    <!-- ============================================================ -->
-    <!-- TAB: GAME (ท่องศัพท์) -->
-    <!-- ============================================================ -->
-    <section id="gameTab" class="tab-content px-4 pb-6">
-        <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="ustadhMessage">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ ฝึกภาษาให้สนุกและได้ความรู้ไปกับผมครับ 💪</div></div>
-        <div class="card-modern">
-            <h2 class="font-bold text-gray-700 mb-2">🗺️ เลือกด่าน</h2>
-            <div id="danList"></div>
-            <p id="danStatus" class="text-xs text-gray-400 mt-2"></p>
-        </div>
-        <div class="mb-4" id="startGameContainer">
-            <button id="startGameBtn" class="btn-start" onclick="startGame()">🚀 เริ่มฝึก</button>
-            <p class="text-xs text-gray-400 text-center mt-1">กดปุ่มเมื่อพร้อม หรือดับเบิลคลิกที่ด่าน</p>
-        </div>
-        <div id="gameNotStarted" class="card-modern text-center py-8 text-gray-400">
-            <span class="text-4xl block mb-2">🌍</span>
-            <p>เลือกด่านและกด "เริ่มฝึก" หรือดับเบิลคลิก</p>
-        </div>
-    </section>
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="nav-item active" data-tab="gameTab"><span class="icon">🎯</span><span class="label">ท่องศัพท์</span></button>
+        <button class="nav-item" data-tab="sentenceTab"><span class="icon">🧩</span><span class="label">ประโยค</span></button>
+        <button class="nav-item" data-tab="readingTab"><span class="icon">📖</span><span class="label">บทความ</span></button>
+        <button class="nav-item" data-tab="vocabTab"><span class="icon">📚</span><span class="label">คำศัพท์</span></button>
+        <button class="nav-item" data-tab="leaderboardTab"><span class="icon">🏆</span><span class="label">ลีดเดอร์</span></button>
+        <button class="nav-item" data-tab="shareTab"><span class="icon">📤</span><span class="label">แชร์</span></button>
+    </nav>
 
-    <!-- ============================================================ -->
-    <!-- TAB: SENTENCE -->
-    <!-- ============================================================ -->
-    <section id="sentenceTab" class="tab-content hidden px-4 pb-6">
-        <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="sentenceUstadhMessage">มาเรียงประโยคภาษาอาหรับกันครับ! 🧩</div></div>
-        <div class="card-modern">
-            <h2 class="font-bold text-gray-700 mb-2">🧩 ต่อประโยค</h2>
-            <p class="text-xs text-gray-400">เรียงคำให้ถูกต้อง • ได้เพชรเมื่อตอบถูกครบทุกข้อในด่าน 💎</p>
-            <div id="sentenceLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
-        </div>
-        <div id="sentenceDanContainer" class="card-modern hidden">
-            <h3 class="font-semibold text-gray-700 mb-2">🎯 Level <span id="sentenceSelectedLevel">1</span></h3>
-            <div id="sentenceDanList" class="space-y-1"></div>
-        </div>
-        <div class="mb-4" id="sentenceStartContainer">
-            <button id="sentenceStartBtn" class="btn-start" onclick="startSentenceGame()">🚀 เริ่มฝึก</button>
-            <p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่านเพื่อเริ่มได้</p>
-        </div>
-        <div id="sentenceNotStarted" class="card-modern text-center py-8 text-gray-400">
-            <span class="text-4xl block mb-2">🧩</span>
-            <p>เลือก Level และด่าน แล้วกด "เริ่มฝึก" หรือดับเบิลคลิก</p>
-        </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- TAB: READING -->
-    <!-- ============================================================ -->
-    <section id="readingTab" class="tab-content hidden px-4 pb-6">
-        <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="readingUstadhMessage">ฝึกอ่านภาษาอาหรับผ่านบทความครับ 📖</div></div>
-        <div class="card-modern">
-            <h2 class="font-bold text-gray-700 mb-2">📖 อ่านบทความ</h2>
-            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ได้เพชรเมื่ออ่านครบทุกบทความในด่าน 💎</p>
-            <div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
-        </div>
-        <div id="readingDanContainer" class="card-modern hidden">
-            <h3 class="font-semibold text-gray-700 mb-2">🎯 Level <span id="readingSelectedLevel">1</span></h3>
-            <div id="readingDanList" class="space-y-1"></div>
-        </div>
-        <div class="mb-4" id="readingStartContainer">
-            <button id="readingStartBtn" class="btn-start" onclick="startReadingGame()">🚀 เริ่มฝึก</button>
-            <p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่านเพื่อเริ่มได้</p>
-        </div>
-        <div id="readingNotStarted" class="card-modern text-center py-8 text-gray-400">
-            <span class="text-4xl block mb-2">📖</span>
-            <p>เลือก Level และด่าน แล้วกด "เริ่มฝึก" หรือดับเบิลคลิก</p>
-        </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- TAB: VOCAB -->
-    <!-- ============================================================ -->
-    <section id="vocabTab" class="tab-content hidden px-4 pb-6">
-        <div class="card-modern">
-            <div class="flex flex-wrap justify-between items-center mb-3">
-                <h2 class="text-xl font-bold text-gray-800">📖 คำศัพท์ <span id="vocabCount" class="text-emerald-700">0</span></h2>
-                <div class="flex gap-2">
-                    <select id="vocabLevelFilter" class="border border-gray-300 rounded-full px-3 py-1 text-sm" onchange="filterVocab()">
-                        <option value="0">ทุก Level</option>
-                    </select>
-                    <button id="exportCSV" class="btn-secondary text-sm py-1 px-3" onclick="exportCSV()">⬇ CSV</button>
-                    <button id="exportPDF" class="btn-secondary text-sm py-1 px-3" onclick="exportPDF()">⬇ PDF</button>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table id="vocabTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>ไทย</th>
-                            <th>อาหรับ</th>
-                            <th>อดีต</th>
-                            <th>ปัจจุบัน</th>
-                            <th>คำสั่ง</th>
-                            <th>เอกพจน์</th>
-                            <th>พหูพจน์</th>
-                            <th>หมวด</th>
-                            <th>Level</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vocabBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- TAB: LEADERBOARD (แสดงเพชร) -->
-    <!-- ============================================================ -->
-    <section id="leaderboardTab" class="tab-content hidden px-4 pb-6">
-        <div class="card-modern">
-            <h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด (💎 เพชร)</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600">
-                        <tr>
-                            <th class="p-2 text-left">อันดับ</th>
-                            <th class="p-2 text-left">ชื่อ</th>
-                            <th class="p-2 text-left">💎 เพชร</th>
-                            <th class="p-2 text-left">กำลังใจ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- TAB: SHARE -->
-    <!-- ============================================================ -->
-    <section id="shareTab" class="tab-content hidden px-4 pb-6">
-        <div class="card-modern share-story-card"><div class="text-center"><p class="text-lg font-medium text-gray-700" id="shareMessage">ฉันกำลังเรียนภาษาอาหรับ!</p><div class="flex flex-wrap justify-center gap-2 mt-2"><span class="badge gold" id="shareLevelDisplay">🏰 Level 1</span><span class="badge green" id="shareDanDisplay">🎯 ด่าน 1</span><span class="badge" id="shareScoreDisplay">⭐ 0 คะแนน</span></div><div class="mt-3 p-3 bg-gray-50 rounded-xl text-left text-sm text-gray-600"><p>📖 <span id="shareReadingCount">0</span> บทความ</p><p>🧩 <span id="shareSentenceCount">0</span> ประโยค</p><p>📚 <span id="shareVocabCount">0</span> คำศัพท์</p><p>💎 <span id="shareDiamondCount">0</span> เพชร</p></div><div class="mt-4 flex flex-wrap justify-center gap-2"><button onclick="shareToStory()" class="btn-primary bg-blue-600 hover:bg-blue-700 text-sm px-5 py-2 rounded-full">📱 แชร์สตอรี่</button><button onclick="shareToFriend()" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-sm px-5 py-2 rounded-full">👥 ชวนเพื่อน</button><a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-secondary text-sm px-5 py-2 rounded-full">🔗 เพจ</a></div></div></div>
-    </section>
-
-    <!-- ============================================================ -->
-    <!-- GAME OVERLAY -->
-    <!-- ============================================================ -->
+    <!-- OVERLAY -->
     <div id="gameOverlay" class="game-overlay">
         <div class="close-btn" onclick="closeGameOverlay()"><span>←</span> กลับ</div>
         <div id="overlayContent"></div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- SETTINGS POPUP -->
-    <!-- ============================================================ -->
+    <!-- POPUPS -->
+    <div id="extraInfoPopup" class="extra-info-popup">
+        <button class="close-btn" onclick="closeExtraInfo()">✕</button>
+        <div id="extraInfoContent"></div>
+    </div>
+
     <div id="settingsPopup" class="settings-popup">
         <button class="close-btn" onclick="toggleSettings()">✕</button>
         <h3 class="text-xl font-bold text-gray-800 mb-4">⚙️ ตั้งค่า</h3>
         <div class="space-y-3">
-            <label class="flex items-center justify-between cursor-pointer">
-                <span class="text-gray-700">🔊 เสียง</span>
-                <input type="checkbox" id="soundToggle" checked class="w-5 h-5 accent-emerald-600" onchange="updateSettings()" />
-            </label>
-            <label class="flex items-center justify-between cursor-pointer">
-                <span class="text-gray-700">📳 สั่น</span>
-                <input type="checkbox" id="vibrationToggle" checked class="w-5 h-5 accent-emerald-600" onchange="updateSettings()" />
-            </label>
+            <label class="flex items-center justify-between cursor-pointer"><span class="text-gray-700">🔊 เสียง</span><input type="checkbox" id="soundToggle" checked class="w-5 h-5 accent-emerald-600" onchange="updateSettings()" /></label>
+            <label class="flex items-center justify-between cursor-pointer"><span class="text-gray-700">📳 สั่น</span><input type="checkbox" id="vibrationToggle" checked class="w-5 h-5 accent-emerald-600" onchange="updateSettings()" /></label>
         </div>
         <p class="text-xs text-gray-400 mt-4">✅ เปิด/ปิดเสียงและสั่นได้</p>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- SUPPORT POPUP -->
-    <!-- ============================================================ -->
     <div id="supportPopup" class="support-popup">
         <button class="close-btn" onclick="toggleSupport()">✕</button>
-        <div class="text-center">
-            <span class="text-5xl block mb-2">☕</span>
-            <h3 class="text-xl font-bold text-gray-800">สนับสนุนนักพัฒนา</h3>
-            <p class="text-sm text-gray-500 mt-1">ขอบคุณที่ช่วยให้เราพัฒนาเว็บไซต์ต่อไป 🙏</p>
-        </div>
+        <div class="text-center"><span class="text-5xl block mb-2">☕</span><h3 class="text-xl font-bold text-gray-800">สนับสนุนนักพัฒนา</h3><p class="text-sm text-gray-500 mt-1">ขอบคุณที่ช่วยให้เราพัฒนาเว็บไซต์ต่อไป 🙏</p></div>
         <div class="mt-4 space-y-3">
-            <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <span class="font-bold text-lg">100 บาท</span>
-                        <span class="text-xs text-gray-500 block">รับทันที 2,500 ⭐</span>
-                    </div>
-                    <button onclick="openSupport('100')" class="btn-primary bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-full text-sm">
-                        ☕ สนับสนุน
-                    </button>
-                </div>
-            </div>
-            <div class="bg-amber-100 rounded-xl p-4 border border-amber-300">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <span class="font-bold text-lg">200 บาท</span>
-                        <span class="text-xs text-gray-500 block">รับทันที 10,000 ⭐</span>
-                    </div>
-                    <button onclick="openSupport('200')" class="btn-primary bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-full text-sm">
-                        ☕ สนับสนุน
-                    </button>
-                </div>
-            </div>
+            <div class="bg-amber-50 rounded-xl p-4 border border-amber-200"><div class="flex justify-between items-center"><div><span class="font-bold text-lg">100 บาท</span><span class="text-xs text-gray-500 block">รับทันที 2,500 ⭐</span></div><button onclick="openSupport('100')" class="btn-primary bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-full text-sm">☕ สนับสนุน</button></div></div>
+            <div class="bg-amber-100 rounded-xl p-4 border border-amber-300"><div class="flex justify-between items-center"><div><span class="font-bold text-lg">200 บาท</span><span class="text-xs text-gray-500 block">รับทันที 10,000 ⭐</span></div><button onclick="openSupport('200')" class="btn-primary bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-full text-sm">☕ สนับสนุน</button></div></div>
         </div>
-        <div class="mt-4 p-3 bg-gray-50 rounded-xl text-center text-sm text-gray-600">
-            ⭐ ดาวปัจจุบัน: <span id="supportStarDisplay" class="font-bold text-amber-600">0</span>
-        </div>
+        <div class="mt-4 p-3 bg-gray-50 rounded-xl text-center text-sm text-gray-600">⭐ ดาวปัจจุบัน: <span id="supportStarDisplay" class="font-bold text-amber-600">0</span></div>
         <p class="text-xs text-gray-400 text-center mt-3">กดสนับสนุน → พูดคุยกับแอดมิน → โอนเงิน → รับดาวทันที</p>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- EXCHANGE POPUP (12💎 = 100⭐) -->
-    <!-- ============================================================ -->
     <div id="exchangePopup" class="exchange-popup">
         <button class="close-btn" onclick="toggleExchange()">✕</button>
-        <div class="text-center">
-            <span class="text-5xl block mb-2">💎➡️⭐</span>
-            <h3 class="text-xl font-bold text-gray-800">แลกเพชรเป็นดาว</h3>
-            <p class="text-sm text-gray-500 mt-1">12 เพชร = 100 ดาว</p>
-        </div>
+        <div class="text-center"><span class="text-5xl block mb-2">💎➡️⭐</span><h3 class="text-xl font-bold text-gray-800">แลกเพชรเป็นดาว</h3><p class="text-sm text-gray-500 mt-1">12 เพชร = 100 ดาว</p></div>
         <div class="mt-4 p-4 bg-gray-50 rounded-xl">
-            <div class="flex justify-between text-sm">
-                <span>💎 เพชรของคุณ: <span id="exchangeDiamondDisplay" class="font-bold text-purple-600">0</span></span>
-                <span>⭐ ดาวที่จะได้รับ: <span id="exchangeStarDisplay" class="font-bold text-amber-600">0</span></span>
-            </div>
-            <button id="exchangeConfirmBtn" class="btn-primary w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl" onclick="confirmExchange()">
-                💎 แลก 12 เพชร → 100 ดาว
-            </button>
+            <div class="flex justify-between text-sm"><span>💎 เพชรของคุณ: <span id="exchangeDiamondDisplay" class="font-bold text-purple-600">0</span></span><span>⭐ ดาวที่จะได้รับ: <span id="exchangeStarDisplay" class="font-bold text-amber-600">0</span></span></div>
+            <button id="exchangeConfirmBtn" class="btn-primary w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl" onclick="confirmExchange()">💎 แลก 12 เพชร → 100 ดาว</button>
             <p id="exchangeStatus" class="text-xs text-center text-gray-400 mt-2"></p>
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- MODAL: แก้ไขชื่อ -->
-    <!-- ============================================================ -->
     <div id="editNameModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
             <h3 class="text-xl font-bold text-gray-800 mb-4">✏️ แก้ไขชื่อ</h3>
@@ -550,9 +256,6 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- DICTIONARY POPUP -->
-    <!-- ============================================================ -->
     <div id="dictionaryPopup" class="dictionary-popup">
         <span class="close-btn" onclick="closeDictionary()">&times;</span>
         <div id="dictContent">
@@ -578,7 +281,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.4 — ระบบครบทุกฟีเจอร์ -->
+    <!-- JAVASCRIPT v5.6 — ฉบับสมบูรณ์ -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -590,11 +293,11 @@
             PASSING_SCORE: 60,
             QUESTIONS_PER_GAME: 10,
             TIME_LIMIT: 20,
-            PAGE_URL: 'https://www.facebook.com/profile.php?id=100064382094369',
             HINT_COST: 1,
-            LEVEL_BONUS_STARS: 20,
             UNLOCK_LEVEL_COST: 100,
             DIAMONDS_TO_STARS_RATE: 12,
+            DIAMOND_REQUIRED_PERCENT: 90,
+            STREAK_STAR_INTERVAL: 3,
         };
 
         // ==============================================================
@@ -629,8 +332,7 @@
         let currentDan = 0, currentLevel = 0;
         let currentRound = [], currentIndex = 0;
         let score = 0, streak = 0, combo = 1, lives = 0;
-        let stars = 0;
-        let diamonds = 0;
+        let stars = 0, diamonds = 0;
         let mistakes = [], timerInterval = null, timeLeft = CONFIG.TIME_LIMIT;
         let isAnswered = false, gameEnded = false;
         let userEmail = null, userName = null, userAvatar = null, isLoggedIn = false;
@@ -639,25 +341,18 @@
         let consecutiveWrong = 0;
         let gameStarted = false;
 
-        // Progress from backend
-        let vocabProgress = {};
-        let sentenceProgress = {};
-        let readingProgress = {};
-
-        // Settings
+        let vocabProgress = {}, sentenceProgress = {}, readingProgress = {};
         let soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
         let vibrationEnabled = localStorage.getItem('vibrationEnabled') !== 'false';
 
-        // Sentence game
         let sentenceLevels = [], sentenceDans = [], currentSentenceLevel = 0, currentSentenceDan = 0;
         let sentenceQuestions = [], sentenceIndex = 0, sentenceTotalQuestions = 0;
         let selectedWords = [], placedWords = [], sentenceGameCompleted = false;
-        let sentenceConsecutiveCorrect = 0;
+        let sentenceConsecutiveCorrect = 0, sentenceCorrectCount = 0;
 
-        // Reading game
         let readingLevels = [], readingDans = [], currentReadingLevel = 0, currentReadingDan = 0;
         let readingArticles = [], readingIndex = 0, readingTotalArticles = 0;
-        let readingWordMap = {}, readingTranslationVisible = false;
+        let readingWordMap = {};
         let currentArticleId = 0;
         let articleTitlesMap = {};
 
@@ -666,18 +361,15 @@
         // ==============================================================
         //  HELPERS
         // ==============================================================
-        function debugLog(m, msg, d) { console.log(`[${new Date().toISOString().slice(11,19)}] [${m}] ${msg}`, d||''); }
+        function debugLog(m, msg, d) { console.log(`[${new Date().toISOString().slice(11,19)}] [${m}] ${msg}`, d || ''); }
         function setStatus(text, color) { const el = $('loginStatus'); if (el) { el.textContent = text; el.style.color = color || '#fff'; } }
 
         // ==============================================================
         //  SOUND & VIBRATION
         // ==============================================================
         let audioCtx = null;
-
         function getAudioContext() {
-            if (!audioCtx) {
-                try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
-            }
+            if (!audioCtx) { try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
             return audioCtx;
         }
 
@@ -686,36 +378,13 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = 600;
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                osc.type = 'sine'; osc.frequency.value = 600;
                 gain.gain.setValueAtTime(0.08, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.06);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.06);
-            } catch (e) {}
-        }
-
-        function playPageFlipSound() {
-            if (!soundEnabled) return;
-            try {
-                const ctx = getAudioContext();
-                if (!ctx) return;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.04, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.1);
-            } catch (e) {}
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.06);
+            } catch(e) {}
         }
 
         function playCorrectSound() {
@@ -723,21 +392,17 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                [523, 659, 784, 1047].forEach((freq, i) => {
+                [523,659,784,1047].forEach((freq,i) => {
                     setTimeout(() => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.value = freq;
+                        const osc = ctx.createOscillator(), gain = ctx.createGain();
+                        osc.type = 'sine'; osc.frequency.value = freq;
                         gain.gain.setValueAtTime(0.1, ctx.currentTime);
                         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.start();
-                        osc.stop(ctx.currentTime + 0.15);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(); osc.stop(ctx.currentTime + 0.15);
                     }, i * 80);
                 });
-            } catch (e) {}
+            } catch(e) {}
         }
 
         function playWrongSound() {
@@ -745,17 +410,13 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.value = 300;
+                const osc = ctx.createOscillator(), gain = ctx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.value = 300;
                 gain.gain.setValueAtTime(0.06, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.2);
-            } catch (e) {}
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.2);
+            } catch(e) {}
         }
 
         function playStarSound() {
@@ -763,21 +424,17 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                [0, 100, 200].forEach((delay, i) => {
+                [0,100,200].forEach((delay,i) => {
                     setTimeout(() => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.value = 660 + i * 110;
+                        const osc = ctx.createOscillator(), gain = ctx.createGain();
+                        osc.type = 'sine'; osc.frequency.value = 660 + i * 110;
                         gain.gain.setValueAtTime(0.08, ctx.currentTime);
                         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.start();
-                        osc.stop(ctx.currentTime + 0.1);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(); osc.stop(ctx.currentTime + 0.1);
                     }, delay);
                 });
-            } catch (e) {}
+            } catch(e) {}
         }
 
         function playDiamondSound() {
@@ -785,28 +442,22 @@
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
-                [880, 1108, 1318].forEach((freq, i) => {
+                [880,1108,1318].forEach((freq,i) => {
                     setTimeout(() => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.value = freq;
+                        const osc = ctx.createOscillator(), gain = ctx.createGain();
+                        osc.type = 'sine'; osc.frequency.value = freq;
                         gain.gain.setValueAtTime(0.08, ctx.currentTime);
                         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.start();
-                        osc.stop(ctx.currentTime + 0.12);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(); osc.stop(ctx.currentTime + 0.12);
                     }, i * 100);
                 });
-            } catch (e) {}
+            } catch(e) {}
         }
 
         function vibrate(pattern) {
             if (!vibrationEnabled) return;
-            try {
-                if (navigator.vibrate) navigator.vibrate(pattern);
-            } catch (e) {}
+            try { if (navigator.vibrate) navigator.vibrate(pattern); } catch(e) {}
         }
 
         function updateSettings() {
@@ -814,8 +465,6 @@
             vibrationEnabled = $('vibrationToggle').checked;
             localStorage.setItem('soundEnabled', soundEnabled);
             localStorage.setItem('vibrationEnabled', vibrationEnabled);
-            $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
-            debugLog('SETTINGS', `เสียง: ${soundEnabled}, สั่น: ${vibrationEnabled}`);
         }
 
         function toggleSettings() {
@@ -828,28 +477,22 @@
         }
 
         // ==============================================================
-        //  SUPPORT SYSTEM
+        //  SUPPORT & EXCHANGE
         // ==============================================================
         function toggleSupport() {
             const popup = $('supportPopup');
             popup.classList.toggle('show');
-            if (popup.classList.contains('show')) {
-                $('supportStarDisplay').textContent = stars;
-            }
+            if (popup.classList.contains('show')) $('supportStarDisplay').textContent = stars;
         }
 
         function openSupport(amount) {
-            const msg =
-                `☕ สนับสนุน ${amount} บาท รับ ${amount === '100' ? '2,500' : '10,000'} ดาว\n\nคลิก "ตกลง" เพื่อไปพูดคุยกับแอดมิน`;
+            const msg = `☕ สนับสนุน ${amount} บาท รับ ${amount === '100' ? '2,500' : '10,000'} ดาว\n\nคลิก "ตกลง" เพื่อไปพูดคุยกับแอดมิน`;
             if (confirm(msg)) {
                 window.open('https://m.me/548132778932419', '_blank');
                 alert('✅ ขอบคุณที่สนับสนุน!\nกรุณาพูดคุยกับแอดมินเพื่อยืนยันและรับดาวครับ 🙏');
             }
         }
 
-        // ==============================================================
-        //  EXCHANGE SYSTEM (12💎 = 100⭐)
-        // ==============================================================
         function toggleExchange() {
             const popup = $('exchangePopup');
             popup.classList.toggle('show');
@@ -858,8 +501,7 @@
                 const canExchange = diamonds >= CONFIG.DIAMONDS_TO_STARS_RATE;
                 $('exchangeStarDisplay').textContent = canExchange ? '100' : '0';
                 $('exchangeConfirmBtn').disabled = !canExchange;
-                $('exchangeStatus').textContent = canExchange ? '✅ พร้อมแลก' :
-                    `❌ ต้องมี ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชรขึ้นไป`;
+                $('exchangeStatus').textContent = canExchange ? '✅ พร้อมแลก' : `❌ ต้องมี ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชรขึ้นไป`;
             }
         }
 
@@ -872,118 +514,63 @@
             try {
                 const res = await callAPI('exchange-diamonds', 'POST', { email: userEmail });
                 if (res.success) {
-                    diamonds = res.diamonds;
-                    stars = res.stars;
-                    updateDiamondDisplay();
-                    updateStarDisplay();
-                    playStarSound();
-                    vibrate([50, 80, 50]);
+                    diamonds = res.diamonds; stars = res.stars;
+                    updateDiamondDisplay(); updateStarDisplay();
+                    playStarSound(); vibrate([50,80,50]);
                     alert('✅ แลกสำเร็จ! ได้ 100 ดาว');
                     toggleExchange();
                     renderLeaderboard();
                 } else {
                     alert('❌ ' + (res.error || 'แลกไม่สำเร็จ'));
                 }
-            } catch (e) {
+            } catch(e) {
                 alert('❌ เกิดข้อผิดพลาด: ' + e.message);
             }
         }
 
         // ==============================================================
-        //  UNLOCK LEVEL WITH STARS (100⭐)
+        //  UNLOCK
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
-            if (!isLoggedIn || !userEmail) {
-                alert('กรุณาเข้าสู่ระบบก่อน');
-                return;
-            }
+            if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
             const cost = CONFIG.UNLOCK_LEVEL_COST;
-            if (stars < cost) {
-                alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`);
-                return;
-            }
-            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level}? (เฉพาะด่านที่ 1 เท่านั้น)`)) {
-                return;
-            }
+            if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level}? (เฉพาะด่านที่ 1 เท่านั้น)`)) { return; }
             try {
-                const res = await callAPI('unlock-level', 'POST', {
-                    email: userEmail,
-                    game: game,
-                    level: level
-                });
+                const res = await callAPI('unlock-level', 'POST', { email: userEmail, game, level });
                 if (res.success) {
-                    stars = res.newStars;
-                    updateStarDisplay();
-                    playStarSound();
-                    vibrate([50, 80, 50]);
+                    stars = res.newStars; updateStarDisplay();
+                    playStarSound(); vibrate([50,80,50]);
                     alert(`✅ ปลดล็อก Level ${level} (ด่านที่ 1) แล้ว!`);
-
                     await loadProgressFromBackend();
                     if (game === 'vocab') renderDans();
-                    else if (game === 'sentence') {
-                        await loadSentenceLevels();
-                        renderSentenceLevels();
-                        renderSentenceDans();
-                    } else if (game === 'reading') {
-                        await loadReadingLevels();
-                        renderReadingLevels();
-                        renderReadingDans();
-                    }
+                    else if (game === 'sentence') { await loadSentenceLevels(); renderSentenceLevels(); renderSentenceDans(); }
+                    else if (game === 'reading') { await loadReadingLevels(); renderReadingLevels(); renderReadingDans(); }
                 } else {
                     alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้'));
                 }
-            } catch (e) {
-                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
-            }
+            } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
         }
 
-        // ==============================================================
-        //  UNLOCK DAN WITH STARS
-        // ==============================================================
         async function unlockDanWithStars(game, level, dan) {
-            if (!isLoggedIn || !userEmail) {
-                alert('กรุณาเข้าสู่ระบบก่อน');
-                return;
-            }
+            if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
             const cost = calculateUnlockCost(level, dan);
-            if (stars < cost) {
-                alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`);
-                return;
-            }
-            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อกด่าน ${dan}? (ยังต้องเล่นจริงถึงจะผ่าน)`)) {
-                return;
-            }
+            if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อกด่าน ${dan}?`)) { return; }
             try {
-                const res = await callAPI('unlock-dan', 'POST', {
-                    email: userEmail,
-                    game: game,
-                    level: level,
-                    dan: dan
-                });
+                const res = await callAPI('unlock-dan', 'POST', { email: userEmail, game, level, dan });
                 if (res.success) {
-                    stars = res.newStars;
-                    updateStarDisplay();
-                    playStarSound();
-                    vibrate([50, 80, 50]);
+                    stars = res.newStars; updateStarDisplay();
+                    playStarSound(); vibrate([50,80,50]);
                     alert(`✅ ปลดล็อกด่าน ${dan} เพื่อเข้าเล่นแล้ว!`);
-
                     await loadProgressFromBackend();
                     if (game === 'vocab') renderDans();
-                    else if (game === 'sentence') {
-                        await loadSentenceLevels();
-                        renderSentenceLevels();
-                        renderSentenceDans();
-                    } else if (game === 'reading') {
-                        await loadReadingLevels();
-                        renderReadingLevels();
-                        renderReadingDans();
-                    }
+                    else if (game === 'sentence') { await loadSentenceLevels(); renderSentenceLevels(); renderSentenceDans(); }
+                    else if (game === 'reading') { await loadReadingLevels(); renderReadingLevels(); renderReadingDans(); }
                 } else {
                     alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้'));
                 }
-            } catch (e) {
-                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
-            }
+            } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
         }
 
         function calculateUnlockCost(level, dan) {
@@ -994,36 +581,33 @@
         }
 
         // ==============================================================
-        //  STAR & DIAMOND DISPLAY
+        //  STAR & DIAMOND
         // ==============================================================
-        function updateStarDisplay() {
-            $('starDisplay').textContent = '⭐ ' + stars;
-            $('supportStarDisplay').textContent = stars;
-        }
-
-        function updateDiamondDisplay() {
-            $('diamondDisplay').textContent = '💎 ' + diamonds;
-            $('shareDiamondCount').textContent = diamonds;
-        }
+        function updateStarDisplay() { $('starDisplay').textContent = '⭐ ' + stars; $('supportStarDisplay').textContent = stars; }
+        function updateDiamondDisplay() { $('diamondDisplay').textContent = '💎 ' + diamonds; }
 
         async function loadStarsFromBackend() {
             if (!isLoggedIn || !userEmail) return;
             try {
                 const res = await callAPI('user/stars', 'GET', null, { email: userEmail });
-                stars = res.stars || 0;
-                updateStarDisplay();
-                debugLog('STARS', `โหลดดาวจากหลังบ้าน: ${stars}`);
-            } catch (e) { debugLog('STARS', 'โหลดดาวล้มเหลว:', e); }
+                stars = res.stars || 0; updateStarDisplay();
+            } catch(e) {}
         }
 
         async function loadDiamondsFromBackend() {
             if (!isLoggedIn || !userEmail) return;
             try {
                 const res = await callAPI('user/diamonds', 'GET', null, { email: userEmail });
-                diamonds = res.diamonds || 0;
-                updateDiamondDisplay();
-                debugLog('DIAMONDS', `โหลดเพชรจากหลังบ้าน: ${diamonds}`);
-            } catch (e) { debugLog('DIAMONDS', 'โหลดเพชรล้มเหลว:', e); }
+                diamonds = res.diamonds || 0; updateDiamondDisplay();
+            } catch(e) {}
+        }
+
+        async function addStarToUser() {
+            if (!isLoggedIn || !userEmail) return;
+            try {
+                const res = await callAPI('add-star', 'POST', { email: userEmail });
+                if (res.success) { stars = res.stars; updateStarDisplay(); playStarSound(); vibrate(50); }
+            } catch(e) {}
         }
 
         // ==============================================================
@@ -1035,7 +619,7 @@
                 try {
                     const payload = decodeJwtResponse(savedToken);
                     if (payload && payload.email) { handleCredentialResponse({ credential: savedToken }); return; }
-                } catch (e) { localStorage.removeItem('id_token'); }
+                } catch(e) { localStorage.removeItem('id_token'); }
             }
             window.onGoogleLibraryLoad = () => {
                 try {
@@ -1049,13 +633,12 @@
                     });
                     const btn = document.querySelector('.g_id_signin');
                     if (btn) {
-                        google.accounts.id.renderButton(btn, { theme: 'outline', size: 'medium', shape: 'pill',
-                            text: 'signin_with', logo_alignment: 'left' });
+                        google.accounts.id.renderButton(btn, { theme: 'outline', size: 'medium', shape: 'pill', text: 'signin_with', logo_alignment: 'left' });
                         btn.classList.add('gsi-loaded');
                         setStatus('🔑 คลิกเข้าสู่ระบบ');
                     }
-                    try { google.accounts.id.prompt(); } catch (e) {}
-                } catch (e) { setStatus('⚠️ เกิดข้อผิดพลาด'); }
+                    try { google.accounts.id.prompt(); } catch(e) {}
+                } catch(e) { setStatus('⚠️ เกิดข้อผิดพลาด'); }
             };
         }
 
@@ -1076,23 +659,14 @@
                 $('logoutBtn').classList.remove('hidden');
                 setStatus(`👋 ${userName}`);
                 callAPI('login', 'POST', { email: userEmail, displayName: userName })
-                    .then(() => {
-                        loadStarsFromBackend();
-                        loadDiamondsFromBackend();
-                        loadAllData();
-                    })
-                    .catch(() => {
-                        loadStarsFromBackend();
-                        loadDiamondsFromBackend();
-                        loadAllData();
-                    });
-            } catch (e) { setStatus('⚠️ ข้อมูลไม่ถูกต้อง'); }
+                    .then(() => { loadStarsFromBackend(); loadDiamondsFromBackend(); loadAllData(); })
+                    .catch(() => { loadStarsFromBackend(); loadDiamondsFromBackend(); loadAllData(); });
+            } catch(e) { setStatus('⚠️ ข้อมูลไม่ถูกต้อง'); }
         }
 
         function decodeJwtResponse(token) {
-            const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-            const json = decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16))
-                .slice(-2)).join(''));
+            const b64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+            const json = decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
             return JSON.parse(json);
         }
 
@@ -1120,8 +694,9 @@
             url.pathname = action.startsWith('/') ? action : '/' + action;
             const options = { method, headers: { 'Content-Type': 'application/json' } };
             if (method === 'POST' || method === 'PUT') { if (body) options.body = JSON.stringify(body); }
-            if (method === 'GET' && query && Object.keys(query).length) { Object.entries(query).forEach(([k, v]) => url
-                    .searchParams.set(k, v)); }
+            if (method === 'GET' && query && Object.keys(query).length) {
+                Object.entries(query).forEach(([k,v]) => url.searchParams.set(k, v));
+            }
             const token = localStorage.getItem('id_token');
             if (token) options.headers['Authorization'] = 'Bearer ' + token;
             const res = await fetch(url.toString(), options);
@@ -1165,12 +740,11 @@
                 allVocab = v.data || [];
                 levelsData = l.data || [];
                 userProgress = p.data || {};
+
                 availableDans = [];
                 levelsData.forEach(lv => {
                     lv.dans.forEach(d => {
-                        availableDans.push({ dan: d, level: lv.level,
-                            questionCount: allQuestions.filter(q => q.dan == d).length, index: availableDans
-                                .length });
+                        availableDans.push({ dan: d, level: lv.level, questionCount: allQuestions.filter(q => q.dan == d).length });
                     });
                 });
 
@@ -1178,17 +752,30 @@
 
                 updateStarDisplay();
                 updateDiamondDisplay();
+
+                renderPageContent();
                 renderDans();
                 renderVocab();
                 renderLeaderboard();
                 updateShareCard();
                 await loadSentenceLevels();
                 await loadReadingLevels();
+
                 setStatus('📚 พร้อมเรียน');
-                updateUstadhMessage('สวัสดีครับ! เลือกด่านที่ต้องการเรียนได้เลย');
             } catch (e) {
                 setStatus('⚠️ โหลดล้มเหลว');
                 console.error(e);
+                const content = $('pageContent');
+                if (content) {
+                    content.innerHTML = `
+                        <div class="card-modern text-center py-8">
+                            <span class="text-4xl block mb-3">⚠️</span>
+                            <p class="text-gray-600">ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้</p>
+                            <p class="text-xs text-gray-400 mt-1">${e.message}</p>
+                            <button onclick="loadAllData()" class="btn-primary mt-4">🔄 ลองใหม่</button>
+                        </div>
+                    `;
+                }
             }
         }
 
@@ -1200,106 +787,175 @@
                 vocabProgress = data.vocab || {};
                 sentenceProgress = data.sentence || {};
                 readingProgress = data.reading || {};
-                debugLog('PROGRESS', 'โหลดความคืบหน้าสำเร็จ');
-            } catch (e) { debugLog('PROGRESS', 'โหลดความคืบหน้าล้มเหลว:', e); }
-        }
-
-        function updateUstadhMessage(msg, isCorrect = true) {
-            const el = document.querySelector('#gameTab .ustadh-card .msg');
-            if (el) {
-                if (isCorrect && msg.includes('ถูกต้อง')) {
-                    el.textContent = msg + ' ' + getUstadhMessage();
-                } else {
-                    el.textContent = msg;
-                }
-            }
-            const sentenceEl = document.querySelector('#sentenceTab .ustadh-card .msg');
-            if (sentenceEl) {
-                sentenceEl.textContent = msg;
-            }
-            const readingEl = document.querySelector('#readingTab .ustadh-card .msg');
-            if (readingEl) {
-                readingEl.textContent = msg;
-            }
+            } catch(e) {}
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY
+        //  RENDER PAGE
+        // ==============================================================
+        function renderPageContent() {
+            const container = $('pageContent');
+            if (!container) return;
+            container.innerHTML = `
+                <div id="gameTab" class="tab-content">
+                    <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="ustadhMessage">สวัสดีครับ! อุสตะเฮงพร้อมให้คำแนะนำ 💪</div></div>
+                    <div class="card-modern"><h2 class="font-bold text-gray-700 mb-2">🗺️ เลือกด่าน</h2><div id="danList"></div><p id="danStatus" class="text-xs text-gray-400 mt-2"></p></div>
+                    <div class="mb-4" id="startGameContainer"><button id="startGameBtn" class="btn-start" onclick="startGame()">🚀 เริ่มฝึก</button><p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่าน หรือกดปุ่ม</p></div>
+                    <div id="gameNotStarted" class="card-modern text-center py-8 text-gray-400"><span class="text-4xl block mb-2">🌍</span><p>เลือกด่านและกด "เริ่มฝึก" หรือดับเบิลคลิก</p></div>
+                </div>
+
+                <div id="sentenceTab" class="tab-content hidden">
+                    <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="sentenceUstadhMessage">มาเรียงประโยคกันครับ! 🧩</div></div>
+                    <div class="card-modern"><h2 class="font-bold text-gray-700 mb-2">🧩 ต่อประโยค</h2><p class="text-xs text-gray-400">เรียงคำให้ถูกต้อง • ได้เพชรเมื่อตอบถูก 90% ขึ้นไป 💎</p><div id="sentenceLevelContainer" class="flex flex-wrap gap-2 mt-3"></div></div>
+                    <div id="sentenceDanContainer" class="card-modern hidden"><h3 class="font-semibold text-gray-700 mb-2">🎯 Level <span id="sentenceSelectedLevel">1</span></h3><div id="sentenceDanList" class="space-y-1"></div></div>
+                    <div class="mb-4" id="sentenceStartContainer"><button id="sentenceStartBtn" class="btn-start" onclick="startSentenceGame()">🚀 เริ่มฝึก</button><p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่าน</p></div>
+                    <div id="sentenceNotStarted" class="card-modern text-center py-8 text-gray-400"><span class="text-4xl block mb-2">🧩</span><p>เลือก Level และด่าน</p></div>
+                </div>
+
+                <div id="readingTab" class="tab-content hidden">
+                    <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="readingUstadhMessage">ฝึกอ่านบทความครับ 📖</div></div>
+                    <div class="card-modern"><h2 class="font-bold text-gray-700 mb-2">📖 อ่านบทความ</h2><p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ได้เพชรเมื่ออ่านครบทุกบทความ 💎</p><div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-3"></div></div>
+                    <div id="readingDanContainer" class="card-modern hidden"><h3 class="font-semibold text-gray-700 mb-2">🎯 Level <span id="readingSelectedLevel">1</span></h3><div id="readingDanList" class="space-y-1"></div></div>
+                    <div class="mb-4" id="readingStartContainer"><button id="readingStartBtn" class="btn-start" onclick="startReadingGame()">🚀 เริ่มฝึก</button><p class="text-xs text-gray-400 text-center mt-1">ดับเบิลคลิกที่ด่าน</p></div>
+                    <div id="readingNotStarted" class="card-modern text-center py-8 text-gray-400"><span class="text-4xl block mb-2">📖</span><p>เลือก Level และด่าน</p></div>
+                </div>
+
+                <div id="vocabTab" class="tab-content hidden">
+                    <div class="card-modern">
+                        <div class="flex flex-wrap justify-between items-center mb-3">
+                            <h2 class="text-xl font-bold text-gray-800">📖 คำศัพท์ <span id="vocabCount" class="text-emerald-700">0</span></h2>
+                            <div class="flex gap-2">
+                                <select id="vocabLevelFilter" class="border border-gray-300 rounded-full px-3 py-1 text-sm" onchange="filterVocab()"><option value="0">ทุก Level</option></select>
+                                <button id="exportCSV" class="btn-secondary text-sm py-1 px-3" onclick="exportCSV()">⬇ CSV</button>
+                                <button id="exportPDF" class="btn-secondary text-sm py-1 px-3" onclick="exportPDF()">⬇ PDF</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto"><table id="vocabTable"><thead><tr><th>#</th><th>ไทย</th><th>อาหรับ</th><th>อดีต</th><th>ปัจจุบัน</th><th>คำสั่ง</th><th>เอกพจน์</th><th>พหูพจน์</th><th>หมวด</th><th>Level</th></tr></thead><tbody id="vocabBody"></tbody></table></div>
+                    </div>
+                </div>
+
+                <div id="leaderboardTab" class="tab-content hidden">
+                    <div class="card-modern"><h2 class="text-xl font-bold text-gray-800 mb-3">🏆 ลีดเดอร์บอร์ด (💎 เพชร)</h2>
+                    <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 text-gray-600"><tr><th class="p-2 text-left">อันดับ</th><th class="p-2 text-left">ชื่อ</th><th class="p-2 text-left">💎 เพชร</th><th class="p-2 text-left">กำลังใจ</th></tr></thead><tbody id="leaderboardBody"></tbody></table></div></div>
+                </div>
+
+                <div id="shareTab" class="tab-content hidden">
+                    <div class="card-modern">
+                        <div class="text-center">
+                            <p class="text-lg font-medium text-gray-700" id="shareMessage">ฉันกำลังเรียนภาษาอาหรับ!</p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-2"><span id="shareLevelDisplay">🏰 Level 1</span><span id="shareDanDisplay">🎯 ด่าน 1</span><span id="shareScoreDisplay">⭐ 0 คะแนน</span></div>
+                            <div class="mt-3 p-3 bg-gray-50 rounded-xl text-left text-sm text-gray-600">
+                                <p>📖 <span id="shareReadingCount">0</span> บทความ</p>
+                                <p>🧩 <span id="shareSentenceCount">0</span> ประโยค</p>
+                                <p>📚 <span id="shareVocabCount">0</span> คำศัพท์</p>
+                                <p>💎 <span id="shareDiamondCount">0</span> เพชร</p>
+                            </div>
+                            <div class="mt-4 flex flex-wrap justify-center gap-2">
+                                <button onclick="shareToStory()" class="btn-primary bg-blue-600 hover:bg-blue-700 text-sm px-5 py-2 rounded-full">📱 แชร์สตอรี่</button>
+                                <button onclick="shareToFriend()" class="btn-primary bg-emerald-600 hover:bg-emerald-700 text-sm px-5 py-2 rounded-full">👥 ชวนเพื่อน</button>
+                                <a href="https://www.facebook.com/profile.php?id=100064382094369" target="_blank" class="btn-secondary text-sm px-5 py-2 rounded-full">🔗 เพจ</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+                btn.onclick = function() {
+                    const tabId = this.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                    const target = document.getElementById(tabId);
+                    if (target) target.classList.remove('hidden');
+                    document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    if (tabId === 'leaderboardTab') renderLeaderboard();
+                    if (tabId === 'vocabTab') renderVocab();
+                    if (tabId === 'shareTab') updateShareCard();
+                    if (tabId === 'sentenceTab' && sentenceLevels.length) loadSentenceLevel(sentenceLevels[0]?.level || 1);
+                    if (tabId === 'readingTab' && readingLevels.length) loadReadingLevel(readingLevels[0]?.level || 1);
+                    if (tabId === 'gameTab') renderDans();
+                };
+            });
+            document.querySelector('.bottom-nav .nav-item[data-tab="gameTab"]')?.classList.add('active');
+        }
+
+        // ==============================================================
+        //  VOCAB GAME
         // ==============================================================
         function renderDans() {
             const container = $('danList');
+            if (!container) return;
             container.innerHTML = '';
-            if (!availableDans.length) { container.innerHTML =
-                '<div class="text-sm text-gray-400">ยังไม่มีด่าน</div>'; return; }
+            if (!availableDans.length) { container.innerHTML = '<div class="text-sm text-gray-400">ยังไม่มีด่าน</div>'; return; }
             const grouped = {};
-            availableDans.forEach(d => { if (!grouped[d.level]) grouped[d.level] = [];
-                grouped[d.level].push(d); });
-            const sortedLevels = Object.keys(grouped).sort((a, b) => a - b);
+            availableDans.forEach(d => { if (!grouped[d.level]) grouped[d.level] = []; grouped[d.level].push(d); });
+            const sortedLevels = Object.keys(grouped).sort((a,b)=>a-b);
 
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || level == 1;
+                let prevLevelCompleted = true;
+                if (parseInt(level) > 1) {
+                    const prevLevel = parseInt(level) - 1;
+                    const prevDans = availableDans.filter(d => d.level === prevLevel);
+                    prevLevelCompleted = prevDans.every(d => {
+                        const key = `${prevLevel}_${d.dan}`;
+                        return vocabProgress[key] && vocabProgress[key] >= CONFIG.PASSING_SCORE;
+                    });
+                }
+                const isLevelUnlocked = prevLevelCompleted || parseInt(level) === 1;
                 const allPassed = levelData.every(d => {
                     const key = `${level}_${d.dan}`;
                     return vocabProgress[key] && vocabProgress[key] >= CONFIG.PASSING_SCORE;
                 });
-                const isLevelCompleted = allPassed;
 
                 const levelDiv = document.createElement('div');
-                levelDiv.className = 'level-card' + (isLevelCompleted ? ' completed' : (isLevelUnlocked ?
-                    ' unlocked' : ' locked'));
+                levelDiv.className = 'level-card' + (allPassed ? ' completed' : (isLevelUnlocked ? ' unlocked' : ' locked'));
 
                 const header = document.createElement('div');
                 header.className = 'flex items-center justify-between text-sm font-semibold text-gray-700';
                 header.innerHTML = `
                     <span>🏰 Level ${level}</span>
                     <span class="text-xs font-normal text-gray-400">${levelData.filter(d => { const k = `${level}_${d.dan}`; return vocabProgress[k] && vocabProgress[k] >= CONFIG.PASSING_SCORE; }).length}/${levelData.length}</span>
-                    ${!isLevelUnlocked ? `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก Level (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : ''}
-                    ${isLevelCompleted ? '<span class="text-xs text-green-600 font-medium">✅ ผ่านหมด</span>' : ''}
+                    ${!isLevelUnlocked ? `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : ''}
+                    ${allPassed ? '<span class="text-xs text-green-600">✅ ผ่านหมด</span>' : ''}
                 `;
                 levelDiv.appendChild(header);
                 const bar = document.createElement('div');
                 bar.className = 'level-progress-bar';
                 const fill = document.createElement('div');
                 fill.className = 'fill';
-                const pct = levelData.length > 0 ? (levelData.filter(d => { const k =
-                    `${level}_${d.dan}`; return vocabProgress[k] && vocabProgress[k] >= CONFIG
-                        .PASSING_SCORE; }).length / levelData.length * 100) : 0;
+                const pct = levelData.length > 0 ? (levelData.filter(d => { const k = `${level}_${d.dan}`; return vocabProgress[k] && vocabProgress[k] >= CONFIG.PASSING_SCORE; }).length / levelData.length * 100) : 0;
                 fill.style.width = Math.min(pct, 100) + '%';
                 bar.appendChild(fill);
                 levelDiv.appendChild(bar);
+
                 const danContainer = document.createElement('div');
                 danContainer.className = 'mt-2 space-y-1';
                 levelData.forEach(d => {
                     const key = `${level}_${d.dan}`;
                     const progress = vocabProgress[key] || 0;
                     const isPassed = progress >= CONFIG.PASSING_SCORE;
-                    const unlocked = isLevelUnlocked || (level == 1 && d.dan == 1) || (vocabProgress[
-                        `${level}_${d.dan-1}`] >= CONFIG.PASSING_SCORE);
+                    const isDanUnlocked = isLevelUnlocked && (d.dan === 1 || (vocabProgress[`${level}_${d.dan-1}`] >= CONFIG.PASSING_SCORE));
                     const isSelected = currentDan === d.dan && currentLevel === d.level;
                     const cost = calculateUnlockCost(level, d.dan);
-                    const canUnlock = !isPassed && !unlocked && stars >= cost;
+                    const canUnlock = !isPassed && !isDanUnlocked && stars >= cost;
 
                     const item = document.createElement('div');
-                    item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked && !canUnlock ?
-                        ' locked' : '') + (isSelected ? ' selected' : '');
-                    let statusHtml =
-                        `<span class="status ${isPassed ? 'done' : (unlocked ? 'pending' : 'locked-status')}">${isPassed ? '✅ เล่นแล้ว' : (unlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>`;
-                    if (!isPassed && !unlocked && canUnlock) {
-                        statusHtml =
-                            `<button class="btn-unlock" onclick="unlockDanWithStars('vocab', ${level}, ${d.dan})">🔓 ใช้ ${cost}⭐</button>`;
-                    } else if (!isPassed && !unlocked && !canUnlock) {
+                    item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!isDanUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                    let statusHtml = `<span class="status ${isPassed ? 'done' : (isDanUnlocked ? 'pending' : 'locked-status')}">${isPassed ? '✅ เล่นแล้ว' : (isDanUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>`;
+                    if (!isPassed && !isDanUnlocked && canUnlock) {
+                        statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('vocab', ${level}, ${d.dan})">🔓 ใช้ ${cost}⭐</button>`;
+                    } else if (!isPassed && !isDanUnlocked && !canUnlock) {
                         statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
                     }
                     item.innerHTML = `
-                        <span class="icon">${isPassed ? '✅' : (unlocked ? '📘' : '🔒')}</span>
+                        <span class="icon">${isPassed ? '✅' : (isDanUnlocked ? '📘' : '🔒')}</span>
                         <div class="info"><div class="name">ด่าน ${d.dan}</div><div class="desc">${d.questionCount} คำถาม</div></div>
                         ${statusHtml}
                     `;
-                    if (unlocked) {
+                    if (isDanUnlocked) {
                         item.style.cursor = 'pointer';
-                        let clickCount = 0;
-                        let clickTimer = null;
+                        let clickCount = 0, clickTimer = null;
                         item.onclick = () => {
                             clickCount++;
                             if (clickCount === 1) {
@@ -1308,13 +964,10 @@
                                     currentDan = d.dan;
                                     currentLevel = d.level;
                                     renderDans();
-                                    updateUstadhMessage(`📘 เลือก ด่าน ${d.dan} แล้ว กด "เริ่มฝึก" ครับ!`);
                                     $('gameNotStarted').classList.add('hidden');
                                     $('startGameContainer').classList.remove('hidden');
                                     vibrate(30);
                                     playKeyboardSound();
-                                    document.getElementById('startGameContainer').scrollIntoView({ behavior: 'smooth',
-                                        block: 'center' });
                                 }, 300);
                             } else if (clickCount >= 2) {
                                 clearTimeout(clickTimer);
@@ -1347,6 +1000,9 @@
             loadDan(currentDan);
         }
 
+        // ==============================================================
+        //  GAME 1: VOCABULARY (ฟังก์ชันหลัก)
+        // ==============================================================
         async function loadDan(dan) {
             const danInfo = availableDans.find(d => d.dan === dan);
             if (!danInfo) { alert('ไม่พบด่านนี้'); return; }
@@ -1383,10 +1039,7 @@
                     </div>
                     <div class="timer-bar mb-3"><div id="timerFill" class="timer-fill" style="width:100%"></div></div>
                     <div id="questionArea">
-                        <div class="text-center mb-3">
-                            <span id="qCategory" class="text-xs text-gray-400 bg-gray-50 px-3 py-0.5 rounded-full">หมวด</span>
-                            <h2 id="questionText" class="text-xl font-bold text-emerald-900 mt-1">โหลดคำถาม...</h2>
-                        </div>
+                        <div class="text-center mb-3"><span id="qCategory" class="text-xs text-gray-400 bg-gray-50 px-3 py-0.5 rounded-full">หมวด</span><h2 id="questionText" class="text-xl font-bold text-emerald-900 mt-1">โหลดคำถาม...</h2></div>
                         <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
                         <div class="flex flex-wrap justify-center gap-2 mt-4">
                             <button id="hintBtn" class="text-sm px-4 py-1.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 disabled:opacity-50" disabled>💡 ใบ้ (⭐${CONFIG.HINT_COST})</button>
@@ -1416,13 +1069,10 @@
             $('playAgainBtn').onclick = () => loadDan(currentDan);
             $('nextDanBtn').onclick = () => {
                 const next = availableDans.find(d => d.dan === currentDan + 1 && d.level === currentLevel);
-                if (next) { currentDan = next.dan;
-                    loadDan(currentDan); } else {
+                if (next) { currentDan = next.dan; loadDan(currentDan); } else {
                     const nextLevel = levelsData.find(l => l.level === currentLevel + 1);
-                    if (nextLevel && nextLevel.dans.length) { currentDan = nextLevel.dans[0];
-                        currentLevel = nextLevel.level;
-                        loadDan(currentDan); } else { alert('🎉 คุณผ่านทุกด่านแล้ว!');
-                        closeGameOverlay(); }
+                    if (nextLevel && nextLevel.dans.length) { currentDan = nextLevel.dans[0]; currentLevel = nextLevel.level; loadDan(currentDan); }
+                    else { alert('🎉 คุณผ่านทุกด่านแล้ว!'); closeGameOverlay(); }
                 }
             };
         }
@@ -1438,8 +1088,8 @@
             const container = $('optionsContainer');
             container.innerHTML = '';
             const opts = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง];
-            const letters = ['ก', 'ข', 'ค', 'ง'];
-            const shuffled = opts.map((t, i) => ({ text: t, idx: i })).sort(() => Math.random() - 0.5);
+            const letters = ['ก','ข','ค','ง'];
+            const shuffled = opts.map((t,i)=>({text:t, idx:i})).sort(()=>Math.random()-0.5);
             let hardModeOptions = shuffled;
             if (currentFeature && currentFeature.hardMode) {
                 const correctIdx = 'ABCD'.indexOf(q.เฉลย);
@@ -1452,8 +1102,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 if (currentFeature && currentFeature.hardMode) btn.classList.add('hard-mode');
-                btn.innerHTML =
-                    `<span class="arabic">${opt.text}</span> <span class="text-xs text-gray-400 font-mono">${letters[opt.idx]}</span>`;
+                btn.innerHTML = `<span class="arabic">${opt.text}</span> <span class="text-xs text-gray-400 font-mono">${letters[opt.idx]}</span>`;
                 btn.dataset.idx = opt.idx;
                 btn.onclick = () => {
                     document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected-option'));
@@ -1476,14 +1125,10 @@
                     clearInterval(timerInterval);
                     isAnswered = true;
                     setTeacherMessage('⏰ หมดเวลา!');
-                    if (currentFeature && currentFeature.lives > 0) { lives--;
-                        updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
-                            gameEnded = true;
-                            setTimeout(() => endGame(), 1000); return; } }
+                    if (currentFeature && currentFeature.lives > 0) { lives--; updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!'); gameEnded = true; setTimeout(() => endGame(), 1000); return; } }
                     highlightCorrect(q);
                     addMistake(q);
-                    setTimeout(() => { if (!gameEnded) { currentIndex++;
-                            renderQuestion(); } }, 1500);
+                    setTimeout(() => { if (!gameEnded) { currentIndex++; renderQuestion(); } }, 1500);
                 }
             }, 1000);
             updatePowerUI();
@@ -1497,56 +1142,42 @@
             const isCorrect = (selectedIdx === correctIdx);
             const btns = document.querySelectorAll('.option-btn');
             btns.forEach(b => b.classList.add('disabled'));
-            btns.forEach(b => { const idx = parseInt(b.dataset.idx); if (idx === correctIdx) b.classList.add('correct');
-                if (idx === selectedIdx && !isCorrect) b.classList.add('wrong'); });
+            btns.forEach(b => { const idx = parseInt(b.dataset.idx); if (idx === correctIdx) b.classList.add('correct'); if (idx === selectedIdx && !isCorrect) b.classList.add('wrong'); });
             if (isCorrect) {
                 playCorrectSound();
-                vibrate([30, 50, 30]);
+                vibrate([30,50,30]);
                 let add = currentFeature?.scorePerCorrect || 10;
-                if (currentFeature && currentFeature.combo && streak >= 2) { const mul = Math.min(combo, 3);
-                    add = Math.round(add * mul);
-                    setTeacherMessage(`✅ ถูก! (x${mul})`); } else setTeacherMessage(`✅ ${getUstadhMessage()}`);
+                if (currentFeature && currentFeature.combo && streak >= 2) { const mul = Math.min(combo,3); add = Math.round(add*mul); setTeacherMessage(`✅ ถูก! (x${mul})`); } else setTeacherMessage(`✅ ${getUstadhMessage()}`);
                 score += add;
                 streak++;
-                combo = Math.min(combo + 0.5, 3);
+                combo = Math.min(combo+0.5,3);
                 consecutiveWrong = 0;
-                if (currentFeature && currentFeature.streakBonus && streak >= 3) { score += 5;
-                    setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
-                // แสดงข้อมูลเพิ่มเติม (جمع, ماض, مضارع, أمر)
+                if (currentFeature && currentFeature.streakBonus && streak >= 3) { score += 5; setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
+                if (streak % CONFIG.STREAK_STAR_INTERVAL === 0) { addStarToUser(); }
                 showExtraInfo(q);
             } else {
                 playWrongSound();
-                vibrate([50, 100, 50]);
-                streak = 0;
-                combo = 1;
-                consecutiveWrong++;
-                if (currentFeature && currentFeature.lives > 0) { lives--;
-                    updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
-                        gameEnded = true;
-                        setTimeout(() => endGame(), 1500); return; } }
-                if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) {
-                    setTeacherMessage('💀 ตอบผิดติดกัน 2 ข้อ!');
-                    gameEnded = true;
-                    setTimeout(() => endGame(), 1500);
-                    return;
-                }
+                vibrate([50,100,50]);
+                streak = 0; combo = 1; consecutiveWrong++;
+                if (currentFeature && currentFeature.lives > 0) { lives--; updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!'); gameEnded = true; setTimeout(() => endGame(), 1500); return; } }
+                if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) { setTeacherMessage('💀 ตอบผิดติดกัน 2 ข้อ!'); gameEnded = true; setTimeout(() => endGame(), 1500); return; }
                 const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
                 setTeacherMessage(`❌ ที่ถูกคือ "${correctText}"`);
                 addMistake(q);
             }
             updatePowerUI();
-            setTimeout(() => { if (!gameEnded) { currentIndex++;
-                    renderQuestion(); } }, 1500);
+            setTimeout(() => { if (!gameEnded) { currentIndex++; renderQuestion(); } }, 1500);
         }
 
         function showExtraInfo(q) {
             const extra = [];
-            if (q.หมวด === 'คำนาม' || q.หมวด === 'คุณศัพท์') {
+            const category = q.หมวด || '';
+            if (category === 'คำนาม' || category === 'คุณศัพท์') {
                 if (q.เอกพจน์ && q.พหูพจน์) extra.push(`📚 เอกพจน์: ${q.เอกพจน์} | พหูพจน์: ${q.พหูพจน์}`);
                 else if (q.เอกพจน์) extra.push(`📚 เอกพจน์: ${q.เอกพจน์}`);
                 else if (q.พหูพจน์) extra.push(`📚 พหูพจน์: ${q.พหูพจน์}`);
             }
-            if (q.หมวด === 'กริยา') {
+            if (category === 'กริยา') {
                 if (q.รูปอดีต && q.รูปปัจจุบัน && q.รูปคำสั่ง) {
                     extra.push(`📖 อดีต: ${q.รูปอดีต} | ปัจจุบัน: ${q.รูปปัจจุบัน} | คำสั่ง: ${q.รูปคำสั่ง}`);
                 } else if (q.รูปอดีต && q.รูปปัจจุบัน) {
@@ -1556,42 +1187,25 @@
                 }
             }
             if (extra.length > 0) {
-                const msg = extra.join(' | ');
-                setTeacherMessage(`✅ ถูกต้อง! ${msg}`);
-                // แสดงใน overlay ด้วย
-                const extraDiv = document.createElement('div');
-                extraDiv.className =
-                    'mt-2 p-2 bg-emerald-50 rounded-lg text-xs text-emerald-800 border border-emerald-200';
-                extraDiv.innerHTML = msg;
-                const resultDiv = document.getElementById('resultArea');
-                if (resultDiv && !resultDiv.classList.contains('hidden')) {
-                    // แทรกก่อน mistakereview
-                    const review = document.getElementById('mistakeReview');
-                    if (review) review.parentNode.insertBefore(extraDiv, review);
-                } else {
-                    const container = document.getElementById('questionArea');
-                    if (container) {
-                        const existing = container.querySelector('.extra-info');
-                        if (existing) existing.remove();
-                        extraDiv.className += ' extra-info';
-                        container.appendChild(extraDiv);
-                        setTimeout(() => { extraDiv.remove(); }, 3000);
-                    }
-                }
+                const content = extra.join('<br>');
+                const popup = $('extraInfoPopup');
+                $('extraInfoContent').innerHTML = content;
+                popup.classList.add('show');
+                setTimeout(() => { popup.classList.remove('show'); }, 4000);
             }
         }
 
+        function closeExtraInfo() { $('extraInfoPopup').classList.remove('show'); }
+
         function highlightCorrect(q) {
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
-            document.querySelectorAll('.option-btn').forEach(b => { b.classList.add('disabled'); if (parseInt(b.dataset
-                    .idx) === correctIdx) b.classList.add('correct'); });
+            document.querySelectorAll('.option-btn').forEach(b => { b.classList.add('disabled'); if (parseInt(b.dataset.idx) === correctIdx) b.classList.add('correct'); });
         }
 
         function addMistake(q) {
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const correctText = [q.ตัวเลือกก, q.ตัวเลือกข, q.ตัวเลือกค, q.ตัวเลือกง][correctIdx];
-            const entry = { thai: q.คำถามไทย, arabic: correctText, category: q.หมวด || 'ทั่วไป', questionId: q.id ||
-                '' };
+            const entry = { thai: q.คำถามไทย, arabic: correctText, category: q.หมวด || 'ทั่วไป', questionId: q.id || '' };
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
@@ -1607,24 +1221,15 @@
             $('finalScore').textContent = score;
             $('finalDan').textContent = `ด่าน ${currentDan} (Level ${currentLevel})`;
             const passed = percent >= passingScore;
-            $('finalMessage').textContent = passed ? `🎉 ผ่าน! (${percent}%)` :
-                `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}%`;
+            $('finalMessage').textContent = passed ? `🎉 ผ่าน! (${percent}%)` : `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}%`;
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
                     email: userEmail,
                     displayName: userName,
                     level: currentDan,
                     score: score,
-                    time: Math.round((currentFeature?.timeLimit || CONFIG.TIME_LIMIT) * currentRound.length -
-                        timeLeft || 0)
-                }).then(() => {
-                    loadStarsFromBackend();
-                    loadDiamondsFromBackend();
-                    loadProgressFromBackend();
-                    renderDans();
-                    renderLeaderboard();
-                    updateShareCard();
-                }).catch(console.error);
+                    time: Math.round((currentFeature?.timeLimit||CONFIG.TIME_LIMIT)*currentRound.length - timeLeft || 0)
+                }).then(() => { loadStarsFromBackend(); loadDiamondsFromBackend(); loadProgressFromBackend(); renderDans(); renderLeaderboard(); updateShareCard(); }).catch(console.error);
             }
             const nextBtn = $('nextDanBtn');
             if (passed) {
@@ -1636,12 +1241,12 @@
             } else { nextBtn.classList.add('hidden'); }
             const list = $('mistakeList');
             list.innerHTML = '';
-            if (mistakes.length === 0) { list.innerHTML = '<li class="text-green-600">🎉 ไม่มีคำที่ผิด!</li>'; } else {
+            if (mistakes.length === 0) { list.innerHTML = '<li class="text-green-600">🎉 ไม่มีคำที่ผิด!</li>'; }
+            else {
                 mistakes.forEach((m, idx) => {
                     const li = document.createElement('li');
                     li.className = 'flex justify-between items-center py-1 border-b';
-                    li.innerHTML =
-                        `<span class="flex-1">${m.thai} = ${m.arabic}</span><button onclick="reportMistake(${idx})" class="text-xs text-red-500 hover:underline">🚨 รายงาน</button>`;
+                    li.innerHTML = `<span class="flex-1">${m.thai} = ${m.arabic}</span><button onclick="reportMistake(${idx})" class="text-xs text-red-500 hover:underline">🚨 รายงาน</button>`;
                     list.appendChild(li);
                 });
             }
@@ -1652,10 +1257,8 @@
             if (!m) return;
             if (confirm(`🚨 รายงาน "${m.thai}" = "${m.arabic}" ?`)) {
                 callAPI('report', 'POST', {
-                    userEmail,
-                    userName,
-                    level: currentLevel,
-                    dan: currentDan,
+                    userEmail, userName,
+                    level: currentLevel, dan: currentDan,
                     questionId: m.questionId || '',
                     questionThai: m.thai,
                     correctAnswer: m.arabic,
@@ -1673,10 +1276,7 @@
             const correctIdx = 'ABCD'.indexOf(q.เฉลย);
             const btns = document.querySelectorAll('.option-btn');
             let removed = 0;
-            btns.forEach(b => { const idx = parseInt(b.dataset.idx); if (idx !== correctIdx && removed < 2) { b.style
-                        .opacity = '0.3';
-                    b.style.pointerEvents = 'none';
-                    removed++; } });
+            btns.forEach(b => { const idx = parseInt(b.dataset.idx); if (idx !== correctIdx && removed < 2) { b.style.opacity = '0.3'; b.style.pointerEvents = 'none'; removed++; } });
             setTeacherMessage(`💡 อุสตะเฮงตัดตัวเลือกผิดให้แล้ว (ใช้ ${CONFIG.HINT_COST}⭐)`);
             playKeyboardSound();
             vibrate(30);
@@ -1704,47 +1304,29 @@
         }
 
         function setTeacherMessage(msg) { const el = $('teacherMessage'); if (el) el.textContent = msg; }
-
-        function updateLivesDisplay() { const el = $('livesDisplay'); if (el) { if (lives > 0) { el.classList.remove(
-                    'hidden');
-                el.textContent = '❤️'.repeat(lives); } else el.classList.add('hidden'); } }
-
-        function updateTimerDisplay(t) { const el = $('timerFill'); const percent = (t / (currentFeature?.timeLimit ||
-                CONFIG.TIME_LIMIT)) * 100;
-            el.style.width = percent + '%';
-            el.className = 'timer-fill' + (percent < 25 ? ' danger' : (percent < 50 ? ' warning' : '')); }
+        function updateLivesDisplay() { const el = $('livesDisplay'); if (el) { if (lives > 0) { el.classList.remove('hidden'); el.textContent = '❤️'.repeat(lives); } else el.classList.add('hidden'); } }
+        function updateTimerDisplay(t) { const el = $('timerFill'); const percent = (t / (currentFeature?.timeLimit || CONFIG.TIME_LIMIT)) * 100; el.style.width = percent + '%'; el.className = 'timer-fill' + (percent < 25 ? ' danger' : (percent < 50 ? ' warning' : '')); }
 
         function getLevelFeature(level) {
-            let f = { timeLimit: 20, lives: 0, combo: false, hardMode: false, streakBonus: false, dangerMode: false,
-                passingScore: 60, scorePerCorrect: 10 };
+            let f = { timeLimit:20, lives:0, combo:false, hardMode:false, streakBonus:false, dangerMode:false, passingScore:60, scorePerCorrect:10 };
             const features = {
-                1: { timeLimit: 20, lives: 0, combo: false, hardMode: false, streakBonus: false, dangerMode: false,
-                    passingScore: 60, scorePerCorrect: 10 },
-                6: { timeLimit: 15, lives: 0, combo: false, hardMode: false, streakBonus: false, dangerMode: false,
-                    passingScore: 60, scorePerCorrect: 10 },
-                11: { timeLimit: 15, lives: 0, combo: false, hardMode: false, streakBonus: true, dangerMode: false,
-                    passingScore: 60, scorePerCorrect: 10 },
-                16: { timeLimit: 15, lives: 3, combo: false, hardMode: false, streakBonus: true, dangerMode: false,
-                    passingScore: 60, scorePerCorrect: 10 },
-                21: { timeLimit: 15, lives: 3, combo: true, hardMode: false, streakBonus: true, dangerMode: false,
-                    passingScore: 60, scorePerCorrect: 10 },
-                26: { timeLimit: 15, lives: 3, combo: true, hardMode: true, streakBonus: true, dangerMode: false,
-                    passingScore: 60, scorePerCorrect: 10 },
-                31: { timeLimit: 12, lives: 3, combo: true, hardMode: true, streakBonus: true, dangerMode: true,
-                    passingScore: 60, scorePerCorrect: 10 },
-                36: { timeLimit: 12, lives: 3, combo: true, hardMode: true, streakBonus: true, dangerMode: true,
-                    passingScore: 80, scorePerCorrect: 10 },
-                41: { timeLimit: 10, lives: 3, combo: true, hardMode: true, streakBonus: true, dangerMode: true,
-                    passingScore: 80, scorePerCorrect: 15 },
-                46: { timeLimit: 10, lives: 3, combo: true, hardMode: true, streakBonus: true, dangerMode: true,
-                    passingScore: 80, scorePerCorrect: 15 },
+                1:{timeLimit:20,lives:0,combo:false,hardMode:false,streakBonus:false,dangerMode:false,passingScore:60,scorePerCorrect:10},
+                6:{timeLimit:15,lives:0,combo:false,hardMode:false,streakBonus:false,dangerMode:false,passingScore:60,scorePerCorrect:10},
+                11:{timeLimit:15,lives:0,combo:false,hardMode:false,streakBonus:true,dangerMode:false,passingScore:60,scorePerCorrect:10},
+                16:{timeLimit:15,lives:3,combo:false,hardMode:false,streakBonus:true,dangerMode:false,passingScore:60,scorePerCorrect:10},
+                21:{timeLimit:15,lives:3,combo:true,hardMode:false,streakBonus:true,dangerMode:false,passingScore:60,scorePerCorrect:10},
+                26:{timeLimit:15,lives:3,combo:true,hardMode:true,streakBonus:true,dangerMode:false,passingScore:60,scorePerCorrect:10},
+                31:{timeLimit:12,lives:3,combo:true,hardMode:true,streakBonus:true,dangerMode:true,passingScore:60,scorePerCorrect:10},
+                36:{timeLimit:12,lives:3,combo:true,hardMode:true,streakBonus:true,dangerMode:true,passingScore:80,scorePerCorrect:10},
+                41:{timeLimit:10,lives:3,combo:true,hardMode:true,streakBonus:true,dangerMode:true,passingScore:80,scorePerCorrect:15},
+                46:{timeLimit:10,lives:3,combo:true,hardMode:true,streakBonus:true,dangerMode:true,passingScore:80,scorePerCorrect:15},
             };
             Object.keys(features).forEach(k => { if (parseInt(k) <= level) f = features[k]; });
             return f;
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE
+        //  GAME 2: SENTENCE (ย่อส่วน)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1752,26 +1334,29 @@
                 sentenceLevels = res.data || [];
                 renderSentenceLevels();
                 if (sentenceLevels.length > 0) loadSentenceLevel(sentenceLevels[0].level);
-            } catch (e) { console.error(e); }
+            } catch(e) { console.error(e); }
         }
 
         function renderSentenceLevels() {
             const container = $('sentenceLevelContainer');
+            if (!container) return;
             container.innerHTML = '';
             if (!sentenceLevels.length) { container.innerHTML = '<span class="text-gray-400">ยังไม่มีข้อมูล</span>'; return; }
             sentenceLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
-                const isLevelUnlocked = sentenceProgress[`${lv.level}_1`] !== undefined || lv.level == 1;
-                const allDone = lv.dans.every(d => {
-                    const key = `${lv.level}_${d}`;
-                    return sentenceProgress[key] === true;
-                });
-                if (allDone) { btn.textContent = `✅ Level ${lv.level}`;
-                    btn.className += ' bg-green-100'; } else if (isLevelUnlocked) { btn.textContent =
-                        `📘 Level ${lv.level}`;
-                    btn.className += ' bg-blue-50'; } else { btn.textContent = `🔒 Level ${lv.level}`;
-                    btn.className += ' opacity-50'; }
+                let prevLevelCompleted = true;
+                if (lv.level > 1) {
+                    const prevLevel = sentenceLevels.find(l => l.level === lv.level - 1);
+                    if (prevLevel) {
+                        prevLevelCompleted = prevLevel.dans.every(d => sentenceProgress[`${prevLevel.level}_${d}`] === true);
+                    }
+                }
+                const isLevelUnlocked = prevLevelCompleted || lv.level === 1;
+                const allDone = lv.dans.every(d => sentenceProgress[`${lv.level}_${d}`] === true);
+                if (allDone) { btn.textContent = `✅ Level ${lv.level}`; btn.className += ' bg-green-100'; }
+                else if (isLevelUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
+                else { btn.textContent = `🔒 Level ${lv.level}`; btn.className += ' opacity-50'; }
                 btn.onclick = () => {
                     if (isLevelUnlocked) loadSentenceLevel(lv.level);
                     else {
@@ -1801,38 +1386,40 @@
 
         function renderSentenceDans() {
             const container = $('sentenceDanList');
+            if (!container) return;
             container.innerHTML = '';
-            const isLevelUnlocked = sentenceProgress[`${currentSentenceLevel}_1`] !== undefined || currentSentenceLevel ==
-                1;
+            let prevLevelCompleted = true;
+            if (currentSentenceLevel > 1) {
+                const prevLevel = sentenceLevels.find(l => l.level === currentSentenceLevel - 1);
+                if (prevLevel) {
+                    prevLevelCompleted = prevLevel.dans.every(d => sentenceProgress[`${prevLevel.level}_${d}`] === true);
+                }
+            }
+            const isLevelUnlocked = prevLevelCompleted || currentSentenceLevel === 1;
             sentenceDans.forEach(dan => {
                 const key = `${currentSentenceLevel}_${dan}`;
                 const done = sentenceProgress[key] === true;
-                const isUnlocked = isLevelUnlocked || dan === sentenceDans[0] || (sentenceProgress[
-                    `${currentSentenceLevel}_${dan-1}`] === true);
+                const isDanUnlocked = isLevelUnlocked && (dan === sentenceDans[0] || (sentenceProgress[`${currentSentenceLevel}_${dan-1}`] === true));
                 const isSelected = currentSentenceDan === dan;
                 const cost = calculateUnlockCost(currentSentenceLevel, dan);
-                const canUnlock = !done && !isUnlocked && stars >= cost;
+                const canUnlock = !done && !isDanUnlocked && stars >= cost;
 
                 const item = document.createElement('div');
-                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked && !canUnlock ? ' locked' :
-                    '') + (isSelected ? ' selected' : '');
-                let statusHtml =
-                    `<span class="status ${done ? 'done' : (isUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>`;
-                if (!done && !isUnlocked && canUnlock) {
-                    statusHtml =
-                        `<button class="btn-unlock" onclick="unlockDanWithStars('sentence', ${currentSentenceLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
-                } else if (!done && !isUnlocked && !canUnlock) {
+                item.className = 'dan-item' + (done ? ' completed' : '') + (!isDanUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                let statusHtml = `<span class="status ${done ? 'done' : (isDanUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ เล่นแล้ว' : (isDanUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก')}</span>`;
+                if (!done && !isDanUnlocked && canUnlock) {
+                    statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('sentence', ${currentSentenceLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
+                } else if (!done && !isDanUnlocked && !canUnlock) {
                     statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
                 }
                 item.innerHTML = `
-                    <span class="icon">${done ? '✅' : (isUnlocked ? '📘' : '🔒')}</span>
-                    <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : 'ล็อก')}</div></div>
+                    <span class="icon">${done ? '✅' : (isDanUnlocked ? '📘' : '🔒')}</span>
+                    <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'เล่นแล้ว' : (isDanUnlocked ? 'พร้อมฝึก' : 'ล็อก')}</div></div>
                     ${statusHtml}
                 `;
-                if (isUnlocked) {
+                if (isDanUnlocked) {
                     item.style.cursor = 'pointer';
-                    let clickCount = 0;
-                    let clickTimer = null;
+                    let clickCount = 0, clickTimer = null;
                     item.onclick = () => {
                         clickCount++;
                         if (clickCount === 1) {
@@ -1875,6 +1462,7 @@
             currentSentenceLevel = level;
             currentSentenceDan = dan;
             sentenceConsecutiveCorrect = 0;
+            sentenceCorrectCount = 0;
             const res = await callAPI('sentences', 'GET', null, { level: level, dan: dan });
             sentenceQuestions = res.data || [];
             if (!sentenceQuestions.length) { alert('ไม่มีประโยคในด่านนี้'); return; }
@@ -1912,7 +1500,7 @@
                     <div id="sentenceGameOver" class="hidden text-center py-4">
                         <div class="text-5xl mb-2">🎉</div>
                         <h3 class="text-xl font-bold text-emerald-900">เล่นครบทุกข้อ!</h3>
-                        <p class="text-gray-600 mt-1">ตอบถูกติดกัน <span id="sentenceFinalStreak" class="font-bold text-amber-700">0</span> ข้อ</p>
+                        <p class="text-gray-600 mt-1">ตอบถูก <span id="sentenceFinalCorrect" class="font-bold text-amber-700">0</span> / ${sentenceTotalQuestions} ข้อ</p>
                         <div class="flex flex-wrap justify-center gap-2 mt-3">
                             <button class="btn-primary text-sm px-6 py-2" onclick="loadSentenceDan(currentSentenceLevel, currentSentenceDan)">🔄 เล่นอีกครั้ง</button>
                             <button id="sentenceNextDanBtn" class="btn-gold text-sm px-6 py-2 hidden">➡️ ด่านถัดไป</button>
@@ -1950,31 +1538,12 @@
             const bank = $('sentenceWordBank');
             drop.innerHTML = '';
             bank.innerHTML = '';
-            placedWords.forEach((w, i) => { const span = document.createElement('span');
-                span.className = 'sentence-word placed';
-                span.textContent = w;
-                span.onclick = () => sentenceRemoveWord(i);
-                drop.appendChild(span); });
-            selectedWords.forEach((w, i) => { const span = document.createElement('span');
-                span.className = 'sentence-word';
-                span.textContent = w;
-                span.onclick = () => sentenceSelectWord(i);
-                bank.appendChild(span); });
+            placedWords.forEach((w, i) => { const span = document.createElement('span'); span.className = 'sentence-word placed'; span.textContent = w; span.onclick = () => sentenceRemoveWord(i); drop.appendChild(span); });
+            selectedWords.forEach((w, i) => { const span = document.createElement('span'); span.className = 'sentence-word'; span.textContent = w; span.onclick = () => sentenceSelectWord(i); bank.appendChild(span); });
         }
 
-        function sentenceSelectWord(idx) { if (sentenceGameCompleted) return; const w = selectedWords[idx];
-            placedWords.push(w);
-            selectedWords.splice(idx, 1);
-            renderSentenceWords();
-            vibrate(10);
-            playKeyboardSound(); }
-
-        function sentenceRemoveWord(idx) { if (sentenceGameCompleted) return; const w = placedWords[idx];
-            selectedWords.push(w);
-            placedWords.splice(idx, 1);
-            renderSentenceWords();
-            vibrate(10);
-            playKeyboardSound(); }
+        function sentenceSelectWord(idx) { if (sentenceGameCompleted) return; const w = selectedWords[idx]; placedWords.push(w); selectedWords.splice(idx,1); renderSentenceWords(); vibrate(10); playKeyboardSound(); }
+        function sentenceRemoveWord(idx) { if (sentenceGameCompleted) return; const w = placedWords[idx]; selectedWords.push(w); placedWords.splice(idx,1); renderSentenceWords(); vibrate(10); playKeyboardSound(); }
 
         function sentenceCheck() {
             if (sentenceGameCompleted) return;
@@ -1986,22 +1555,19 @@
             result.classList.remove('hidden');
             if (userAnswer === correct) {
                 playCorrectSound();
-                vibrate([30, 50, 30]);
+                vibrate([30,50,30]);
                 sentenceConsecutiveCorrect++;
+                sentenceCorrectCount++;
                 const msg = getUstadhMessage();
-                if (sentenceConsecutiveCorrect >= 3) {
-                    result.innerHTML = `<p class="text-green-600 font-bold">✅ ${msg} (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
-                    sentenceConsecutiveCorrect = 0;
-                } else {
-                    result.innerHTML = `<p class="text-green-600 font-bold">✅ ${msg} (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
-                }
+                result.innerHTML = `<p class="text-green-600 font-bold">✅ ${msg}</p>`;
                 $('sentenceStreakDisplay').textContent = `🔥 ${sentenceConsecutiveCorrect} ติด`;
+                if (sentenceConsecutiveCorrect % CONFIG.STREAK_STAR_INTERVAL === 0) { addStarToUser(); }
                 $('sentenceCheckBtn').classList.add('hidden');
                 $('sentenceNextBtn').classList.remove('hidden');
                 $('sentenceRevealBtn').classList.add('hidden');
             } else {
                 playWrongSound();
-                vibrate([50, 100, 50]);
+                vibrate([50,100,50]);
                 sentenceConsecutiveCorrect = 0;
                 $('sentenceStreakDisplay').textContent = `🔥 0 ติด`;
                 result.innerHTML = `<p class="text-red-600 font-bold">❌ ยังไม่ถูกต้อง ลองใหม่ หรือใช้เฉลย</p>`;
@@ -2029,8 +1595,7 @@
             $('sentenceRevealBtn').classList.add('hidden');
         }
 
-        function sentenceNext() { sentenceIndex++;
-            renderSentenceQuestion(); }
+        function sentenceNext() { sentenceIndex++; renderSentenceQuestion(); }
 
         function sentenceReset() {
             if (sentenceQuestions.length && !sentenceGameCompleted) {
@@ -2050,14 +1615,16 @@
             sentenceGameCompleted = true;
             $('sentenceQuestionArea').classList.add('hidden');
             $('sentenceGameOver').classList.remove('hidden');
-            $('sentenceFinalStreak').textContent = sentenceConsecutiveCorrect;
+            const percent = sentenceTotalQuestions > 0 ? Math.round((sentenceCorrectCount / sentenceTotalQuestions) * 100) : 0;
+            $('sentenceFinalCorrect').textContent = sentenceCorrectCount;
+            const passed = percent >= CONFIG.DIAMOND_REQUIRED_PERCENT;
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
                     email: userEmail,
                     game: 'sentence',
                     level: currentSentenceLevel,
                     dan: currentSentenceDan,
-                    passed: true
+                    passed: passed
                 }).then(() => {
                     loadStarsFromBackend();
                     loadDiamondsFromBackend();
@@ -2065,6 +1632,11 @@
                     renderSentenceDans();
                     renderSentenceLevels();
                 }).catch(console.error);
+                if (passed) {
+                    playDiamondSound();
+                    vibrate(100);
+                    alert('💎 ได้รับ 1 เพชร! (ผ่าน 90% ขึ้นไป)');
+                }
             }
             const nextBtn = $('sentenceNextDanBtn');
             const next = sentenceDans.find(d => d === currentSentenceDan + 1);
@@ -2072,20 +1644,18 @@
                 nextBtn.classList.remove('hidden');
                 nextBtn.textContent = next ? '➡️ ด่านถัดไป' : '➡️ Level ถัดไป';
                 nextBtn.onclick = () => {
-                    if (next) { currentSentenceDan = next;
-                        loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else {
+                    if (next) { currentSentenceDan = next; loadSentenceDan(currentSentenceLevel, currentSentenceDan); }
+                    else {
                         const nextLevel = sentenceLevels.find(l => l.level === currentSentenceLevel + 1);
-                        if (nextLevel && nextLevel.dans.length) { currentSentenceLevel = nextLevel.level;
-                            currentSentenceDan = nextLevel.dans[0];
-                            loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else alert(
-                            '🎉 คุณผ่านทุกด่านแล้ว!');
+                        if (nextLevel && nextLevel.dans.length) { currentSentenceLevel = nextLevel.level; currentSentenceDan = nextLevel.dans[0]; loadSentenceDan(currentSentenceLevel, currentSentenceDan); }
+                        else alert('🎉 คุณผ่านทุกด่านแล้ว!');
                     }
                 };
             } else { nextBtn.classList.add('hidden'); }
         }
 
         // ==============================================================
-        //  GAME 3: READING
+        //  GAME 3: READING (ย่อส่วน)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -2093,26 +1663,29 @@
                 readingLevels = res.data || [];
                 renderReadingLevels();
                 if (readingLevels.length > 0) loadReadingLevel(readingLevels[0].level);
-            } catch (e) { console.error(e); }
+            } catch(e) { console.error(e); }
         }
 
         function renderReadingLevels() {
             const container = $('readingLevelContainer');
+            if (!container) return;
             container.innerHTML = '';
             if (!readingLevels.length) { container.innerHTML = '<span class="text-gray-400">ยังไม่มีบทความ</span>'; return; }
             readingLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
-                const isLevelUnlocked = readingProgress[`${lv.level}_1`] !== undefined || lv.level == 1;
-                const allDone = lv.dans.every(d => {
-                    const key = `${lv.level}_${d}`;
-                    return readingProgress[key] === true;
-                });
-                if (allDone) { btn.textContent = `✅ Level ${lv.level}`;
-                    btn.className += ' bg-green-100'; } else if (isLevelUnlocked) { btn.textContent =
-                        `📘 Level ${lv.level}`;
-                    btn.className += ' bg-blue-50'; } else { btn.textContent = `🔒 Level ${lv.level}`;
-                    btn.className += ' opacity-50'; }
+                let prevLevelCompleted = true;
+                if (lv.level > 1) {
+                    const prevLevel = readingLevels.find(l => l.level === lv.level - 1);
+                    if (prevLevel) {
+                        prevLevelCompleted = prevLevel.dans.every(d => readingProgress[`${prevLevel.level}_${d}`] === true);
+                    }
+                }
+                const isLevelUnlocked = prevLevelCompleted || lv.level === 1;
+                const allDone = lv.dans.every(d => readingProgress[`${lv.level}_${d}`] === true);
+                if (allDone) { btn.textContent = `✅ Level ${lv.level}`; btn.className += ' bg-green-100'; }
+                else if (isLevelUnlocked) { btn.textContent = `📘 Level ${lv.level}`; btn.className += ' bg-blue-50'; }
+                else { btn.textContent = `🔒 Level ${lv.level}`; btn.className += ' opacity-50'; }
                 btn.onclick = () => {
                     if (isLevelUnlocked) loadReadingLevel(lv.level);
                     else {
@@ -2152,47 +1725,49 @@
                     map[dan].push(art['หัวข้อ'] || `บทความที่ ${art.id}`);
                 });
                 articleTitlesMap = map;
-            } catch (e) { console.error('Failed to fetch article titles:', e); }
+            } catch(e) { console.error('Failed to fetch article titles:', e); }
         }
 
         function renderReadingDans() {
             const container = $('readingDanList');
+            if (!container) return;
             container.innerHTML = '';
-            const isLevelUnlocked = readingProgress[`${currentReadingLevel}_1`] !== undefined || currentReadingLevel ==
-                1;
+            let prevLevelCompleted = true;
+            if (currentReadingLevel > 1) {
+                const prevLevel = readingLevels.find(l => l.level === currentReadingLevel - 1);
+                if (prevLevel) {
+                    prevLevelCompleted = prevLevel.dans.every(d => readingProgress[`${prevLevel.level}_${d}`] === true);
+                }
+            }
+            const isLevelUnlocked = prevLevelCompleted || currentReadingLevel === 1;
             readingDans.forEach(dan => {
                 const key = `${currentReadingLevel}_${dan}`;
                 const done = readingProgress[key] === true;
-                const isUnlocked = isLevelUnlocked || dan === readingDans[0] || (readingProgress[
-                    `${currentReadingLevel}_${dan-1}`] === true);
+                const isDanUnlocked = isLevelUnlocked && (dan === readingDans[0] || (readingProgress[`${currentReadingLevel}_${dan-1}`] === true));
                 const cost = calculateUnlockCost(currentReadingLevel, dan);
-                const canUnlock = !done && !isUnlocked && stars >= cost;
+                const canUnlock = !done && !isDanUnlocked && stars >= cost;
                 const isSelected = currentReadingDan === dan;
 
                 const item = document.createElement('div');
-                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked && !canUnlock ? ' locked' :
-                    '') + (isSelected ? ' selected' : '');
-                let statusHtml =
-                    `<span class="status ${done ? 'done' : (isUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ อ่านแล้ว' : (isUnlocked ? '📖 พร้อมอ่าน' : '🔒 ล็อก')}</span>`;
-                if (!done && !isUnlocked && canUnlock) {
-                    statusHtml =
-                        `<button class="btn-unlock" onclick="unlockDanWithStars('reading', ${currentReadingLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
-                } else if (!done && !isUnlocked && !canUnlock) {
+                item.className = 'dan-item' + (done ? ' completed' : '') + (!isDanUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                let statusHtml = `<span class="status ${done ? 'done' : (isDanUnlocked ? 'pending' : 'locked-status')}">${done ? '✅ อ่านแล้ว' : (isDanUnlocked ? '📖 พร้อมอ่าน' : '🔒 ล็อก')}</span>`;
+                if (!done && !isDanUnlocked && canUnlock) {
+                    statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('reading', ${currentReadingLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
+                } else if (!done && !isDanUnlocked && !canUnlock) {
                     statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
                 }
                 item.innerHTML = `
-                    <span class="icon">${done ? '✅' : (isUnlocked ? '📖' : '🔒')}</span>
+                    <span class="icon">${done ? '✅' : (isDanUnlocked ? '📖' : '🔒')}</span>
                     <div class="info">
                         <div class="name">ด่าน ${dan}</div>
-                        <div class="desc">${done ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : 'ล็อก')}</div>
+                        <div class="desc">${done ? 'อ่านแล้ว' : (isDanUnlocked ? 'พร้อมอ่าน' : 'ล็อก')}</div>
                         ${articleTitlesMap[dan] && articleTitlesMap[dan].length > 0 ? `<div class="sub-desc">📄 ${articleTitlesMap[dan].slice(0, 2).join(', ')}${articleTitlesMap[dan].length > 2 ? '…' : ''}</div>` : ''}
                     </div>
                     ${statusHtml}
                 `;
-                if (isUnlocked) {
+                if (isDanUnlocked) {
                     item.style.cursor = 'pointer';
-                    let clickCount = 0;
-                    let clickTimer = null;
+                    let clickCount = 0, clickTimer = null;
                     item.onclick = () => {
                         clickCount++;
                         if (clickCount === 1) {
@@ -2284,14 +1859,11 @@
             const article = readingArticles[readingIndex];
             currentArticleId = parseInt(article.id) || 0;
             $('readingArticleTitle').textContent = article['หัวข้อ'] || `บทความที่ ${readingIndex+1}`;
-            $('readingArticleInfo').textContent =
-                `Dan ${currentReadingDan} · ${readingIndex+1}/${readingTotalArticles} · ${article.จำนวนคำ||0} คำ`;
+            $('readingArticleInfo').textContent = `Dan ${currentReadingDan} · ${readingIndex+1}/${readingTotalArticles} · ${article.จำนวนคำ||0} คำ`;
             const body = $('readingArticleBody');
             const arabicText = article['บทความ (อาหรับ)'] || '';
             const words = arabicText.split(' ').filter(w => w.trim() !== '');
-            body.innerHTML = words.map(word => {
-                return `<span class="reading-word" data-word="${word}" onclick="showWordMeaning('${word}')">${word}</span> `;
-            }).join('');
+            body.innerHTML = words.map(word => `<span class="reading-word" data-word="${word}" onclick="showWordMeaning('${word}')">${word}</span> `).join('');
             $('readingTranslation').classList.add('hidden');
             readingTranslationVisible = false;
             $('readingShowTranslationBtn').textContent = '📝 ดูคำแปล';
@@ -2313,23 +1885,17 @@
                         plural: w['พหูพจน์ (جمع)'] || '',
                         root: w['รากศัพท์'] || '',
                     };
-                    if (w['คำพ้องที่ 1'] && w['ความหมายคำพ้อง 1']) { readingWordMap[key].synonyms.push({ word: w[
-                                'คำพ้องที่ 1'], meaning: w['ความหมายคำพ้อง 1'] }); }
-                    if (w['คำพ้องที่ 2'] && w['ความหมายคำพ้อง 2']) { readingWordMap[key].synonyms.push({ word: w[
-                                'คำพ้องที่ 2'], meaning: w['ความหมายคำพ้อง 2'] }); }
-                    if (w['คำตรงข้ามที่ 1'] && w['ความหมายคำตรงข้าม 1']) { readingWordMap[key].antonyms.push({ word: w[
-                                'คำตรงข้ามที่ 1'], meaning: w['ความหมายคำตรงข้าม 1'] }); }
-                    if (w['คำตรงข้ามที่ 2'] && w['ความหมายคำตรงข้าม 2']) { readingWordMap[key].antonyms.push({ word: w[
-                                'คำตรงข้ามที่ 2'], meaning: w['ความหมายคำตรงข้าม 2'] }); }
+                    if (w['คำพ้องที่ 1'] && w['ความหมายคำพ้อง 1']) { readingWordMap[key].synonyms.push({ word: w['คำพ้องที่ 1'], meaning: w['ความหมายคำพ้อง 1'] }); }
+                    if (w['คำพ้องที่ 2'] && w['ความหมายคำพ้อง 2']) { readingWordMap[key].synonyms.push({ word: w['คำพ้องที่ 2'], meaning: w['ความหมายคำพ้อง 2'] }); }
+                    if (w['คำตรงข้ามที่ 1'] && w['ความหมายคำตรงข้าม 1']) { readingWordMap[key].antonyms.push({ word: w['คำตรงข้ามที่ 1'], meaning: w['ความหมายคำตรงข้าม 1'] }); }
+                    if (w['คำตรงข้ามที่ 2'] && w['ความหมายคำตรงข้าม 2']) { readingWordMap[key].antonyms.push({ word: w['คำตรงข้ามที่ 2'], meaning: w['ความหมายคำตรงข้าม 2'] }); }
                 });
-            } catch (e) { console.error('Failed to load article dictionary:', e); }
+            } catch(e) { console.error('Failed to load article dictionary:', e); }
         }
 
         function showWordMeaning(word) {
             document.querySelectorAll('.reading-word').forEach(el => el.classList.remove('active-word'));
-            document.querySelectorAll('.reading-word').forEach(el => {
-                if (el.dataset.word === word) el.classList.add('active-word');
-            });
+            document.querySelectorAll('.reading-word').forEach(el => { if (el.dataset.word === word) el.classList.add('active-word'); });
             vibrate(15);
             playKeyboardSound();
 
@@ -2344,8 +1910,7 @@
                     const data = res.data || [];
                     if (data.length === 0) {
                         const normalized = normalizeArabicWord(word);
-                        return callAPI('article-dictionary', 'GET', null, { articleId: currentArticleId,
-                            word: normalized });
+                        return callAPI('article-dictionary', 'GET', null, { articleId: currentArticleId, word: normalized });
                     }
                     return res;
                 })
@@ -2353,8 +1918,7 @@
                     const data = res.data || [];
                     if (data.length === 0) {
                         const root = normalizeArabicWord(word).substring(0, 3);
-                        if (root.length >= 3) { return callAPI('article-dictionary', 'GET', null,
-                            { articleId: currentArticleId, word: root }); }
+                        if (root.length >= 3) { return callAPI('article-dictionary', 'GET', null, { articleId: currentArticleId, word: root }); }
                         return { data: [] };
                     }
                     return res;
@@ -2380,41 +1944,30 @@
                     const synList = $('dictSynonyms');
                     synList.innerHTML = '';
                     const syn = [];
-                    if (info['คำพ้องที่ 1'] && info['ความหมายคำพ้อง 1']) { syn.push({ word: info['คำพ้องที่ 1'],
-                            meaning: info['ความหมายคำพ้อง 1'] }); }
-                    if (info['คำพ้องที่ 2'] && info['ความหมายคำพ้อง 2']) { syn.push({ word: info['คำพ้องที่ 2'],
-                            meaning: info['ความหมายคำพ้อง 2'] }); }
-                    if (syn.length > 0) { syn.forEach(s => { const li = document.createElement('li');
-                            li.innerHTML = `<span class="arabic">${s.word}</span> = ${s.meaning}`;
-                            synList.appendChild(li); }); } else { synList.innerHTML =
-                        '<li class="text-gray-400">ไม่มีข้อมูล</li>'; }
+                    if (info['คำพ้องที่ 1'] && info['ความหมายคำพ้อง 1']) { syn.push({ word: info['คำพ้องที่ 1'], meaning: info['ความหมายคำพ้อง 1'] }); }
+                    if (info['คำพ้องที่ 2'] && info['ความหมายคำพ้อง 2']) { syn.push({ word: info['คำพ้องที่ 2'], meaning: info['ความหมายคำพ้อง 2'] }); }
+                    if (syn.length > 0) { syn.forEach(s => { const li = document.createElement('li'); li.innerHTML = `<span class="arabic">${s.word}</span> = ${s.meaning}`; synList.appendChild(li); }); }
+                    else { synList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>'; }
 
                     const antList = $('dictAntonyms');
                     antList.innerHTML = '';
                     const ant = [];
-                    if (info['คำตรงข้ามที่ 1'] && info['ความหมายคำตรงข้าม 1']) { ant.push({ word: info[
-                                'คำตรงข้ามที่ 1'], meaning: info['ความหมายคำตรงข้าม 1'] }); }
-                    if (info['คำตรงข้ามที่ 2'] && info['ความหมายคำตรงข้าม 2']) { ant.push({ word: info[
-                                'คำตรงข้ามที่ 2'], meaning: info['ความหมายคำตรงข้าม 2'] }); }
-                    if (ant.length > 0) { ant.forEach(a => { const li = document.createElement('li');
-                            li.innerHTML = `<span class="arabic">${a.word}</span> = ${a.meaning}`;
-                            antList.appendChild(li); }); } else { antList.innerHTML =
-                        '<li class="text-gray-400">ไม่มีข้อมูล</li>'; }
+                    if (info['คำตรงข้ามที่ 1'] && info['ความหมายคำตรงข้าม 1']) { ant.push({ word: info['คำตรงข้ามที่ 1'], meaning: info['ความหมายคำตรงข้าม 1'] }); }
+                    if (info['คำตรงข้ามที่ 2'] && info['ความหมายคำตรงข้าม 2']) { ant.push({ word: info['คำตรงข้ามที่ 2'], meaning: info['ความหมายคำตรงข้าม 2'] }); }
+                    if (ant.length > 0) { ant.forEach(a => { const li = document.createElement('li'); li.innerHTML = `<span class="arabic">${a.word}</span> = ${a.meaning}`; antList.appendChild(li); }); }
+                    else { antList.innerHTML = '<li class="text-gray-400">ไม่มีข้อมูล</li>'; }
 
                     const pluralSection = $('dictPluralSection');
                     const pluralEl = $('dictPlural');
-                    if (info['พหูพจน์ (جمع)']) { pluralSection.style.display = 'block';
-                        pluralEl.textContent = info['พหูพจน์ (جمع)']; } else { pluralSection.style.display =
-                        'none'; }
+                    if (info['พหูพจน์ (جمع)']) { pluralSection.style.display = 'block'; pluralEl.textContent = info['พหูพจน์ (جمع)']; }
+                    else { pluralSection.style.display = 'none'; }
 
                     $('dictRoot').textContent = info['รากศัพท์'] || 'ไม่มีข้อมูล';
                     $('reportWordBtn').dataset.word = word;
                     $('reportWordBtn').disabled = false;
                     $('reportWordBtn').textContent = '🚨 ส่งรายงาน';
                 })
-                .catch(err => {
-                    $('dictMeaning').textContent = '⚠️ ' + err.message;
-                });
+                .catch(err => { $('dictMeaning').textContent = '⚠️ ' + err.message; });
         }
 
         function closeDictionary() { $('dictionaryPopup').classList.remove('show'); }
@@ -2433,16 +1986,12 @@
             }
         }
 
-        function nextReadingArticle() { readingIndex++;
-            renderReadingArticle(); }
-
-        function resetReadingArticle() { readingIndex = 0;
-            renderReadingArticle(); }
+        function nextReadingArticle() { readingIndex++; renderReadingArticle(); }
+        function resetReadingArticle() { readingIndex = 0; renderReadingArticle(); }
 
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
-            $('readingTotalArticles').textContent = readingTotalArticles;
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
                     email: userEmail,
@@ -2456,6 +2005,8 @@
                     loadProgressFromBackend();
                     renderReadingDans();
                     renderReadingLevels();
+                    playDiamondSound();
+                    alert('💎 ได้รับ 1 เพชร! (อ่านบทความครบทุกบทความ)');
                 }).catch(console.error);
             }
             const nextBtn = $('readingNextDanBtn');
@@ -2464,13 +2015,11 @@
                 nextBtn.classList.remove('hidden');
                 nextBtn.textContent = next ? '➡️ ด่านถัดไป' : '➡️ Level ถัดไป';
                 nextBtn.onclick = () => {
-                    if (next) { currentReadingDan = next;
-                        loadReadingDan(currentReadingLevel, currentReadingDan); } else {
+                    if (next) { currentReadingDan = next; loadReadingDan(currentReadingLevel, currentReadingDan); }
+                    else {
                         const nextLevel = readingLevels.find(l => l.level === currentReadingLevel + 1);
-                        if (nextLevel && nextLevel.dans.length) { currentReadingLevel = nextLevel.level;
-                            currentReadingDan = nextLevel.dans[0];
-                            loadReadingDan(currentReadingLevel, currentReadingDan); } else alert(
-                            '🎉 คุณผ่านทุกด่านแล้ว!');
+                        if (nextLevel && nextLevel.dans.length) { currentReadingLevel = nextLevel.level; currentReadingDan = nextLevel.dans[0]; loadReadingDan(currentReadingLevel, currentReadingDan); }
+                        else alert('🎉 คุณผ่านทุกด่านแล้ว!');
                     }
                 };
             } else { nextBtn.classList.add('hidden'); }
@@ -2487,14 +2036,9 @@
             const meaning = $('dictMeaning').textContent || '';
             if (confirm(`🚨 รายงาน "${word}" (${reportType})?`)) {
                 callAPI('report-word', 'POST', {
-                    userEmail,
-                    userName,
-                    level: currentReadingLevel,
-                    dan: currentReadingDan,
-                    articleId: currentArticleId,
-                    word,
-                    meaning,
-                    reportType,
+                    userEmail, userName,
+                    level: currentReadingLevel, dan: currentReadingDan,
+                    articleId: currentArticleId, word, meaning, reportType,
                     note: `รายงานจากบทความ ID ${currentArticleId}`
                 }).then(() => {
                     alert('✅ รายงานเรียบร้อยแล้ว! ขอบคุณครับ 🙏');
@@ -2506,7 +2050,7 @@
         }
 
         // ==============================================================
-        //  OVERLAY
+        //  OVERLAY & OTHER
         // ==============================================================
         function showGameOverlay() { $('gameOverlay').classList.add('show'); }
 
@@ -2527,33 +2071,30 @@
         //  VOCAB / LEADERBOARD / SHARE
         // ==============================================================
         function renderVocab() {
-            const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+            const filterLevel = parseInt($('vocabLevelFilter')?.value) || 0;
             const tbody = $('vocabBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
-
             let filtered = allVocab;
-            if (filterLevel > 0) {
-                filtered = filtered.filter(item => parseInt(item.level) === filterLevel);
-            }
-            document.getElementById('vocabCount').textContent = filtered.length;
-
+            if (filterLevel > 0) { filtered = filtered.filter(item => parseInt(item.level) === filterLevel); }
+            const countEl = document.getElementById('vocabCount');
+            if (countEl) countEl.textContent = filtered.length;
             const filterSelect = $('vocabLevelFilter');
-            const currentVal = filterSelect.value;
-            const allOption = filterSelect.querySelector('option[value="0"]');
-            filterSelect.innerHTML = '';
-            filterSelect.appendChild(allOption);
-
-            const levels = [...new Set(allVocab.map(item => parseInt(item.level)).filter(l => l > 0))].sort((a, b) => a -
-                b);
-            levels.forEach(l => {
-                const count = allVocab.filter(item => parseInt(item.level) === l).length;
-                const opt = document.createElement('option');
-                opt.value = l;
-                opt.textContent = `Level ${l} (${count} คำ)`;
-                filterSelect.appendChild(opt);
-            });
-            filterSelect.value = currentVal || '0';
-
+            if (filterSelect) {
+                const currentVal = filterSelect.value;
+                const allOption = filterSelect.querySelector('option[value="0"]');
+                filterSelect.innerHTML = '';
+                filterSelect.appendChild(allOption);
+                const levels = [...new Set(allVocab.map(item => parseInt(item.level)).filter(l => l > 0))].sort((a,b)=>a-b);
+                levels.forEach(l => {
+                    const count = allVocab.filter(item => parseInt(item.level) === l).length;
+                    const opt = document.createElement('option');
+                    opt.value = l;
+                    opt.textContent = `Level ${l} (${count} คำ)`;
+                    filterSelect.appendChild(opt);
+                });
+                filterSelect.value = currentVal || '0';
+            }
             filtered.forEach((item, idx) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -2574,187 +2115,17 @@
 
         function filterVocab() { renderVocab(); }
 
-        // ==============================================================
-        //  EXPORT CSV & PDF
-        // ==============================================================
-        function exportCSV() {
-            try {
-                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
-                let data = allVocab;
-                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
-                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
-
-                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
-                const rows = data.map((item, idx) => [
-                    idx + 1,
-                    item.คำศัพท์ไทย || '',
-                    item.คำศัพท์อาหรับ || '',
-                    item.รูปอดีต || '',
-                    item.รูปปัจจุบัน || '',
-                    item.รูปคำสั่ง || '',
-                    item.เอกพจน์ || '',
-                    item.พหูพจน์ || '',
-                    item.หมวดหมู่ || '',
-                    item.level || ''
-                ]);
-
-                let csv = '\uFEFF' + headers.join(',') + '\n';
-                rows.forEach(row => {
-                    const escaped = row.map(cell => {
-                        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell
-                                .includes('\n'))) {
-                            return `"${cell.replace(/"/g, '""')}"`;
-                        }
-                        return cell;
-                    });
-                    csv += escaped.join(',') + '\n';
-                });
-
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download =
-                    `คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
-            } catch (e) {
-                alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message);
-                console.error(e);
-            }
-        }
-
-        function exportPDF() {
-            try {
-                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
-                let data = allVocab;
-                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
-                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
-
-                const wrapper = document.createElement('div');
-                wrapper.style.padding = '20px';
-                wrapper.style.background = '#ffffff';
-                wrapper.style.fontFamily = 'Noto Sans Thai, Noto Naskh Arabic, sans-serif';
-
-                const title = document.createElement('h2');
-                title.textContent = `📚 คำศัพท์ ศึกษา ต่างถิ่น ${filterLevel > 0 ? `(Level ${filterLevel})` : '(ทั้งหมด)'}`;
-                title.style.textAlign = 'center';
-                title.style.color = '#065f46';
-                title.style.marginBottom = '16px';
-                title.style.fontSize = '20px';
-                wrapper.appendChild(title);
-
-                const table = document.createElement('table');
-                table.style.width = '100%';
-                table.style.borderCollapse = 'collapse';
-                table.style.fontSize = '12px';
-                table.style.border = '1px solid #d1d5db';
-
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
-                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
-                headers.forEach(h => {
-                    const th = document.createElement('th');
-                    th.textContent = h;
-                    th.style.background = '#065f46';
-                    th.style.color = '#fff';
-                    th.style.padding = '6px 8px';
-                    th.style.border = '1px solid #065f46';
-                    th.style.textAlign = 'left';
-                    headerRow.appendChild(th);
-                });
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
-
-                const tbody = document.createElement('tbody');
-                data.forEach((item, idx) => {
-                    const tr = document.createElement('tr');
-                    const cells = [
-                        idx + 1,
-                        item.คำศัพท์ไทย || '',
-                        item.คำศัพท์อาหรับ || '',
-                        item.รูปอดีต || '',
-                        item.รูปปัจจุบัน || '',
-                        item.รูปคำสั่ง || '',
-                        item.เอกพจน์ || '',
-                        item.พหูพจน์ || '',
-                        item.หมวดหมู่ || '',
-                        item.level || ''
-                    ];
-                    cells.forEach((cell, i) => {
-                        const td = document.createElement('td');
-                        td.textContent = cell;
-                        td.style.padding = '4px 6px';
-                        td.style.border = '1px solid #d1d5db';
-                        td.style.background = i % 2 === 0 ? '#f8fafc' : '#ffffff';
-                        if (i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
-                            td.style.fontFamily = 'Noto Naskh Arabic, serif';
-                            td.style.direction = 'rtl';
-                            td.style.fontSize = '1.1rem';
-                        }
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
-                });
-                table.appendChild(tbody);
-                wrapper.appendChild(table);
-
-                document.body.appendChild(wrapper);
-
-                html2canvas(wrapper, {
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    useCORS: true,
-                    logging: false,
-                }).then(canvas => {
-                    document.body.removeChild(wrapper);
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('l', 'mm', 'a4');
-                    const imgWidth = 280;
-                    const pageHeight = 210;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
-
-                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-
-                    while (heightLeft > 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
-
-                    pdf.save(`คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.pdf`);
-                }).catch(err => {
-                    document.body.removeChild(wrapper);
-                    alert('ไม่สามารถสร้าง PDF ได้: ' + err.message);
-                });
-
-            } catch (e) {
-                alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + e.message);
-                console.error(e);
-            }
-        }
-
-        // ==============================================================
-        //  LEADERBOARD (แสดงเพชร)
-        // ==============================================================
         async function renderLeaderboard() {
             try {
                 const res = await callAPI('leaderboard', 'GET');
                 const data = res.data || [];
                 const tbody = $('leaderboardBody');
+                if (!tbody) return;
                 tbody.innerHTML = '';
                 if (!data.length) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="4" class="text-center text-gray-400 py-4">ยังไม่มีผู้เล่น</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-400 py-4">ยังไม่มีผู้เล่น</td></tr>';
                     return;
                 }
-
                 const messages = [
                     "🏆 สุดยอด! เจ้าแห่งเพชร!", "🥇 ยอดเยี่ยม! เก่งมาก!",
                     "🥈 เก่ง! ใกล้ถึงอันดับ 1 แล้ว", "🥉 เยี่ยม! ติดท็อป 3",
@@ -2767,7 +2138,6 @@
                     "🎓 นักเรียนดี! เป็นแบบอย่างให้คนอื่น", "👏 ปรบมือให้ความมุ่งมั่น!",
                     "⭐ เป็นดาวเด่น! อย่าหยุดแค่นี้", "🌈 สู้ต่อไป! อนาคตสดใส",
                 ];
-
                 data.forEach((item, idx) => {
                     const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
                     const tr = document.createElement('tr');
@@ -2780,50 +2150,48 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (e) {
-                console.error('Leaderboard error:', e);
-            }
+            } catch(e) { console.error('Leaderboard error:', e); }
         }
 
-        // ==============================================================
-        //  SHARE
-        // ==============================================================
         function updateShareCard() {
             const level = currentLevel || 1;
             const dan = currentDan || 1;
-            $('shareLevelDisplay').textContent = `🏰 Level ${level}`;
-            $('shareDanDisplay').textContent = `🎯 ด่าน ${dan}`;
-            $('shareScoreDisplay').textContent = `⭐ ${score} คะแนน`;
-            $('shareMessage').textContent = `${userName || 'นักศึกษา'} กำลังเรียนภาษาอาหรับกับอุสตะเฮง!`;
+            const el = $('shareLevelDisplay');
+            if (el) el.textContent = `🏰 Level ${level}`;
+            const el2 = $('shareDanDisplay');
+            if (el2) el2.textContent = `🎯 ด่าน ${dan}`;
+            const el3 = $('shareScoreDisplay');
+            if (el3) el3.textContent = `⭐ ${score} คะแนน`;
+            const msg = $('shareMessage');
+            if (msg) msg.textContent = `${userName || 'นักศึกษา'} กำลังเรียนภาษาอาหรับกับอุสตะเฮง!`;
             let tr = Object.keys(readingProgress).length;
             let ts = Object.keys(sentenceProgress).length;
-            $('shareReadingCount').textContent = tr;
-            $('shareSentenceCount').textContent = ts;
-            $('shareVocabCount').textContent = allVocab.length || 0;
-            $('shareDiamondCount').textContent = diamonds;
+            const elRead = $('shareReadingCount');
+            if (elRead) elRead.textContent = tr;
+            const elSent = $('shareSentenceCount');
+            if (elSent) elSent.textContent = ts;
+            const elVoc = $('shareVocabCount');
+            if (elVoc) elVoc.textContent = allVocab.length || 0;
+            const elDia = $('shareDiamondCount');
+            if (elDia) elDia.textContent = diamonds;
         }
 
         function shareToStory() {
-            const text =
-                `📚 ศึกษา ต่างถิ่น\n${userName||'นักศึกษา'} กำลังเรียนภาษาอาหรับ!\n🏰 Level ${currentLevel} · 🎯 ด่าน ${currentDan}\n📖 อ่าน ${$('shareReadingCount').textContent} บทความ\n🧩 เรียน ${$('shareSentenceCount').textContent} ประโยค\n📚 รู้ ${$('shareVocabCount').textContent} คำศัพท์\n💎 มี ${diamonds} เพชร\n\nมาเรียนกันเถอะ! 🚀`;
+            const text = `📚 ศึกษา ต่างถิ่น\n${userName||'นักศึกษา'} กำลังเรียนภาษาอาหรับ!\n🏰 Level ${currentLevel} · 🎯 ด่าน ${currentDan}\n📖 อ่าน ${$('shareReadingCount')?.textContent||0} บทความ\n🧩 เรียน ${$('shareSentenceCount')?.textContent||0} ประโยค\n📚 รู้ ${$('shareVocabCount')?.textContent||0} คำศัพท์\n💎 มี ${diamonds} เพชร\n\nมาเรียนกันเถอะ! 🚀`;
             const url = encodeURIComponent(window.location.href);
-            window.open(
-                `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`, '_blank');
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`, '_blank');
         }
 
         function shareToFriend() {
             const text = `📚 ชวนเพื่อนมาเรียนภาษาอาหรับกับอุสตะเฮง! สนุกและได้ความรู้ ไปเล่นกันเถอะ! 🚀`;
             const url = encodeURIComponent(window.location.href);
-            window.open(
-                `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`, '_blank');
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`, '_blank');
         }
 
         // ==============================================================
         //  EDIT NAME
         // ==============================================================
-        function openEditName() { $('editNameModal').classList.remove('hidden');
-            $('editNameInput').value = userName || ''; }
-
+        function openEditName() { $('editNameModal').classList.remove('hidden'); $('editNameInput').value = userName || ''; }
         function closeEditName() { $('editNameModal').classList.add('hidden'); }
 
         async function saveName() {
@@ -2840,11 +2208,148 @@
                     updateShareCard();
                     renderLeaderboard();
                 } else { alert('❌ เปลี่ยนชื่อไม่สำเร็จ: ' + (res.error || '')); }
-            } catch (e) { alert('❌ เปลี่ยนชื่อไม่สำเร็จ: ' + e.message); }
+            } catch(e) { alert('❌ เปลี่ยนชื่อไม่สำเร็จ: ' + e.message); }
         }
 
         // ==============================================================
-        //  TABS
+        //  EXPORT
+        // ==============================================================
+        function exportCSV() {
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter')?.value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+                const headers = ['#','ไทย','อาหรับ','อดีต','ปัจจุบัน','คำสั่ง','เอกพจน์','พหูพจน์','หมวด','Level'];
+                const rows = data.map((item, idx) => [
+                    idx + 1,
+                    item.คำศัพท์ไทย || '',
+                    item.คำศัพท์อาหรับ || '',
+                    item.รูปอดีต || '',
+                    item.รูปปัจจุบัน || '',
+                    item.รูปคำสั่ง || '',
+                    item.เอกพจน์ || '',
+                    item.พหูพจน์ || '',
+                    item.หมวดหมู่ || '',
+                    item.level || ''
+                ]);
+                let csv = '\uFEFF' + headers.join(',') + '\n';
+                rows.forEach(row => {
+                    const escaped = row.map(cell => {
+                        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                            return `"${cell.replace(/"/g, '""')}"`;
+                        }
+                        return cell;
+                    });
+                    csv += escaped.join(',') + '\n';
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch(e) { alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message); console.error(e); }
+        }
+
+        function exportPDF() {
+            alert('📄 ฟังก์ชัน PDF พร้อมใช้งานแล้ว (กด OK เพื่อดาวน์โหลด)');
+            const filterLevel = parseInt($('vocabLevelFilter')?.value) || 0;
+            let data = allVocab;
+            if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+            if (!data || data.length === 0) { alert('ไม่มีข้อมูล'); return; }
+            const wrapper = document.createElement('div');
+            wrapper.style.padding = '20px';
+            wrapper.style.background = '#ffffff';
+            wrapper.style.fontFamily = 'Noto Sans Thai, Noto Naskh Arabic, sans-serif';
+            const title = document.createElement('h2');
+            title.textContent = `📚 คำศัพท์ ศึกษา ต่างถิ่น ${filterLevel > 0 ? `(Level ${filterLevel})` : '(ทั้งหมด)'}`;
+            title.style.textAlign = 'center';
+            title.style.color = '#065f46';
+            title.style.marginBottom = '16px';
+            title.style.fontSize = '20px';
+            wrapper.appendChild(title);
+            const table = document.createElement('table');
+            table.style.width = '100%';
+            table.style.borderCollapse = 'collapse';
+            table.style.fontSize = '12px';
+            table.style.border = '1px solid #d1d5db';
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            const headers = ['#','ไทย','อาหรับ','อดีต','ปัจจุบัน','คำสั่ง','เอกพจน์','พหูพจน์','หมวด','Level'];
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                th.style.background = '#065f46';
+                th.style.color = '#fff';
+                th.style.padding = '6px 8px';
+                th.style.border = '1px solid #065f46';
+                th.style.textAlign = 'left';
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            data.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                const cells = [
+                    idx + 1,
+                    item.คำศัพท์ไทย || '',
+                    item.คำศัพท์อาหรับ || '',
+                    item.รูปอดีต || '',
+                    item.รูปปัจจุบัน || '',
+                    item.รูปคำสั่ง || '',
+                    item.เอกพจน์ || '',
+                    item.พหูพจน์ || '',
+                    item.หมวดหมู่ || '',
+                    item.level || ''
+                ];
+                cells.forEach((cell, i) => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    td.style.padding = '4px 6px';
+                    td.style.border = '1px solid #d1d5db';
+                    td.style.background = i % 2 === 0 ? '#f8fafc' : '#ffffff';
+                    if (i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
+                        td.style.fontFamily = 'Noto Naskh Arabic, serif';
+                        td.style.direction = 'rtl';
+                        td.style.fontSize = '1.1rem';
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            wrapper.appendChild(table);
+            document.body.appendChild(wrapper);
+            html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false })
+                .then(canvas => {
+                    document.body.removeChild(wrapper);
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('l', 'mm', 'a4');
+                    const imgWidth = 280;
+                    const pageHeight = 210;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    while (heightLeft > 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save(`คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.pdf`);
+                })
+                .catch(err => { document.body.removeChild(wrapper); alert('ไม่สามารถสร้าง PDF ได้: ' + err.message); });
+        }
+
+        // ==============================================================
+        //  TABS & INIT
         // ==============================================================
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2856,79 +2361,56 @@
                 if (btn.dataset.tab === 'vocabTab') renderVocab();
                 if (btn.dataset.tab === 'shareTab') updateShareCard();
                 if (btn.dataset.tab === 'sentenceTab') {
-                    $('sentenceNotStarted').classList.remove('hidden');
-                    $('sentenceGameArea').classList.add('hidden');
-                    $('sentenceDanContainer').classList.add('hidden');
                     if (sentenceLevels.length) loadSentenceLevel(sentenceLevels[0]?.level || 1);
                 }
                 if (btn.dataset.tab === 'readingTab') {
-                    $('readingNotStarted').classList.remove('hidden');
-                    $('readingArticleArea').classList.add('hidden');
-                    $('readingDanContainer').classList.add('hidden');
                     if (readingLevels.length) loadReadingLevel(readingLevels[0]?.level || 1);
                 }
             });
         });
 
-        // ==============================================================
-        //  INIT
-        // ==============================================================
-        document.addEventListener('click', () => {
-            getAudioContext();
-        }, { once: true });
-
+        document.addEventListener('click', () => { getAudioContext(); }, { once: true });
         initGoogleLogin();
-
         $('soundToggle').checked = soundEnabled;
         $('vibrationToggle').checked = vibrationEnabled;
-        $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
 
         document.addEventListener('click', function(e) {
             const popup = $('dictionaryPopup');
-            if (popup.classList.contains('show')) {
+            if (popup && popup.classList.contains('show')) {
                 const rect = popup.getBoundingClientRect();
-                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e
-                    .clientY <= rect.bottom);
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
                 if (!inside && e.target.closest('.reading-word') === null && !e.target.closest('.close-btn')) {
                     closeDictionary();
                 }
             }
-            const settingsPopup = $('settingsPopup');
-            if (settingsPopup.classList.contains('show')) {
-                const rect = settingsPopup.getBoundingClientRect();
-                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e
-                    .clientY <= rect.bottom);
-                if (!inside && !e.target.closest('.btn-settings')) {
-                    settingsPopup.classList.remove('show');
-                }
+            const sp = $('settingsPopup');
+            if (sp && sp.classList.contains('show')) {
+                const rect = sp.getBoundingClientRect();
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
+                if (!inside && !e.target.closest('.btn-settings')) { sp.classList.remove('show'); }
             }
-            const supportPopup = $('supportPopup');
-            if (supportPopup.classList.contains('show')) {
-                const rect = supportPopup.getBoundingClientRect();
-                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e
-                    .clientY <= rect.bottom);
-                if (!inside && !e.target.closest('.btn-support')) {
-                    supportPopup.classList.remove('show');
-                }
+            const sup = $('supportPopup');
+            if (sup && sup.classList.contains('show')) {
+                const rect = sup.getBoundingClientRect();
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
+                if (!inside && !e.target.closest('.btn-support')) { sup.classList.remove('show'); }
             }
-            const exchangePopup = $('exchangePopup');
-            if (exchangePopup.classList.contains('show')) {
-                const rect = exchangePopup.getBoundingClientRect();
-                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e
-                    .clientY <= rect.bottom);
-                if (!inside && !e.target.closest('.btn-exchange')) {
-                    exchangePopup.classList.remove('show');
-                }
+            const exp = $('exchangePopup');
+            if (exp && exp.classList.contains('show')) {
+                const rect = exp.getBoundingClientRect();
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
+                if (!inside && !e.target.closest('.btn-exchange')) { exp.classList.remove('show'); }
             }
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.4 — ระบบครบทุกฟีเจอร์');
-        console.log('💎 เพชร: ได้จากการเล่นครบทุกข้อในด่าน');
+        console.log('🚀 ศึกษา ต่างถิ่น v5.6 — ฉบับสมบูรณ์');
+        console.log('💎 เพชร: 1 ต่อด่าน เมื่อตอบถูก ≥90% (ท่องศัพท์/ประโยค) หรืออ่านครบ (บทความ)');
         console.log('💎➡️⭐ แลก 12 เพชร = 100 ดาว');
         console.log('🔓 ปลดล็อก Level: 100⭐ (เปิดเฉพาะด่านที่ 1)');
         console.log('🔓 ปลดล็อกด่าน: 5-30⭐');
-        console.log('🏆 ลีดเดอร์บอร์ดแสดงเพชร');
+        console.log('⭐ ทุก 3 ตอบถูกติดต่อกัน ได้ 1 ดาว');
         console.log('👳 อุสตะเฮงคอยให้กำลังใจและให้ข้อมูลเพิ่มเติม');
+        console.log('📱 Worker:', CONFIG.WORKER_URL);
     </script>
 </body>
 </html>

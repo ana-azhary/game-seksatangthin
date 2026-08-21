@@ -2038,9 +2038,7 @@
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
-            if (isLoggedIn) {
-function readingEndGame() {
-    if (isLoggedIn) {
+ if (isLoggedIn) {
         callAPI('progress', 'POST', {
             email: userEmail,
             game: 'reading',

@@ -16,7 +16,6 @@
         .app-container { max-width: 480px; margin: 0 auto; background: #f8fafc; min-height: 100vh; position: relative; }
         @media (min-width: 640px) { .app-container { border-radius: 32px; margin: 16px auto; min-height: calc(100vh - 32px); box-shadow: 0 20px 60px rgba(0,0,0,0.08); } }
 
-        /* Header Modern */
         .app-header { background: linear-gradient(135deg, #065f46, #0d9488); color: #fff; padding: 12px 16px 10px; border-radius: 0 0 28px 28px; position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
         .app-header .brand { display: flex; align-items: center; gap: 8px; }
         .app-header .brand h1 { font-size: 1.2rem; font-weight: 700; margin: 0; }
@@ -27,7 +26,6 @@
         .app-header .actions .btn-icon.active { background: rgba(255,255,255,0.3); }
         .app-header .actions .btn-icon .badge { background: #f59e0b; color: #1e293b; font-size: 0.6rem; padding: 1px 6px; border-radius: 20px; margin-left: 2px; }
 
-        /* Side Menu */
         .side-menu {
             position: fixed;
             top: 0;
@@ -49,7 +47,6 @@
         .side-menu .menu-item .icon { font-size: 1.2rem; width: 28px; text-align: center; }
         .side-menu .menu-item .badge { background: #f59e0b; color: #1e293b; font-size: 0.7rem; padding: 1px 8px; border-radius: 20px; margin-left: auto; }
         .side-menu .menu-divider { border-top: 1px solid #e5e7eb; margin: 12px 0; }
-
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; display: none; }
         .overlay.show { display: block; }
 
@@ -178,26 +175,11 @@
         .settings-popup .close-btn:hover, .support-popup .close-btn:hover, .exchange-popup .close-btn:hover { color: #1f2937; }
 
         .option-btn.selected-option { border-color: #3b82f6; background: #dbeafe; }
-
         .extra-info { background: #f0fdf4; border: 1px solid #16a34a; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 0.85rem; color: #14532d; display: flex; flex-wrap: wrap; gap: 4px 12px; }
 
         /* Vocab Table */
-        #vocabTable {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 0.85rem;
-        }
-        #vocabTable thead th {
-            padding: 8px 6px;
-            text-align: left;
-            font-weight: 700;
-            color: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
+        #vocabTable { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+        #vocabTable thead th { padding: 8px 6px; text-align: left; font-weight: 700; color: #fff; position: sticky; top: 0; z-index: 5; font-size: 0.75rem; white-space: nowrap; }
         #vocabTable thead th:nth-child(1) { background: #1e293b; min-width: 32px; text-align: center; }
         #vocabTable thead th:nth-child(2) { background: #065f46; min-width: 80px; }
         #vocabTable thead th:nth-child(3) { background: #0d9488; min-width: 90px; }
@@ -212,12 +194,7 @@
         #vocabTable tbody tr:nth-child(even) { background: #f8fafc; }
         #vocabTable tbody tr:nth-child(odd) { background: #ffffff; }
         #vocabTable tbody tr:hover { background: #dbeafe; }
-        #vocabTable tbody td {
-            padding: 5px 4px;
-            border-bottom: 1px solid #e5e7eb;
-            vertical-align: middle;
-            font-size: 0.8rem;
-        }
+        #vocabTable tbody td { padding: 5px 4px; border-bottom: 1px solid #e5e7eb; vertical-align: middle; font-size: 0.8rem; }
         #vocabTable tbody td:nth-child(1) { text-align: center; color: #6b7280; font-size: 0.7rem; background: #f1f5f9; }
         #vocabTable tbody td:nth-child(2) { background: #fffbeb; }
         #vocabTable tbody td:nth-child(3) { background: #f0fdf4; font-family: 'Noto Naskh Arabic', serif; font-size: 1.1rem; direction: rtl; text-align: right; }
@@ -244,7 +221,6 @@
     </style>
 </head>
 <body>
-
 <div class="app-container" id="app">
 
     <!-- Side Menu -->
@@ -356,7 +332,7 @@
         <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="readingUstadhMessage">ฝึกอ่านภาษาอาหรับผ่านบทความครับ 📖</div></div>
         <div class="card-modern">
             <h2 class="font-bold text-gray-700 mb-2">📖 อ่านบทความ</h2>
-            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • อ่านจบได้ 1 ดาว ⭐</p>
+            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • ได้เพชรเมื่ออ่านครบทุกบทความในด่าน 💎</p>
             <div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
         </div>
         <div id="readingDanContainer" class="card-modern hidden">
@@ -516,7 +492,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.7 — ครบทุกฟีเจอร์ (แก้ไขการแสดง played) -->
+    <!-- JAVASCRIPT v5.7 — Real-time played status update -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -530,11 +506,10 @@
             TIME_LIMIT: 20,
             PAGE_URL: 'https://www.facebook.com/profile.php?id=100064382094369',
             HINT_COST: 1,
-            UNLOCK_LEVEL_COST: 120,
+            UNLOCK_LEVEL_COST: 100,
             DIAMONDS_TO_STARS_RATE: 12,
             STREAK_STARS: 3,
-            DIAMOND_THRESHOLD: 100,
-            FREE_LEVELS: 3,
+            DIAMOND_THRESHOLD: 90,
         };
 
         // ==============================================================
@@ -568,9 +543,8 @@
         let currentFeature = null;
         let consecutiveWrong = 0;
         let gameStarted = false;
-        let isPerfectRun = false;
 
-        // Progress from backend
+        // Progress from backend (will be updated in memory for real-time)
         let vocabProgress = {};
         let sentenceProgress = {};
         let readingProgress = {};
@@ -584,7 +558,6 @@
         let sentenceQuestions = [], sentenceIndex = 0, sentenceTotalQuestions = 0;
         let selectedWords = [], placedWords = [], sentenceGameCompleted = false;
         let sentenceConsecutiveCorrect = 0;
-        let sentencePerfect = false;
 
         // Reading game
         let readingLevels = [], readingDans = [], currentReadingLevel = 0, currentReadingDan = 0;
@@ -605,17 +578,129 @@
         //  SOUND & VIBRATION
         // ==============================================================
         let audioCtx = null;
+
         function getAudioContext() {
             if (!audioCtx) { try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; } }
             return audioCtx;
         }
-        function playKeyboardSound() { /* ... */ }
-        function playPageFlipSound() { /* ... */ }
-        function playCorrectSound() { /* ... */ }
-        function playWrongSound() { /* ... */ }
-        function playStarSound() { /* ... */ }
-        function playDiamondSound() { /* ... */ }
+
+        function playKeyboardSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext(); if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 600;
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.06);
+            } catch(e) {}
+        }
+
+        function playPageFlipSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext(); if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            } catch(e) {}
+        }
+
+        function playCorrectSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext(); if (!ctx) return;
+                [523, 659, 784, 1047].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.15);
+                    }, i * 80);
+                });
+            } catch(e) {}
+        }
+
+        function playWrongSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext(); if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.value = 300;
+                gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.2);
+            } catch(e) {}
+        }
+
+        function playStarSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext(); if (!ctx) return;
+                [0, 100, 200].forEach((delay, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = 660 + i * 110;
+                        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.1);
+                    }, delay);
+                });
+            } catch(e) {}
+        }
+
+        function playDiamondSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext(); if (!ctx) return;
+                [880, 1108, 1318].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.12);
+                    }, i * 100);
+                });
+            } catch(e) {}
+        }
+
         function vibrate(pattern) { if (!vibrationEnabled) return; try { if (navigator.vibrate) navigator.vibrate(pattern); } catch(e) {} }
+
         function updateSettings() {
             soundEnabled = $('soundToggle').checked;
             vibrationEnabled = $('vibrationToggle').checked;
@@ -623,6 +708,7 @@
             localStorage.setItem('vibrationEnabled', vibrationEnabled);
             $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
         }
+
         function toggleSettings() { $('settingsPopup').classList.toggle('show'); if ($('settingsPopup').classList.contains('show')) { $('soundToggle').checked = soundEnabled; $('vibrationToggle').checked = vibrationEnabled; } }
 
         // ==============================================================
@@ -633,6 +719,7 @@
             const msg = `☕ สนับสนุน ${amount} บาท รับ ${amount === '100' ? '2,500' : '10,000'} ดาว\n\nคลิก "ตกลง" เพื่อไปพูดคุยกับแอดมิน`;
             if (confirm(msg)) { window.open('https://m.me/548132778932419', '_blank'); alert('✅ ขอบคุณที่สนับสนุน!\nกรุณาพูดคุยกับแอดมินเพื่อยืนยันและรับดาวครับ 🙏'); }
         }
+
         function toggleExchange() {
             $('exchangePopup').classList.toggle('show');
             if ($('exchangePopup').classList.contains('show')) {
@@ -643,6 +730,7 @@
                 $('exchangeStatus').textContent = canExchange ? '✅ พร้อมแลก' : `❌ ต้องมี ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชรขึ้นไป`;
             }
         }
+
         async function confirmExchange() {
             if (diamonds < CONFIG.DIAMONDS_TO_STARS_RATE) { alert(`💎 ไม่พอ! ต้องใช้ ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชร (มี ${diamonds} เพชร)`); return; }
             if (!confirm(`แลก 12 เพชร เป็น 100 ดาว?`)) return;
@@ -663,17 +751,13 @@
         }
 
         // ==============================================================
-        //  UNLOCK LEVEL
+        //  UNLOCK LEVEL / DAN WITH STARS
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
-            if (level <= CONFIG.FREE_LEVELS) {
-                alert(`Level ${level} เป็น Level ฟรี เปิดให้เล่นอยู่แล้ว!`);
-                return;
-            }
             const cost = CONFIG.UNLOCK_LEVEL_COST;
             if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
-            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level} ทุกด่าน?`)) { return; }
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level}? (เฉพาะด่านที่ 1 เท่านั้น)`)) { return; }
             try {
                 const res = await callAPI('unlock-level', 'POST', { email: userEmail, game: game, level: level });
                 if (res.success) {
@@ -681,7 +765,7 @@
                     updateStarDisplay();
                     playStarSound();
                     vibrate([50, 80, 50]);
-                    alert(`✅ ปลดล็อก Level ${level} ทุกด่านแล้ว!`);
+                    alert(`✅ ปลดล็อก Level ${level} (ด่านที่ 1) แล้ว!`);
                     await loadProgressFromBackend();
                     if (game === 'vocab') renderDans();
                     else if (game === 'sentence') { await loadSentenceLevels(); renderSentenceLevels(); renderSentenceDans(); }
@@ -690,10 +774,32 @@
             } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
         }
 
-        // ปิดฟังก์ชัน unlockDanWithStars
         async function unlockDanWithStars(game, level, dan) {
-            alert('❌ ไม่สามารถเปิดด่านด้วยดาวได้ กรุณาเล่นด่านก่อนหน้าให้ผ่าน');
-            return;
+            if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
+            const cost = calculateUnlockCost(level, dan);
+            if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
+            if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อกด่าน ${dan}? (ยังต้องเล่นจริงถึงจะผ่าน)`)) { return; }
+            try {
+                const res = await callAPI('unlock-dan', 'POST', { email: userEmail, game: game, level: level, dan: dan });
+                if (res.success) {
+                    stars = res.newStars;
+                    updateStarDisplay();
+                    playStarSound();
+                    vibrate([50, 80, 50]);
+                    alert(`✅ ปลดล็อกด่าน ${dan} เพื่อเข้าเล่นแล้ว!`);
+                    await loadProgressFromBackend();
+                    if (game === 'vocab') renderDans();
+                    else if (game === 'sentence') { await loadSentenceLevels(); renderSentenceLevels(); renderSentenceDans(); }
+                    else if (game === 'reading') { await loadReadingLevels(); renderReadingLevels(); renderReadingDans(); }
+                } else { alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้')); }
+            } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
+        }
+
+        function calculateUnlockCost(level, dan) {
+            const baseCost = 5;
+            const levelCost = (level - 1) * 3;
+            const danCost = dan;
+            return Math.min(baseCost + levelCost + danCost, 30);
         }
 
         // ==============================================================
@@ -706,6 +812,7 @@
             if (!isLoggedIn || !userEmail) return;
             try { const res = await callAPI('user/stars', 'GET', null, { email: userEmail }); stars = res.stars || 0; updateStarDisplay(); } catch(e) {}
         }
+
         async function loadDiamondsFromBackend() {
             if (!isLoggedIn || !userEmail) return;
             try { const res = await callAPI('user/diamonds', 'GET', null, { email: userEmail }); diamonds = res.diamonds || 0; updateDiamondDisplay(); } catch(e) {}
@@ -822,7 +929,7 @@
                 allQuestions = q.data || [];
                 allVocab = v.data || [];
                 levelsData = l.data || [];
-                userProgress = p.data || {};
+                // userProgress ยังไม่ใช้
                 availableDans = [];
                 levelsData.forEach(lv => {
                     lv.dans.forEach(d => {
@@ -865,6 +972,30 @@
         }
 
         // ==============================================================
+        //  UPDATE PLAYED STATUS IN MEMORY (Realtime)
+        // ==============================================================
+        function markVocabDanPlayed(level, dan, percent) {
+            const key = `${level}_${dan}`;
+            if (!vocabProgress[key]) vocabProgress[key] = {};
+            vocabProgress[key].percent = Math.max(vocabProgress[key].percent || 0, percent);
+            vocabProgress[key].played = true;
+        }
+
+        function markSentenceDanPlayed(level, dan, done) {
+            const key = `${level}_${dan}`;
+            if (!sentenceProgress[key]) sentenceProgress[key] = {};
+            if (done) sentenceProgress[key].done = true;
+            sentenceProgress[key].played = true;
+        }
+
+        function markReadingDanPlayed(level, dan, done) {
+            const key = `${level}_${dan}`;
+            if (!readingProgress[key]) readingProgress[key] = {};
+            if (done) readingProgress[key].done = true;
+            readingProgress[key].played = true;
+        }
+
+        // ==============================================================
         //  GAME 1: VOCABULARY
         // ==============================================================
         function renderDans() {
@@ -878,8 +1009,7 @@
 
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                const isFree = parseInt(level) <= CONFIG.FREE_LEVELS;
-                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || isFree;
+                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || level == 1;
                 const allPassed = levelData.every(d => {
                     const key = `${level}_${d.dan}`;
                     return vocabProgress[key] && vocabProgress[key].percent >= CONFIG.PASSING_SCORE;
@@ -894,7 +1024,7 @@
                 header.innerHTML = `
                     <span>🏰 Level ${level}</span>
                     <span class="text-xs font-normal text-gray-400">${levelData.filter(d => { const k = `${level}_${d.dan}`; return vocabProgress[k] && vocabProgress[k].percent >= CONFIG.PASSING_SCORE; }).length}/${levelData.length}</span>
-                    ${!isLevelUnlocked ? `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก Level (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : (isFree ? '<span class="text-xs text-green-600">🆓 ฟรี</span>' : '')}
+                    ${!isLevelUnlocked ? `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก Level (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : ''}
                     ${isLevelCompleted ? '<span class="text-xs text-green-600 font-medium">✅ ผ่านหมด</span>' : ''}
                 `;
                 levelDiv.appendChild(header);
@@ -914,19 +1044,19 @@
                     const percent = progress ? progress.percent : 0;
                     const played = progress ? progress.played : false;
                     const isPassed = percent >= CONFIG.PASSING_SCORE;
-                    // 🔥 ใช้ percent > 0 เพื่อตรวจจับว่าเล่นแล้ว (แม้ยังไม่ผ่าน)
-                    const isPlayed = played || percent > 0 || isPassed;
-                    const isFirstDan = d.dan === 1;
-                    const prevDanKey = `${level}_${d.dan-1}`;
-                    const prevPassed = vocabProgress[prevDanKey] && vocabProgress[prevDanKey].percent >= CONFIG.PASSING_SCORE;
-                    const unlocked = isLevelUnlocked || (isFirstDan) || prevPassed;
+                    const isPlayed = played || isPassed;
+                    const unlocked = isLevelUnlocked || (level == 1 && d.dan == 1) || (vocabProgress[`${level}_${d.dan-1}`] && vocabProgress[`${level}_${d.dan-1}`].percent >= CONFIG.PASSING_SCORE);
                     const isSelected = currentDan === d.dan && currentLevel === d.level;
+                    const cost = calculateUnlockCost(level, d.dan);
+                    const canUnlock = !isPassed && !unlocked && stars >= cost;
 
                     const item = document.createElement('div');
-                    item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
+                    item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
                     let statusHtml = `<span class="status ${isPassed ? 'done' : (isPlayed ? 'played' : (unlocked ? 'pending' : 'locked-status'))}">${isPassed ? '✅ เล่นแล้ว' : (isPlayed ? '📖 เล่นแล้ว' : (unlocked ? 'พร้อมฝึก' : '🔒 ล็อก'))}</span>`;
-                    if (!unlocked) {
-                        statusHtml = `<span class="status locked-status">🔒 ต้องผ่านด่านก่อน</span>`;
+                    if (!isPassed && !unlocked && canUnlock) {
+                        statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('vocab', ${level}, ${d.dan})">🔓 ใช้ ${cost}⭐</button>`;
+                    } else if (!isPassed && !unlocked && !canUnlock) {
+                        statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
                     }
                     item.innerHTML = `
                         <span class="icon">${isPassed ? '✅' : (unlocked ? '📘' : '🔒')}</span>
@@ -991,7 +1121,6 @@
             combo = 1;
             consecutiveWrong = 0;
             streak = 0;
-            isPerfectRun = true;
             const res = await callAPI('questions', 'GET', null, { dan: dan });
             const questions = res.data || [];
             if (!questions.length) { alert('ไม่มีข้อสอบในด่านนี้'); return; }
@@ -1003,16 +1132,6 @@
             mistakes = [];
             gameEnded = false;
             renderOverlayGame();
-            // บันทึก played = TRUE ทันที
-            callAPI('scores', 'POST', {
-                email: userEmail,
-                displayName: userName,
-                level: currentDan,
-                score: 0,
-                time: 0,
-                streak: 0,
-                isPerfect: false
-            }).catch(console.error);
         }
 
         function renderOverlayGame() {
@@ -1061,14 +1180,22 @@
             $('skipBtn').onclick = () => useSkip();
             $('playAgainBtn').onclick = () => loadDan(currentDan);
             $('nextDanBtn').onclick = () => {
+                // Find next dan/level
                 const next = availableDans.find(d => d.dan === currentDan + 1 && d.level === currentLevel);
-                if (next) { currentDan = next.dan;
-                    loadDan(currentDan); } else {
+                if (next) {
+                    // Mark current as played before moving
+                    markVocabDanPlayed(currentLevel, currentDan, Math.round((score / (currentRound.length * 10)) * 100) || 0);
+                    renderDans();
+                    loadDan(next.dan);
+                } else {
                     const nextLevel = levelsData.find(l => l.level === currentLevel + 1);
-                    if (nextLevel && nextLevel.dans.length) { currentDan = nextLevel.dans[0];
+                    if (nextLevel && nextLevel.dans.length) {
+                        markVocabDanPlayed(currentLevel, currentDan, Math.round((score / (currentRound.length * 10)) * 100) || 0);
+                        renderDans();
+                        currentDan = nextLevel.dans[0];
                         currentLevel = nextLevel.level;
-                        loadDan(currentDan); } else { alert('🎉 คุณผ่านทุกด่านแล้ว!');
-                        closeGameOverlay(); }
+                        loadDan(currentDan);
+                    } else { alert('🎉 คุณผ่านทุกด่านแล้ว!'); closeGameOverlay(); }
                 }
             };
         }
@@ -1127,7 +1254,6 @@
                             setTimeout(() => endGame(), 1000); return; } }
                     highlightCorrect(q);
                     addMistake(q);
-                    isPerfectRun = false;
                     setTimeout(() => { if (!gameEnded) { currentIndex++;
                             renderQuestion(); } }, 1500);
                 }
@@ -1166,7 +1292,6 @@
                 streak = 0;
                 combo = 1;
                 consecutiveWrong++;
-                isPerfectRun = false;
                 $('streakDisplay').textContent = `🔥 0`;
                 if (currentFeature && currentFeature.lives > 0) { lives--;
                     updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
@@ -1236,6 +1361,7 @@
             clearInterval(timerInterval);
             $('questionArea').classList.add('hidden');
             $('resultArea').classList.remove('hidden');
+
             const total = currentRound.length;
             const maxScore = total * (currentFeature?.scorePerCorrect || 10);
             const percent = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
@@ -1243,9 +1369,17 @@
             $('finalScore').textContent = score;
             $('finalDan').textContent = `ด่าน ${currentDan} (Level ${currentLevel})`;
             const passed = percent >= passingScore;
+
+            // --- Mark as played in memory (realtime) ---
+            markVocabDanPlayed(currentLevel, currentDan, percent);
+
+            // Refresh UI immediately
+            renderDans();
+
             $('finalMessage').textContent = passed ? `🎉 ผ่าน! (${percent}%)` :
                 `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}%`;
-            const perfect = isPerfectRun && mistakes.length === 0 && percent === 100;
+
+            // Save to backend (async)
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
                     email: userEmail,
@@ -1253,17 +1387,14 @@
                     level: currentDan,
                     score: score,
                     time: Math.round((currentFeature?.timeLimit || CONFIG.TIME_LIMIT) * currentRound.length - timeLeft || 0),
-                    streak: streak,
-                    isPerfect: perfect
+                    streak: streak
                 }).then(() => {
                     loadStarsFromBackend();
                     loadDiamondsFromBackend();
-                    loadProgressFromBackend();
-                    renderDans();
-                    renderLeaderboard();
-                    updateShareCard();
+                    // We already updated memory, but still sync backend
                 }).catch(console.error);
             }
+
             const nextBtn = $('nextDanBtn');
             if (passed) {
                 const next = availableDans.find(d => d.dan === currentDan + 1 && d.level === currentLevel);
@@ -1272,19 +1403,16 @@
                     nextBtn.textContent = next ? '➡️ ด่านถัดไป' : '➡️ Level ถัดไป';
                 } else { nextBtn.classList.add('hidden'); }
             } else { nextBtn.classList.add('hidden'); }
+
             const list = $('mistakeList');
             list.innerHTML = '';
             if (mistakes.length === 0) { list.innerHTML = '<li class="text-green-600">🎉 ไม่มีคำที่ผิด!</li>'; } else {
                 mistakes.forEach((m, idx) => {
                     const li = document.createElement('li');
                     li.className = 'flex justify-between items-center py-1 border-b';
-                    li.innerHTML =
-                        `<span class="flex-1">${m.thai} = ${m.arabic}</span><button onclick="reportMistake(${idx})" class="text-xs text-red-500 hover:underline">🚨 รายงาน</button>`;
+                    li.innerHTML = `<span class="flex-1">${m.thai} = ${m.arabic}</span><button onclick="reportMistake(${idx})" class="text-xs text-red-500 hover:underline">🚨 รายงาน</button>`;
                     list.appendChild(li);
                 });
-            }
-            if (perfect) {
-                alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
             }
         }
 
@@ -1382,7 +1510,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (ปรับปรุงการแสดง played)
+        //  GAME 2: SENTENCE (Real-time played)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1400,8 +1528,7 @@
             sentenceLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
-                const isFree = lv.level <= CONFIG.FREE_LEVELS;
-                const isLevelUnlocked = sentenceProgress[`${lv.level}_1`] !== undefined || isFree;
+                const isLevelUnlocked = sentenceProgress[`${lv.level}_1`] !== undefined || lv.level == 1;
                 const allDone = lv.dans.every(d => {
                     const key = `${lv.level}_${d}`;
                     return sentenceProgress[key] && sentenceProgress[key].done === true;
@@ -1438,30 +1565,28 @@
         function renderSentenceDans() {
             const container = $('sentenceDanList');
             container.innerHTML = '';
-            const isFree = currentSentenceLevel <= CONFIG.FREE_LEVELS;
-            const isLevelUnlocked = sentenceProgress[`${currentSentenceLevel}_1`] !== undefined || isFree;
+            const isLevelUnlocked = sentenceProgress[`${currentSentenceLevel}_1`] !== undefined || currentSentenceLevel == 1;
             sentenceDans.forEach(dan => {
                 const key = `${currentSentenceLevel}_${dan}`;
                 const progress = sentenceProgress[key];
                 const done = progress ? progress.done : false;
                 const played = progress ? progress.played : false;
-                // 🔥 ใช้ played หรือ done
-                const isPlayed = played || done;
-                const isFirstDan = dan === sentenceDans[0];
-                const prevDanKey = `${currentSentenceLevel}_${dan-1}`;
-                const prevPassed = sentenceProgress[prevDanKey] && sentenceProgress[prevDanKey].done === true;
-                const isUnlocked = isLevelUnlocked || isFirstDan || prevPassed;
+                const isUnlocked = isLevelUnlocked || dan === sentenceDans[0] || (sentenceProgress[`${currentSentenceLevel}_${dan-1}`] && sentenceProgress[`${currentSentenceLevel}_${dan-1}`].done === true);
                 const isSelected = currentSentenceDan === dan;
+                const cost = calculateUnlockCost(currentSentenceLevel, dan);
+                const canUnlock = !done && !isUnlocked && stars >= cost;
 
                 const item = document.createElement('div');
-                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
-                let statusHtml = `<span class="status ${done ? 'done' : (isPlayed ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ เล่นแล้ว' : (isPlayed ? '📖 เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก'))}</span>`;
-                if (!isUnlocked) {
-                    statusHtml = `<span class="status locked-status">🔒 ต้องผ่านด่านก่อน</span>`;
+                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                let statusHtml = `<span class="status ${done ? 'done' : (played ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ เล่นแล้ว' : (played ? '📖 เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก'))}</span>`;
+                if (!done && !isUnlocked && canUnlock) {
+                    statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('sentence', ${currentSentenceLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
+                } else if (!done && !isUnlocked && !canUnlock) {
+                    statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
                 }
                 item.innerHTML = `
                     <span class="icon">${done ? '✅' : (isUnlocked ? '📘' : '🔒')}</span>
-                    <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'ผ่านแล้ว' : (isPlayed ? 'เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : 'ล็อก'))}</div></div>
+                    <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'ผ่านแล้ว' : (played ? 'เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : 'ล็อก'))}</div></div>
                     ${statusHtml}
                 `;
                 if (isUnlocked) {
@@ -1509,7 +1634,6 @@
             currentSentenceLevel = level;
             currentSentenceDan = dan;
             sentenceConsecutiveCorrect = 0;
-            sentencePerfect = true;
             const res = await callAPI('sentences', 'GET', null, { level: level, dan: dan });
             sentenceQuestions = res.data || [];
             if (!sentenceQuestions.length) { alert('ไม่มีประโยคในด่านนี้'); return; }
@@ -1517,14 +1641,17 @@
             sentenceTotalQuestions = sentenceQuestions.length;
             sentenceGameCompleted = false;
             renderSentenceOverlay();
+            // Mark as played immediately
+            markSentenceDanPlayed(level, dan, false);
+            renderSentenceDans();
+            // Async save to backend
             callAPI('progress', 'POST', {
                 email: userEmail,
                 game: 'sentence',
                 level: currentSentenceLevel,
                 dan: currentSentenceDan,
                 passed: false,
-                played: true,
-                isPerfect: false
+                played: true
             }).catch(console.error);
         }
 
@@ -1652,7 +1779,6 @@
                 playWrongSound();
                 vibrate([50, 100, 50]);
                 sentenceConsecutiveCorrect = 0;
-                sentencePerfect = false;
                 $('sentenceStreakDisplay').textContent = `🔥 0 ติด`;
                 result.innerHTML = `<p class="text-red-600 font-bold">❌ ยังไม่ถูกต้อง ลองใหม่ หรือใช้เฉลย</p>`;
                 $('sentenceRevealBtn').classList.remove('hidden');
@@ -1701,7 +1827,10 @@
             $('sentenceQuestionArea').classList.add('hidden');
             $('sentenceGameOver').classList.remove('hidden');
             $('sentenceFinalStreak').textContent = sentenceConsecutiveCorrect;
-            const perfect = sentencePerfect && sentenceConsecutiveCorrect === sentenceTotalQuestions;
+            // Mark as played and done
+            markSentenceDanPlayed(currentSentenceLevel, currentSentenceDan, true);
+            renderSentenceDans();
+            // Save to backend
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
                     email: userEmail,
@@ -1709,8 +1838,7 @@
                     level: currentSentenceLevel,
                     dan: currentSentenceDan,
                     passed: true,
-                    played: true,
-                    isPerfect: perfect
+                    played: true
                 }).then(() => {
                     loadStarsFromBackend();
                     loadDiamondsFromBackend();
@@ -1719,28 +1847,34 @@
                     renderSentenceLevels();
                 }).catch(console.error);
             }
-            if (perfect) {
-                alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
-            }
             const nextBtn = $('sentenceNextDanBtn');
             const next = sentenceDans.find(d => d === currentSentenceDan + 1);
             if (next || (sentenceLevels.find(l => l.level === currentSentenceLevel + 1)?.dans?.length)) {
                 nextBtn.classList.remove('hidden');
                 nextBtn.textContent = next ? '➡️ ด่านถัดไป' : '➡️ Level ถัดไป';
                 nextBtn.onclick = () => {
-                    if (next) { currentSentenceDan = next;
-                        loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else {
+                    if (next) {
+                        // Mark current as done before moving
+                        markSentenceDanPlayed(currentSentenceLevel, currentSentenceDan, true);
+                        renderSentenceDans();
+                        currentSentenceDan = next;
+                        loadSentenceDan(currentSentenceLevel, currentSentenceDan);
+                    } else {
                         const nextLevel = sentenceLevels.find(l => l.level === currentSentenceLevel + 1);
-                        if (nextLevel && nextLevel.dans.length) { currentSentenceLevel = nextLevel.level;
+                        if (nextLevel && nextLevel.dans.length) {
+                            markSentenceDanPlayed(currentSentenceLevel, currentSentenceDan, true);
+                            renderSentenceDans();
+                            currentSentenceLevel = nextLevel.level;
                             currentSentenceDan = nextLevel.dans[0];
-                            loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else alert('🎉 คุณผ่านทุกด่านแล้ว!');
+                            loadSentenceDan(currentSentenceLevel, currentSentenceDan);
+                        } else { alert('🎉 คุณผ่านทุกด่านแล้ว!'); closeGameOverlay(); }
                     }
                 };
             } else { nextBtn.classList.add('hidden'); }
         }
 
         // ==============================================================
-        //  GAME 3: READING (ปรับปรุงการแสดง played)
+        //  GAME 3: READING (Real-time played)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1758,8 +1892,7 @@
             readingLevels.forEach(lv => {
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn mr-1 text-sm';
-                const isFree = lv.level <= CONFIG.FREE_LEVELS;
-                const isLevelUnlocked = readingProgress[`${lv.level}_1`] !== undefined || isFree;
+                const isLevelUnlocked = readingProgress[`${lv.level}_1`] !== undefined || lv.level == 1;
                 const allDone = lv.dans.every(d => {
                     const key = `${lv.level}_${d}`;
                     return readingProgress[key] && readingProgress[key].done === true;
@@ -1811,32 +1944,30 @@
         function renderReadingDans() {
             const container = $('readingDanList');
             container.innerHTML = '';
-            const isFree = currentReadingLevel <= CONFIG.FREE_LEVELS;
-            const isLevelUnlocked = readingProgress[`${currentReadingLevel}_1`] !== undefined || isFree;
+            const isLevelUnlocked = readingProgress[`${currentReadingLevel}_1`] !== undefined || currentReadingLevel == 1;
             readingDans.forEach(dan => {
                 const key = `${currentReadingLevel}_${dan}`;
                 const progress = readingProgress[key];
                 const done = progress ? progress.done : false;
                 const played = progress ? progress.played : false;
-                // 🔥 ใช้ played หรือ done
-                const isPlayed = played || done;
-                const isFirstDan = dan === readingDans[0];
-                const prevDanKey = `${currentReadingLevel}_${dan-1}`;
-                const prevPassed = readingProgress[prevDanKey] && readingProgress[prevDanKey].done === true;
-                const isUnlocked = isLevelUnlocked || isFirstDan || prevPassed;
+                const isUnlocked = isLevelUnlocked || dan === readingDans[0] || (readingProgress[`${currentReadingLevel}_${dan-1}`] && readingProgress[`${currentReadingLevel}_${dan-1}`].done === true);
+                const cost = calculateUnlockCost(currentReadingLevel, dan);
+                const canUnlock = !done && !isUnlocked && stars >= cost;
                 const isSelected = currentReadingDan === dan;
 
                 const item = document.createElement('div');
-                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
-                let statusHtml = `<span class="status ${done ? 'done' : (isPlayed ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ อ่านแล้ว' : (isPlayed ? '📖 อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : '🔒 ล็อก'))}</span>`;
-                if (!isUnlocked) {
-                    statusHtml = `<span class="status locked-status">🔒 ต้องอ่านด่านก่อน</span>`;
+                item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked && !canUnlock ? ' locked' : '') + (isSelected ? ' selected' : '');
+                let statusHtml = `<span class="status ${done ? 'done' : (played ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ อ่านแล้ว' : (played ? '📖 อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : '🔒 ล็อก'))}</span>`;
+                if (!done && !isUnlocked && canUnlock) {
+                    statusHtml = `<button class="btn-unlock" onclick="unlockDanWithStars('reading', ${currentReadingLevel}, ${dan})">🔓 ใช้ ${cost}⭐</button>`;
+                } else if (!done && !isUnlocked && !canUnlock) {
+                    statusHtml = `<span class="status locked-status">🔒 ${cost}⭐</span>`;
                 }
                 item.innerHTML = `
                     <span class="icon">${done ? '✅' : (isUnlocked ? '📖' : '🔒')}</span>
                     <div class="info">
                         <div class="name">ด่าน ${dan}</div>
-                        <div class="desc">${done ? 'อ่านแล้ว' : (isPlayed ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : 'ล็อก'))}</div>
+                        <div class="desc">${done ? 'อ่านแล้ว' : (played ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : 'ล็อก'))}</div>
                         ${articleTitlesMap[dan] && articleTitlesMap[dan].length > 0 ? `<div class="sub-desc">📄 ${articleTitlesMap[dan].slice(0, 2).join(', ')}${articleTitlesMap[dan].length > 2 ? '…' : ''}</div>` : ''}
                     </div>
                     ${statusHtml}
@@ -1891,6 +2022,9 @@
             readingIndex = 0;
             readingTotalArticles = readingArticles.length;
             renderReadingOverlay();
+            // Mark as played immediately
+            markReadingDanPlayed(level, dan, false);
+            renderReadingDans();
             callAPI('progress', 'POST', {
                 email: userEmail,
                 game: 'reading',
@@ -2086,6 +2220,8 @@
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
+            markReadingDanPlayed(currentReadingLevel, currentReadingDan, true);
+            renderReadingDans();
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
                     email: userEmail,
@@ -2108,14 +2244,20 @@
                 nextBtn.classList.remove('hidden');
                 nextBtn.textContent = next ? '➡️ ด่านถัดไป' : '➡️ Level ถัดไป';
                 nextBtn.onclick = () => {
-                    if (confirm('คุณอ่านจบแล้ว! ไปด่านถัดไปเลยไหม?')) {
-                        if (next) { currentReadingDan = next;
-                            loadReadingDan(currentReadingLevel, currentReadingDan); } else {
-                            const nextLevel = readingLevels.find(l => l.level === currentReadingLevel + 1);
-                            if (nextLevel && nextLevel.dans.length) { currentReadingLevel = nextLevel.level;
-                                currentReadingDan = nextLevel.dans[0];
-                                loadReadingDan(currentReadingLevel, currentReadingDan); } else alert('🎉 คุณผ่านทุกด่านแล้ว!');
-                        }
+                    if (next) {
+                        markReadingDanPlayed(currentReadingLevel, currentReadingDan, true);
+                        renderReadingDans();
+                        currentReadingDan = next;
+                        loadReadingDan(currentReadingLevel, currentReadingDan);
+                    } else {
+                        const nextLevel = readingLevels.find(l => l.level === currentReadingLevel + 1);
+                        if (nextLevel && nextLevel.dans.length) {
+                            markReadingDanPlayed(currentReadingLevel, currentReadingDan, true);
+                            renderReadingDans();
+                            currentReadingLevel = nextLevel.level;
+                            currentReadingDan = nextLevel.dans[0];
+                            loadReadingDan(currentReadingLevel, currentReadingDan);
+                        } else { alert('🎉 คุณผ่านทุกด่านแล้ว!'); closeGameOverlay(); }
                     }
                 };
             } else { nextBtn.classList.add('hidden'); }
@@ -2215,8 +2357,144 @@
         // ==============================================================
         //  EXPORT CSV & PDF
         // ==============================================================
-        function exportCSV() { /* ... */ }
-        function exportPDF() { /* ... */ }
+        function exportCSV() {
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                const rows = data.map((item, idx) => [
+                    idx + 1,
+                    item.คำศัพท์ไทย || '',
+                    item.คำศัพท์อาหรับ || '',
+                    item.รูปอดีต || '',
+                    item.รูปปัจจุบัน || '',
+                    item.รูปคำสั่ง || '',
+                    item.เอกพจน์ || '',
+                    item.พหูพจน์ || '',
+                    item.หมวดหมู่ || '',
+                    item.level || ''
+                ]);
+                let csv = '\uFEFF' + headers.join(',') + '\n';
+                rows.forEach(row => {
+                    const escaped = row.map(cell => {
+                        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                            return `"${cell.replace(/"/g, '""')}"`;
+                        }
+                        return cell;
+                    });
+                    csv += escaped.join(',') + '\n';
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch(e) { alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message);
+                console.error(e); }
+        }
+
+        function exportPDF() {
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+                const wrapper = document.createElement('div');
+                wrapper.style.padding = '20px';
+                wrapper.style.background = '#ffffff';
+                wrapper.style.fontFamily = 'Noto Sans Thai, Noto Naskh Arabic, sans-serif';
+                const title = document.createElement('h2');
+                title.textContent = `📚 คำศัพท์ ศึกษา ต่างถิ่น ${filterLevel > 0 ? `(Level ${filterLevel})` : '(ทั้งหมด)'}`;
+                title.style.textAlign = 'center';
+                title.style.color = '#065f46';
+                title.style.marginBottom = '16px';
+                title.style.fontSize = '20px';
+                wrapper.appendChild(title);
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                table.style.fontSize = '12px';
+                table.style.border = '1px solid #d1d5db';
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                headers.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    th.style.background = '#065f46';
+                    th.style.color = '#fff';
+                    th.style.padding = '6px 8px';
+                    th.style.border = '1px solid #065f46';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+                const tbody = document.createElement('tbody');
+                data.forEach((item, idx) => {
+                    const tr = document.createElement('tr');
+                    const cells = [
+                        idx + 1,
+                        item.คำศัพท์ไทย || '',
+                        item.คำศัพท์อาหรับ || '',
+                        item.รูปอดีต || '',
+                        item.รูปปัจจุบัน || '',
+                        item.รูปคำสั่ง || '',
+                        item.เอกพจน์ || '',
+                        item.พหูพจน์ || '',
+                        item.หมวดหมู่ || '',
+                        item.level || ''
+                    ];
+                    cells.forEach((cell, i) => {
+                        const td = document.createElement('td');
+                        td.textContent = cell;
+                        td.style.padding = '4px 6px';
+                        td.style.border = '1px solid #d1d5db';
+                        td.style.background = i % 2 === 0 ? '#f8fafc' : '#ffffff';
+                        if (i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
+                            td.style.fontFamily = 'Noto Naskh Arabic, serif';
+                            td.style.direction = 'rtl';
+                            td.style.fontSize = '1.1rem';
+                        }
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                wrapper.appendChild(table);
+                document.body.appendChild(wrapper);
+                html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false })
+                    .then(canvas => {
+                        document.body.removeChild(wrapper);
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('l', 'mm', 'a4');
+                        const imgWidth = 280;
+                        const pageHeight = 210;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        let heightLeft = imgHeight;
+                        let position = 0;
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                        while (heightLeft > 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+                        pdf.save(`คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.pdf`);
+                    }).catch(err => {
+                        document.body.removeChild(wrapper);
+                        alert('ไม่สามารถสร้าง PDF ได้: ' + err.message);
+                    });
+            } catch(e) { alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + e.message);
+                console.error(e); }
+        }
 
         // ==============================================================
         //  LEADERBOARD
@@ -2318,8 +2596,6 @@
             if (tabId === 'leaderboardTab') renderLeaderboard();
             if (tabId === 'vocabTab') renderVocab();
             if (tabId === 'shareTab') updateShareCard();
-            if (tabId === 'sentenceTab') { /* handled */ }
-            if (tabId === 'readingTab') { /* handled */ }
         }
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -2350,9 +2626,10 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.7 — แก้ไขการแสดง "เล่นแล้ว"');
-        console.log('✅ ใช้ percent > 0 เป็นตัวบ่งชี้ว่าเคยเล่นแล้ว');
-        console.log('✅ แสดง "📖 เล่นแล้ว" สำหรับด่านที่เล่นแล้วแต่ยังไม่ผ่าน');
+        console.log('🚀 ศึกษา ต่างถิ่น v5.7 — Real-time played status');
+        console.log('✅ บันทึกเล่นแล้วทันทีเมื่อเล่นด่าน');
+        console.log('✅ อัปเดต UI ทันทีโดยไม่ต้องรีเฟรช');
+        console.log('✅ ปุ่มถัดไปทำงานและอัปเดตสถานะ');
     </script>
 </body>
 </html>

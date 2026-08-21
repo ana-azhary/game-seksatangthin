@@ -507,7 +507,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v6.2 — แก้ไข unlock level + reading star notification -->
+    <!-- JAVASCRIPT v6.2 — แก้ไข unlockLevelWithStars และ readingEndGame -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -529,7 +529,7 @@
         };
 
         // ==============================================================
-        //  LOADING MESSAGES (Ready / Motivational)
+        //  LOADING MESSAGES
         // ==============================================================
         const LOADING_MESSAGES = [
             { emoji: '📚', text: 'กำลังเตรียมบทเรียน...', sub: 'อุสตะเฮงกำลังจัดเตรียมให้คุณ 🕌' },
@@ -549,7 +549,7 @@
         }
 
         // ==============================================================
-        //  🌀 LOADING OVERLAY FUNCTIONS
+        //  LOADING OVERLAY
         // ==============================================================
         function showLoading(message) {
             const overlay = document.getElementById('loadingOverlay');
@@ -771,7 +771,7 @@
         function toggleSettings() { $('settingsPopup').classList.toggle('show'); if ($('settingsPopup').classList.contains('show')) { $('soundToggle').checked = soundEnabled; $('vibrationToggle').checked = vibrationEnabled; } }
 
         // ==============================================================
-        //  SUPPORT / EXCHANGE (ATM)
+        //  SUPPORT / EXCHANGE
         // ==============================================================
         function toggleSupport() { $('supportPopup').classList.toggle('show'); if ($('supportPopup').classList.contains('show')) { $('supportStarDisplay').textContent = stars; } }
         function openSupport(amount) {
@@ -839,7 +839,7 @@
         }
 
         // ==============================================================
-        //  🔥 UNLOCK LEVEL (แก้ไขแล้ว: โหลดข้อมูลใหม่ + รีเฟรช UI ทันที)
+        //  🔥 UNLOCK LEVEL (แก้ไขแล้ว: โหลด progress และรีเฟรช UI ทันที)
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
@@ -858,14 +858,28 @@
                     playStarSound();
                     vibrate([50, 80, 50]);
                     alert(`✅ ปลดล็อก Level ${level} ทุกด่านแล้ว!`);
-                    // 🔥 โหลดข้อมูลทั้งหมดใหม่ เพื่อให้สถานะปลดล็อกอัปเดตทันที
-                    await loadAllData();
-                    // บังคับสลับแท็บเพื่อให้ UI รีเฟรช
-                    if (game === 'vocab') switchTab('gameTab');
-                    else if (game === 'sentence') switchTab('sentenceTab');
-                    else if (game === 'reading') switchTab('readingTab');
-                } else { alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้')); }
-            } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
+
+                    // 🔥 โหลด progress ใหม่จากเซิร์ฟเวอร์ทันที
+                    await loadProgressFromBackend();
+
+                    // รีเฟรช UI เฉพาะส่วนที่เกี่ยวข้อง
+                    if (game === 'vocab') {
+                        renderDans();
+                    } else if (game === 'sentence') {
+                        await loadSentenceLevels();
+                        renderSentenceLevels();
+                        renderSentenceDans();
+                    } else if (game === 'reading') {
+                        await loadReadingLevels();
+                        renderReadingLevels();
+                        renderReadingDans();
+                    }
+                } else {
+                    alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้'));
+                }
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+            }
         }
 
         // ==============================================================
@@ -1148,25 +1162,25 @@
         }
 
         // ==============================================================
-        //  🔥 CORE: loadDan() — พร้อม Loading Animation
+        //  GAME START
         // ==============================================================
         async function startGame() {
             playKeyboardSound();
             vibrate(30);
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            
-            showLoading({ 
-                emoji: '⚔️', 
-                text: 'เตรียมตัวหรือยัง?', 
-                sub: 'อุสตะเฮงกำลังเตรียมด่านให้คุณ... 🕌' 
+
+            showLoading({
+                emoji: '⚔️',
+                text: 'เตรียมตัวหรือยัง?',
+                sub: 'อุสตะเฮงกำลังเตรียมด่านให้คุณ... 🕌'
             });
 
             gameStarted = true;
             $('gameNotStarted').classList.add('hidden');
             $('startGameContainer').classList.add('hidden');
             showGameOverlay();
-            
+
             await loadDan(currentDan);
             hideLoading();
         }
@@ -1321,8 +1335,7 @@
                     clearInterval(timerInterval);
                     isAnswered = true;
                     setTeacherMessage('⏰ หมดเวลา!');
-                    if (currentFeature && currentFeature.lives > 0) { lives--;
-                        updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
+                    if (currentFeature && currentFeature.lives > 0) { lives--; updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
                             gameEnded = true;
                             setTimeout(() => endGame(), 1000); return; } }
                     highlightCorrect(q);
@@ -1335,7 +1348,6 @@
             updatePowerUI();
         }
 
-        // 🔥 selectAnswer — ติดต่อกัน 3 ครั้ง ได้ดาว
         function selectAnswer(selectedIdx, q) {
             if (isAnswered || gameEnded) return;
             isAnswered = true;
@@ -1357,15 +1369,15 @@
                 streak++;
                 combo = Math.min(combo + 0.5, 3);
                 consecutiveWrong = 0;
-                
-                // 🔥 NEW: ติดต่อกัน 3 ครั้ง → ได้ดาว
+
+                // ได้ดาวเมื่อตอบถูกติดต่อกัน 3 ครั้ง
                 if (streak % 3 === 0) {
                     stars += 1;
                     updateStarDisplay();
                     playStarSound();
                     setTeacherMessage(`⭐ สุดยอด! ติด ${streak} ข้อ ได้ 1 ดาว!`);
                 }
-                
+
                 if (currentFeature && currentFeature.streakBonus && streak >= 5) { score += 5;
                     setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
                 showExtraInfo(q);
@@ -1378,8 +1390,7 @@
                 consecutiveWrong++;
                 isPerfectRun = false;
                 $('streakDisplay').textContent = `🔥 0`;
-                if (currentFeature && currentFeature.lives > 0) { lives--;
-                    updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
+                if (currentFeature && currentFeature.lives > 0) { lives--; updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
                         gameEnded = true;
                         setTimeout(() => endGame(), 1500); return; } }
                 if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) {
@@ -1441,7 +1452,7 @@
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
-        // 🔥 endGame — ผ่าน 60% ถึง TRUE, Perfect ได้เพชรครั้งแรก
+        // ===== endGame =====
         function endGame() {
             gameEnded = true;
             clearInterval(timerInterval);
@@ -1603,7 +1614,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (พร้อม Loading)
+        //  GAME 2: SENTENCE (ไม่เปลี่ยนแปลง)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1720,13 +1731,13 @@
             vibrate(30);
             if (!currentSentenceDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            
+
             showLoading({
                 emoji: '🧩',
                 text: 'เตรียมตัวต่อประโยคกัน!',
                 sub: 'อุสตะเฮงกำลังเตรียมคำศัพท์ให้คุณ 🧠'
             });
-            
+
             $('sentenceStartContainer').classList.add('hidden');
             showGameOverlay();
             await loadSentenceDan(currentSentenceLevel, currentSentenceDan);
@@ -1858,7 +1869,6 @@
             vibrate(10);
             playKeyboardSound(); }
 
-        // 🔥 sentenceCheck — ติดต่อกัน 3 ครั้ง ได้ดาว
         function sentenceCheck() {
             if (sentenceGameCompleted) return;
             if (placedWords.length === 0) { alert('กรุณาเรียงคำให้ครบ'); return; }
@@ -1872,7 +1882,7 @@
                 vibrate([30, 50, 30]);
                 sentenceConsecutiveCorrect++;
                 const msg = getUstadhMessage();
-                
+
                 if (sentenceConsecutiveCorrect % 3 === 0) {
                     stars += 1;
                     updateStarDisplay();
@@ -1933,7 +1943,6 @@
             }
         }
 
-        // 🔥 sentenceEndGame — Perfect ได้เพชรครั้งแรก
         function sentenceEndGame() {
             sentenceGameCompleted = true;
             $('sentenceQuestionArea').classList.add('hidden');
@@ -1989,7 +1998,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (พร้อม Loading + Star ครั้งแรกเท่านั้น)
+        //  GAME 3: READING (แก้ไข: แจ้งดาวเฉพาะครั้งแรก)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -2125,13 +2134,13 @@
             vibrate(30);
             if (!currentReadingDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-            
+
             showLoading({
                 emoji: '📖',
                 text: 'กำลังเปิดบทความ...',
                 sub: 'อุสตะเฮงกำลังเตรียมบทอ่านให้คุณ 📜'
             });
-            
+
             $('readingStartContainer').classList.add('hidden');
             showGameOverlay();
             await loadReadingDan(currentReadingLevel, currentReadingDan);
@@ -2348,7 +2357,7 @@
         function resetReadingArticle() { readingIndex = 0;
             renderReadingArticle(); }
 
-        // 🔥 addStarToUser — เพิ่ม 1 ดาว (ใช้ใน readingEndGame)
+        // ===== addStarToUser (ใช้ใน readingEndGame) =====
         async function addStarToUser(email) {
             try {
                 const res = await callAPI('user/stars/add', 'POST', { email: email, amount: 1 });
@@ -2365,14 +2374,15 @@
             }
         }
 
-        // 🔥 readingEndGame — แสดงแจ้งเตือนเมื่อได้รับดาว + ตรวจสอบรอบสอง
+        // ===== readingEndGame (แก้ไข: แจ้งดาวครั้งแรกเท่านั้น) =====
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
 
+            // 🔥 ตรวจสอบว่าเคยอ่านด่านนี้แล้วหรือยัง (ได้ดาวไปแล้ว)
             const key = `${currentReadingLevel}_${currentReadingDan}`;
-            let alreadyDone = readingProgress[key] && readingProgress[key].done === true;
+            const alreadyDone = readingProgress[key] && readingProgress[key].done === true;
 
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
@@ -2384,16 +2394,16 @@
                     played: true
                 }).then(async () => {
                     await loadProgressFromBackend();
-                    alreadyDone = readingProgress[key] && readingProgress[key].done === true;
                     renderReadingDans();
                     renderReadingLevels();
-                    
+
+                    // 🔥 เพิ่มดาวเฉพาะครั้งแรกที่อ่านจบเท่านั้น
                     if (!alreadyDone) {
                         await addStarToUser(userEmail);
                         alert('⭐ อ่านจบแล้ว! คุณได้รับ 1 ดาว (ครั้งแรก)');
                         updateStarDisplay();
                     } else {
-                        alert('📖 อ่านจบแล้ว! (แต่คุณได้รับดาวไปแล้ว)');
+                        alert('📖 อ่านจบแล้ว! (คุณได้รับดาวไปแล้ว)');
                     }
                 }).catch(console.error);
             }
@@ -2780,9 +2790,9 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v6.2 — แก้ไข unlock level + reading star notification');
-        console.log('✅ ปลดล็อก Level: โหลดข้อมูลใหม่และรีเฟรช UI ทันที');
-        console.log('✅ อ่านบทความจบ: แจ้งเตือนเมื่อได้ดาว + ตรวจสอบรอบสอง');
+        console.log('🚀 ศึกษา ต่างถิ่น v6.2 — แก้ไข unlockLevelWithStars และ readingEndGame');
+        console.log('✅ ปลดล็อก Level แล้วโหลด progress ทันที');
+        console.log('✅ อ่านบทความจบได้ 1 ดาวเฉพาะครั้งแรก');
     </script>
 </body>
 </html>

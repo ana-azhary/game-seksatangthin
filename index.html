@@ -2039,21 +2039,22 @@
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
             if (isLoggedIn) {
-                callAPI('progress', 'POST', {
-                    email: userEmail,
-                    game: 'reading',
-                    level: currentReadingLevel,
-                    dan: currentReadingDan,
-                    passed: true,
-                    played: true
-                }).then(() => {
-                    loadStarsFromBackend();
-                    loadDiamondsFromBackend();
-                    loadProgressFromBackend();
-                    renderReadingDans();
-                    renderReadingLevels();
-                }).catch(console.error);
-            }
+function readingEndGame() {
+    if (isLoggedIn) {
+        callAPI('progress', 'POST', {
+            email: userEmail,
+            game: 'reading',
+            level: currentReadingLevel,
+            dan: currentReadingDan,
+            passed: true,
+            played: true
+        }).then(async () => {
+            await loadProgressFromBackend();
+            renderReadingDans();
+            renderReadingLevels();
+        }).catch(console.error);
+    }
+
             const nextBtn = $('readingNextDanBtn');
             const next = readingDans.find(d => d === currentReadingDan + 1);
             if (next || (readingLevels.find(l => l.level === currentReadingLevel + 1)?.dans?.length)) {

@@ -375,7 +375,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- EXCHANGE POPUP -->
+    <!-- EXCHANGE POPUP (ATM) -->
     <!-- ============================================================ -->
     <div id="exchangePopup" class="exchange-popup">
         <button class="close-btn" onclick="toggleExchange()">✕</button>
@@ -384,6 +384,10 @@
             <div class="flex justify-between text-sm"><span>💎 เพชรของคุณ: <span id="exchangeDiamondDisplay" class="font-bold text-purple-600">0</span></span><span>⭐ ดาวที่จะได้รับ: <span id="exchangeStarDisplay" class="font-bold text-amber-600">0</span></span></div>
             <button id="exchangeConfirmBtn" class="btn-primary w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl" onclick="confirmExchange()">💎 แลก 12 เพชร → 100 ดาว</button>
             <p id="exchangeStatus" class="text-xs text-center text-gray-400 mt-2"></p>
+        </div>
+        <div class="mt-3 text-xs text-gray-400 text-center">
+            <p>💡 ระบบจะตรวจสอบเพชรและเพิ่มดาวให้ทันที</p>
+            <p>⚠️ แลกแล้วไม่สามารถย้อนกลับได้</p>
         </div>
     </div>
 
@@ -426,7 +430,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v6.0 — ปรับปรุงตามข้อกำหนด 5 ข้อ -->
+    <!-- JAVASCRIPT v6.0 — ครบทุกฟีเจอร์ พร้อมระบบแลกเพชร -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -526,13 +530,123 @@
             if (!audioCtx) { try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; } }
             return audioCtx;
         }
-        function playKeyboardSound() { /* ... */ }
-        function playPageFlipSound() { /* ... */ }
-        function playCorrectSound() { /* ... */ }
-        function playWrongSound() { /* ... */ }
-        function playStarSound() { /* ... */ }
-        function playDiamondSound() { /* ... */ }
+        function playKeyboardSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = 600;
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.06);
+            } catch(e) {}
+        }
+        function playPageFlipSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            } catch(e) {}
+        }
+        function playCorrectSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                [523, 659, 784, 1047].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.15);
+                    }, i * 80);
+                });
+            } catch(e) {}
+        }
+        function playWrongSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.value = 300;
+                gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.2);
+            } catch(e) {}
+        }
+        function playStarSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                [0, 100, 200].forEach((delay, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = 660 + i * 110;
+                        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.1);
+                    }, delay);
+                });
+            } catch(e) {}
+        }
+        function playDiamondSound() {
+            if (!soundEnabled) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                [880, 1108, 1318].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.12);
+                    }, i * 100);
+                });
+            } catch(e) {}
+        }
         function vibrate(pattern) { if (!vibrationEnabled) return; try { if (navigator.vibrate) navigator.vibrate(pattern); } catch(e) {} }
+
         function updateSettings() {
             soundEnabled = $('soundToggle').checked;
             vibrationEnabled = $('vibrationToggle').checked;
@@ -543,26 +657,50 @@
         function toggleSettings() { $('settingsPopup').classList.toggle('show'); if ($('settingsPopup').classList.contains('show')) { $('soundToggle').checked = soundEnabled; $('vibrationToggle').checked = vibrationEnabled; } }
 
         // ==============================================================
-        //  SUPPORT / EXCHANGE
+        //  SUPPORT / EXCHANGE (ATM)
         // ==============================================================
         function toggleSupport() { $('supportPopup').classList.toggle('show'); if ($('supportPopup').classList.contains('show')) { $('supportStarDisplay').textContent = stars; } }
         function openSupport(amount) {
             const msg = `☕ สนับสนุน ${amount} บาท รับ ${amount === '100' ? '2,500' : '10,000'} ดาว\n\nคลิก "ตกลง" เพื่อไปพูดคุยกับแอดมิน`;
             if (confirm(msg)) { window.open('https://m.me/548132778932419', '_blank'); alert('✅ ขอบคุณที่สนับสนุน!\nกรุณาพูดคุยกับแอดมินเพื่อยืนยันและรับดาวครับ 🙏'); }
         }
+
+        // ==============================================================
+        //  🔥 EXCHANGE SYSTEM (ATM) - ระบบแลกเพชร
+        // ==============================================================
         function toggleExchange() {
-            $('exchangePopup').classList.toggle('show');
-            if ($('exchangePopup').classList.contains('show')) {
-                $('exchangeDiamondDisplay').textContent = diamonds;
-                const canExchange = diamonds >= CONFIG.DIAMONDS_TO_STARS_RATE;
-                $('exchangeStarDisplay').textContent = canExchange ? '100' : '0';
-                $('exchangeConfirmBtn').disabled = !canExchange;
-                $('exchangeStatus').textContent = canExchange ? '✅ พร้อมแลก' : `❌ ต้องมี ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชรขึ้นไป`;
+            const popup = $('exchangePopup');
+            popup.classList.toggle('show');
+            if (popup.classList.contains('show')) {
+                updateExchangeUI();
             }
         }
+
+        function updateExchangeUI() {
+            $('exchangeDiamondDisplay').textContent = diamonds;
+            const canExchange = diamonds >= CONFIG.DIAMONDS_TO_STARS_RATE;
+            const starsToGet = canExchange ? 100 : 0;
+            $('exchangeStarDisplay').textContent = starsToGet;
+            const btn = $('exchangeConfirmBtn');
+            btn.disabled = !canExchange;
+            $('exchangeStatus').textContent = canExchange ?
+                '✅ พร้อมแลก 12 เพชร → 100 ดาว' :
+                `❌ ต้องมี ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชรขึ้นไป (มี ${diamonds} เพชร)`;
+        }
+
         async function confirmExchange() {
-            if (diamonds < CONFIG.DIAMONDS_TO_STARS_RATE) { alert(`💎 ไม่พอ! ต้องใช้ ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชร (มี ${diamonds} เพชร)`); return; }
-            if (!confirm(`แลก 12 เพชร เป็น 100 ดาว?`)) return;
+            if (diamonds < CONFIG.DIAMONDS_TO_STARS_RATE) {
+                alert(`💎 ไม่พอ! ต้องใช้ ${CONFIG.DIAMONDS_TO_STARS_RATE} เพชร (มี ${diamonds} เพชร)`);
+                return;
+            }
+            if (!confirm(`💎 แลก 12 เพชร เป็น 100 ดาว?`)) return;
+
+            // แสดงสถานะกำลังดำเนินการ
+            const btn = $('exchangeConfirmBtn');
+            btn.textContent = '⏳ กำลังแลก...';
+            btn.disabled = true;
+            $('exchangeStatus').textContent = '⏳ กรุณารอสักครู่...';
+
             try {
                 const res = await callAPI('exchange-diamonds', 'POST', { email: userEmail });
                 if (res.success) {
@@ -570,13 +708,24 @@
                     stars = res.stars;
                     updateDiamondDisplay();
                     updateStarDisplay();
+                    playDiamondSound();
                     playStarSound();
-                    vibrate([50, 80, 50]);
-                    alert('✅ แลกสำเร็จ! ได้ 100 ดาว');
-                    toggleExchange();
+                    vibrate([50, 80, 50, 100, 50]);
+                    alert(`✅ แลกสำเร็จ!\n💎 เหลือ ${diamonds} เพชร\n⭐ ได้รับ 100 ดาว (รวม ${stars} ดาว)`);
+                    updateExchangeUI();
                     renderLeaderboard();
-                } else { alert('❌ ' + (res.error || 'แลกไม่สำเร็จ')); }
-            } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
+                    toggleExchange(); // ปิดป๊อปอัป
+                } else {
+                    alert('❌ ' + (res.error || 'แลกไม่สำเร็จ กรุณาลองใหม่'));
+                    updateExchangeUI();
+                }
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
+                updateExchangeUI();
+            } finally {
+                btn.textContent = '💎 แลก 12 เพชร → 100 ดาว';
+                btn.disabled = diamonds < CONFIG.DIAMONDS_TO_STARS_RATE;
+            }
         }
 
         // ==============================================================
@@ -610,8 +759,14 @@
         // ==============================================================
         //  STAR & DIAMOND DISPLAY
         // ==============================================================
-        function updateStarDisplay() { $('starDisplay').textContent = '⭐ ' + stars; $('supportStarDisplay').textContent = stars; }
-        function updateDiamondDisplay() { $('diamondDisplay').textContent = '💎 ' + diamonds; $('shareDiamondCount').textContent = diamonds; }
+        function updateStarDisplay() {
+            $('starDisplay').textContent = '⭐ ' + stars;
+            $('supportStarDisplay').textContent = stars;
+        }
+        function updateDiamondDisplay() {
+            $('diamondDisplay').textContent = '💎 ' + diamonds;
+            $('shareDiamondCount').textContent = diamonds;
+        }
 
         async function loadStarsFromBackend() {
             if (!isLoggedIn || !userEmail) return;
@@ -706,7 +861,7 @@
             let n = w;
             n = n.replace(/[ًٌٍَُِّْ]/g, '');
             n = n.replace(/^ال/g, '').replace(/^وَال/g, '').replace(/^فَال/g, '').replace(/^بِال/g, '');
-            n = n.replace(/^(و|ف|ب|ل|ك)/, '');
+            n = n.replace(/^(و|ف|ب|ล|ك)/, '');
             n = n.replace(/ي$/g, '').replace(/كَ$/g, '').replace(/كِ$/g, '').replace(/هُ$/g, '').replace(/هَا$/g, '');
             n = n.replace(/نَا$/g, '').replace(/كُمْ$/g, '').replace(/هُمْ$/g, '').replace(/هِنَّ$/g, '');
             n = n.replace(/^أ/g, '').replace(/^ن/g, '').replace(/^ت/g, '').replace(/^ي/g, '');
@@ -906,7 +1061,6 @@
             streak = 0;
             isPerfectRun = true;
 
-            // 🔥 โหลดข้อสอบก่อน
             const res = await callAPI('questions', 'GET', null, { dan: dan });
             const questions = res.data || [];
             if (!questions.length) { alert('ไม่มีข้อสอบในด่านนี้'); return; }
@@ -918,9 +1072,8 @@
             mistakes = [];
             gameEnded = false;
 
-            // 🔥 บันทึก played = TRUE ไป backend (รอให้เสร็จ)
             try {
-                const result = await callAPI('scores', 'POST', {
+                await callAPI('scores', 'POST', {
                     email: userEmail,
                     displayName: userName,
                     level: currentDan,
@@ -929,16 +1082,14 @@
                     streak: 0,
                     isPerfect: false
                 });
-                debugLog('SAVE', '✅ บันทึก played เรียบร้อย', result);
+                debugLog('SAVE', '✅ บันทึก played เรียบร้อย');
             } catch (e) {
                 debugLog('SAVE', '❌ บันทึก played ล้มเหลว:', e);
             }
 
-            // 🔥 อัปเดต local progress และ UI ทันที
             const key = `${currentLevel}_${currentDan}`;
             vocabProgress[key] = { percent: 0, played: true };
             renderDans();
-
             renderOverlayGame();
         }
 
@@ -1062,7 +1213,7 @@
             updatePowerUI();
         }
 
-        // 🔥 แก้ไข selectAnswer — เพิ่มดาวเมื่อถูกติดต่อกัน 3 ครั้ง
+        // 🔥 selectAnswer — ติดต่อกัน 3 ครั้ง ได้ดาว
         function selectAnswer(selectedIdx, q) {
             if (isAnswered || gameEnded) return;
             isAnswered = true;
@@ -1168,7 +1319,7 @@
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
-        // 🔥 แก้ไข endGame — ผ่าน 60% ถึงจะ TRUE, perfect ได้เพชรครั้งแรก
+        // 🔥 endGame — ผ่าน 60% ถึง TRUE, Perfect ได้เพชรครั้งแรก
         function endGame() {
             gameEnded = true;
             clearInterval(timerInterval);
@@ -1185,7 +1336,6 @@
                 `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}%`;
             const perfect = isPerfectRun && mistakes.length === 0;
 
-            // 🔥 NEW: ตรวจสอบว่าเคยได้เพชรจากด่านนี้หรือยัง
             const key = `${currentLevel}_${currentDan}`;
             const alreadyGotDiamond = vocabProgress[key] && vocabProgress[key].gotDiamond;
 
@@ -1198,7 +1348,7 @@
                     time: Math.round((currentFeature?.timeLimit || CONFIG.TIME_LIMIT) * currentRound.length - timeLeft || 0),
                     streak: streak,
                     isPerfect: perfect,
-                    passed: passed,  // 🔥 ส่ง passed ไปด้วย
+                    passed: passed,
                 }).then(() => {
                     loadStarsFromBackend();
                     loadDiamondsFromBackend();
@@ -1209,11 +1359,12 @@
                 }).catch(console.error);
             }
 
-            // 🔥 NEW: แจ้งเตือนเพชร (ถ้ายังไม่เคยได้และ perfect)
             if (perfect && !alreadyGotDiamond) {
                 alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
                 if (!vocabProgress[key]) vocabProgress[key] = {};
                 vocabProgress[key].gotDiamond = true;
+                // อัปเดต UI เพชร
+                loadDiamondsFromBackend();
             }
 
             const nextBtn = $('nextDanBtn');
@@ -1483,7 +1634,6 @@
             const key = `${currentSentenceLevel}_${currentSentenceDan}`;
             sentenceProgress[key] = { done: false, played: true };
             renderSentenceDans();
-
             renderSentenceOverlay();
         }
 
@@ -1579,7 +1729,7 @@
             vibrate(10);
             playKeyboardSound(); }
 
-        // 🔥 แก้ไข sentenceCheck — เพิ่มดาวเมื่อถูกติดต่อกัน 3 ครั้ง
+        // 🔥 sentenceCheck — ติดต่อกัน 3 ครั้ง ได้ดาว
         function sentenceCheck() {
             if (sentenceGameCompleted) return;
             if (placedWords.length === 0) { alert('กรุณาเรียงคำให้ครบ'); return; }
@@ -1594,7 +1744,6 @@
                 sentenceConsecutiveCorrect++;
                 const msg = getUstadhMessage();
                 
-                // 🔥 NEW: ติดต่อกัน 3 ครั้ง → ได้ดาว
                 if (sentenceConsecutiveCorrect % 3 === 0) {
                     stars += 1;
                     updateStarDisplay();
@@ -1655,7 +1804,7 @@
             }
         }
 
-        // 🔥 แก้ไข sentenceEndGame — perfect ได้เพชรครั้งแรก
+        // 🔥 sentenceEndGame — Perfect ได้เพชรครั้งแรก
         function sentenceEndGame() {
             sentenceGameCompleted = true;
             $('sentenceQuestionArea').classList.add('hidden');
@@ -1663,7 +1812,6 @@
             $('sentenceFinalStreak').textContent = sentenceConsecutiveCorrect;
             const perfect = sentencePerfect && sentenceConsecutiveCorrect === sentenceTotalQuestions;
 
-            // 🔥 NEW: ตรวจสอบว่าเคยได้เพชรจากด่านนี้หรือยัง
             const key = `${currentSentenceLevel}_${currentSentenceDan}`;
             const alreadyGotDiamond = sentenceProgress[key] && sentenceProgress[key].gotDiamond;
 
@@ -1685,11 +1833,11 @@
                 }).catch(console.error);
             }
 
-            // 🔥 NEW: แจ้งเตือนเพชร (ถ้ายังไม่เคยได้และ perfect)
             if (perfect && !alreadyGotDiamond) {
                 alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
                 if (!sentenceProgress[key]) sentenceProgress[key] = {};
                 sentenceProgress[key].gotDiamond = true;
+                loadDiamondsFromBackend();
             }
 
             const nextBtn = $('sentenceNextDanBtn');
@@ -1879,7 +2027,6 @@
             const key = `${currentReadingLevel}_${currentReadingDan}`;
             readingProgress[key] = { done: false, played: true };
             renderReadingDans();
-
             renderReadingOverlay();
         }
 
@@ -2064,9 +2211,7 @@
         function resetReadingArticle() { readingIndex = 0;
             renderReadingArticle(); }
 
-        // ==============================================================
-        //  🔥 NEW: addStarToUser — เพิ่ม 1 ดาวให้ผู้ใช้ (ใช้ใน readingEndGame)
-        // ==============================================================
+        // 🔥 addStarToUser — เพิ่ม 1 ดาว (ใช้ใน readingEndGame)
         async function addStarToUser(email) {
             try {
                 const res = await callAPI('user/stars/add', 'POST', { email: email, amount: 1 });
@@ -2078,21 +2223,18 @@
                 }
             } catch(e) {
                 debugLog('STAR', '❌ เพิ่มดาวล้มเหลว:', e);
-                // fallback: เพิ่มใน local
                 stars += 1;
                 updateStarDisplay();
             }
         }
 
-        // 🔥 แก้ไข readingEndGame — มีปุ่มไปด่านถัดไป + ได้ 1 ดาว
+        // 🔥 readingEndGame — มีปุ่มไปด่านถัดไป + ได้ 1 ดาว
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
 
-            // 🔥 NEW: อ่านจบ → ได้ 1 ดาว
             if (isLoggedIn) {
-                // บันทึก progress
                 callAPI('progress', 'POST', {
                     email: userEmail,
                     game: 'reading',
@@ -2101,7 +2243,6 @@
                     passed: true,
                     played: true
                 }).then(async () => {
-                    // 🔥 ได้ 1 ดาว
                     await addStarToUser(userEmail);
                     await loadProgressFromBackend();
                     renderReadingDans();
@@ -2111,7 +2252,6 @@
                 }).catch(console.error);
             }
 
-            // 🔥 NEW: ปุ่มไปด่านถัดไป (แสดงทันที)
             const nextBtn = $('readingNextDanBtn');
             const next = readingDans.find(d => d === currentReadingDan + 1);
             if (next || (readingLevels.find(l => l.level === currentReadingLevel + 1)?.dans?.length)) {
@@ -2225,8 +2365,144 @@
         // ==============================================================
         //  EXPORT CSV & PDF
         // ==============================================================
-        function exportCSV() { /* ... */ }
-        function exportPDF() { /* ... */ }
+        function exportCSV() {
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                const rows = data.map((item, idx) => [
+                    idx + 1,
+                    item.คำศัพท์ไทย || '',
+                    item.คำศัพท์อาหรับ || '',
+                    item.รูปอดีต || '',
+                    item.รูปปัจจุบัน || '',
+                    item.รูปคำสั่ง || '',
+                    item.เอกพจน์ || '',
+                    item.พหูพจน์ || '',
+                    item.หมวดหมู่ || '',
+                    item.level || ''
+                ]);
+                let csv = '\uFEFF' + headers.join(',') + '\n';
+                rows.forEach(row => {
+                    const escaped = row.map(cell => {
+                        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                            return `"${cell.replace(/"/g, '""')}"`;
+                        }
+                        return cell;
+                    });
+                    csv += escaped.join(',') + '\n';
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch(e) { alert('เกิดข้อผิดพลาดในการส่งออก CSV: ' + e.message);
+                console.error(e); }
+        }
+
+        function exportPDF() {
+            try {
+                const filterLevel = parseInt($('vocabLevelFilter').value) || 0;
+                let data = allVocab;
+                if (filterLevel > 0) data = data.filter(item => parseInt(item.level) === filterLevel);
+                if (!data || data.length === 0) { alert('ไม่มีข้อมูลที่จะส่งออก'); return; }
+                const wrapper = document.createElement('div');
+                wrapper.style.padding = '20px';
+                wrapper.style.background = '#ffffff';
+                wrapper.style.fontFamily = 'Noto Sans Thai, Noto Naskh Arabic, sans-serif';
+                const title = document.createElement('h2');
+                title.textContent = `📚 คำศัพท์ ศึกษา ต่างถิ่น ${filterLevel > 0 ? `(Level ${filterLevel})` : '(ทั้งหมด)'}`;
+                title.style.textAlign = 'center';
+                title.style.color = '#065f46';
+                title.style.marginBottom = '16px';
+                title.style.fontSize = '20px';
+                wrapper.appendChild(title);
+                const table = document.createElement('table');
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+                table.style.fontSize = '12px';
+                table.style.border = '1px solid #d1d5db';
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['#', 'ไทย', 'อาหรับ', 'อดีต', 'ปัจจุบัน', 'คำสั่ง', 'เอกพจน์', 'พหูพจน์', 'หมวด', 'Level'];
+                headers.forEach(h => {
+                    const th = document.createElement('th');
+                    th.textContent = h;
+                    th.style.background = '#065f46';
+                    th.style.color = '#fff';
+                    th.style.padding = '6px 8px';
+                    th.style.border = '1px solid #065f46';
+                    th.style.textAlign = 'left';
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+                const tbody = document.createElement('tbody');
+                data.forEach((item, idx) => {
+                    const tr = document.createElement('tr');
+                    const cells = [
+                        idx + 1,
+                        item.คำศัพท์ไทย || '',
+                        item.คำศัพท์อาหรับ || '',
+                        item.รูปอดีต || '',
+                        item.รูปปัจจุบัน || '',
+                        item.รูปคำสั่ง || '',
+                        item.เอกพจน์ || '',
+                        item.พหูพจน์ || '',
+                        item.หมวดหมู่ || '',
+                        item.level || ''
+                    ];
+                    cells.forEach((cell, i) => {
+                        const td = document.createElement('td');
+                        td.textContent = cell;
+                        td.style.padding = '4px 6px';
+                        td.style.border = '1px solid #d1d5db';
+                        td.style.background = i % 2 === 0 ? '#f8fafc' : '#ffffff';
+                        if (i === 2 || i === 3 || i === 4 || i === 5 || i === 6 || i === 7) {
+                            td.style.fontFamily = 'Noto Naskh Arabic, serif';
+                            td.style.direction = 'rtl';
+                            td.style.fontSize = '1.1rem';
+                        }
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                wrapper.appendChild(table);
+                document.body.appendChild(wrapper);
+                html2canvas(wrapper, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false })
+                    .then(canvas => {
+                        document.body.removeChild(wrapper);
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('l', 'mm', 'a4');
+                        const imgWidth = 280;
+                        const pageHeight = 210;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        let heightLeft = imgHeight;
+                        let position = 0;
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                        while (heightLeft > 0) {
+                            position = heightLeft - imgHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                            heightLeft -= pageHeight;
+                        }
+                        pdf.save(`คำศัพท์_ศึกษา_ต่างถิ่น${filterLevel > 0 ? `_Level${filterLevel}` : '_ทั้งหมด'}.pdf`);
+                    }).catch(err => {
+                        document.body.removeChild(wrapper);
+                        alert('ไม่สามารถสร้าง PDF ได้: ' + err.message);
+                    });
+            } catch(e) { alert('เกิดข้อผิดพลาดในการส่งออก PDF: ' + e.message);
+                console.error(e); }
+        }
 
         // ==============================================================
         //  LEADERBOARD
@@ -2328,8 +2604,6 @@
             if (tabId === 'leaderboardTab') renderLeaderboard();
             if (tabId === 'vocabTab') renderVocab();
             if (tabId === 'shareTab') updateShareCard();
-            if (tabId === 'sentenceTab') { /* handled */ }
-            if (tabId === 'readingTab') { /* handled */ }
         }
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -2360,11 +2634,12 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v6.0 — ปรับปรุงตามข้อกำหนด 5 ข้อ');
-        console.log('✅ ถูกติดต่อกัน 3 ครั้ง ได้ดาว');
+        console.log('🚀 ศึกษา ต่างถิ่น v6.0 — ระบบแลกเพชร (ATM) ครบถ้วน');
+        console.log('✅ แลก 12 เพชร → 100 ดาว');
+        console.log('✅ ตรวจสอบเพชรพอ, อัปเดตทันที');
         console.log('✅ Perfect ได้เพชรครั้งแรก');
-        console.log('✅ อ่านบทความจบได้ 1 ดาวและมีปุ่มไปด่านถัดไป');
-        console.log('✅ เกมที่ 1 ต้องผ่าน 60% ถึงจะเป็น TRUE');
+        console.log('✅ ถูกติดต่อกัน 3 ครั้ง ได้ดาว');
+        console.log('✅ อ่านบทความจบได้ 1 ดาว');
     </script>
 </body>
 </html>

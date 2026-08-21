@@ -516,11 +516,11 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.7 — ครบทุกฟีเจอร์ -->
+    <!-- JAVASCRIPT v5.7 — ครบทุกฟีเจอร์ (แก้ไขการแสดง played) -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
-        //  CONFIG (ปรับปรุง)
+        //  CONFIG
         // ==============================================================
         const CONFIG = {
             WORKER_URL: 'https://game-seksatangthin.hem5426.workers.dev',
@@ -530,11 +530,11 @@
             TIME_LIMIT: 20,
             PAGE_URL: 'https://www.facebook.com/profile.php?id=100064382094369',
             HINT_COST: 1,
-            UNLOCK_LEVEL_COST: 120,        // เปลี่ยนเป็น 120
+            UNLOCK_LEVEL_COST: 120,
             DIAMONDS_TO_STARS_RATE: 12,
             STREAK_STARS: 3,
-            DIAMOND_THRESHOLD: 100,        // ต้อง 100% (Perfect)
-            FREE_LEVELS: 3,                // 3 Level แรกฟรี
+            DIAMOND_THRESHOLD: 100,
+            FREE_LEVELS: 3,
         };
 
         // ==============================================================
@@ -554,7 +554,7 @@
         function getUstadhMessage() { return USTADH_MESSAGES[Math.floor(Math.random() * USTADH_MESSAGES.length)]; }
 
         // ==============================================================
-        //  STATE (เพิ่ม perfect flag)
+        //  STATE
         // ==============================================================
         let allQuestions = [], allVocab = [], levelsData = [], userProgress = {};
         let currentDan = 0, currentLevel = 0;
@@ -568,7 +568,7 @@
         let currentFeature = null;
         let consecutiveWrong = 0;
         let gameStarted = false;
-        let isPerfectRun = false;   // เพิ่มตัวแปรบอกว่าเล่น Perfect หรือไม่
+        let isPerfectRun = false;
 
         // Progress from backend
         let vocabProgress = {};
@@ -596,13 +596,13 @@
         const $ = id => document.getElementById(id);
 
         // ==============================================================
-        //  HELPERS (เหมือนเดิม)
+        //  HELPERS
         // ==============================================================
         function debugLog(m, msg, d) { console.log(`[${new Date().toISOString().slice(11,19)}] [${m}] ${msg}`, d||''); }
         function setStatus(text, color) { const el = $('loginStatus'); if (el) { el.textContent = text; el.style.color = color || '#fff'; } }
 
         // ==============================================================
-        //  SOUND & VIBRATION (เหมือนเดิม)
+        //  SOUND & VIBRATION
         // ==============================================================
         let audioCtx = null;
         function getAudioContext() {
@@ -626,7 +626,7 @@
         function toggleSettings() { $('settingsPopup').classList.toggle('show'); if ($('settingsPopup').classList.contains('show')) { $('soundToggle').checked = soundEnabled; $('vibrationToggle').checked = vibrationEnabled; } }
 
         // ==============================================================
-        //  SUPPORT / EXCHANGE (เหมือนเดิม)
+        //  SUPPORT / EXCHANGE
         // ==============================================================
         function toggleSupport() { $('supportPopup').classList.toggle('show'); if ($('supportPopup').classList.contains('show')) { $('supportStarDisplay').textContent = stars; } }
         function openSupport(amount) {
@@ -663,16 +663,15 @@
         }
 
         // ==============================================================
-        //  UNLOCK LEVEL (ปรับปรุง)
+        //  UNLOCK LEVEL
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
-            const cost = CONFIG.UNLOCK_LEVEL_COST;
-            // ตรวจสอบว่าเป็น Level ฟรีหรือไม่
             if (level <= CONFIG.FREE_LEVELS) {
                 alert(`Level ${level} เป็น Level ฟรี เปิดให้เล่นอยู่แล้ว!`);
                 return;
             }
+            const cost = CONFIG.UNLOCK_LEVEL_COST;
             if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
             if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level} ทุกด่าน?`)) { return; }
             try {
@@ -691,7 +690,7 @@
             } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
         }
 
-        // ปิดฟังก์ชัน unlockDanWithStars (ไม่ใช้แล้ว)
+        // ปิดฟังก์ชัน unlockDanWithStars
         async function unlockDanWithStars(game, level, dan) {
             alert('❌ ไม่สามารถเปิดด่านด้วยดาวได้ กรุณาเล่นด่านก่อนหน้าให้ผ่าน');
             return;
@@ -713,7 +712,7 @@
         }
 
         // ==============================================================
-        //  GOOGLE LOGIN (เหมือนเดิม)
+        //  GOOGLE LOGIN
         // ==============================================================
         function initGoogleLogin() {
             const savedToken = localStorage.getItem('id_token');
@@ -866,7 +865,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY (ปรับปรุง)
+        //  GAME 1: VOCABULARY
         // ==============================================================
         function renderDans() {
             const container = $('danList');
@@ -879,7 +878,6 @@
 
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                // ตรวจสอบว่า Level นี้เปิดฟรีหรือไม่
                 const isFree = parseInt(level) <= CONFIG.FREE_LEVELS;
                 const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || isFree;
                 const allPassed = levelData.every(d => {
@@ -916,8 +914,8 @@
                     const percent = progress ? progress.percent : 0;
                     const played = progress ? progress.played : false;
                     const isPassed = percent >= CONFIG.PASSING_SCORE;
-                    const isPlayed = played || isPassed;
-                    // ตรวจสอบการปลดล็อก: ต้องผ่านด่านก่อนหน้า หรือ Level ฟรี หรือด่านแรกของ Level
+                    // 🔥 ใช้ percent > 0 เพื่อตรวจจับว่าเล่นแล้ว (แม้ยังไม่ผ่าน)
+                    const isPlayed = played || percent > 0 || isPassed;
                     const isFirstDan = d.dan === 1;
                     const prevDanKey = `${level}_${d.dan-1}`;
                     const prevPassed = vocabProgress[prevDanKey] && vocabProgress[prevDanKey].percent >= CONFIG.PASSING_SCORE;
@@ -927,7 +925,6 @@
                     const item = document.createElement('div');
                     item.className = 'dan-item' + (isPassed ? ' completed' : '') + (!unlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
                     let statusHtml = `<span class="status ${isPassed ? 'done' : (isPlayed ? 'played' : (unlocked ? 'pending' : 'locked-status'))}">${isPassed ? '✅ เล่นแล้ว' : (isPlayed ? '📖 เล่นแล้ว' : (unlocked ? 'พร้อมฝึก' : '🔒 ล็อก'))}</span>`;
-                    // ไม่มีปุ่ม unlock-dan
                     if (!unlocked) {
                         statusHtml = `<span class="status locked-status">🔒 ต้องผ่านด่านก่อน</span>`;
                     }
@@ -994,7 +991,7 @@
             combo = 1;
             consecutiveWrong = 0;
             streak = 0;
-            isPerfectRun = true;   // เริ่มต้นคิดว่า perfect
+            isPerfectRun = true;
             const res = await callAPI('questions', 'GET', null, { dan: dan });
             const questions = res.data || [];
             if (!questions.length) { alert('ไม่มีข้อสอบในด่านนี้'); return; }
@@ -1169,7 +1166,7 @@
                 streak = 0;
                 combo = 1;
                 consecutiveWrong++;
-                isPerfectRun = false;   // มีผิด -> ไม่ Perfect
+                isPerfectRun = false;
                 $('streakDisplay').textContent = `🔥 0`;
                 if (currentFeature && currentFeature.lives > 0) { lives--;
                     updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
@@ -1248,7 +1245,6 @@
             const passed = percent >= passingScore;
             $('finalMessage').textContent = passed ? `🎉 ผ่าน! (${percent}%)` :
                 `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}%`;
-            // ตรวจสอบ Perfect
             const perfect = isPerfectRun && mistakes.length === 0 && percent === 100;
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
@@ -1287,7 +1283,6 @@
                     list.appendChild(li);
                 });
             }
-            // แจ้ง Perfect
             if (perfect) {
                 alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
             }
@@ -1387,7 +1382,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (ปรับปรุง)
+        //  GAME 2: SENTENCE (ปรับปรุงการแสดง played)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1450,6 +1445,8 @@
                 const progress = sentenceProgress[key];
                 const done = progress ? progress.done : false;
                 const played = progress ? progress.played : false;
+                // 🔥 ใช้ played หรือ done
+                const isPlayed = played || done;
                 const isFirstDan = dan === sentenceDans[0];
                 const prevDanKey = `${currentSentenceLevel}_${dan-1}`;
                 const prevPassed = sentenceProgress[prevDanKey] && sentenceProgress[prevDanKey].done === true;
@@ -1458,13 +1455,13 @@
 
                 const item = document.createElement('div');
                 item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
-                let statusHtml = `<span class="status ${done ? 'done' : (played ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ เล่นแล้ว' : (played ? '📖 เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก'))}</span>`;
+                let statusHtml = `<span class="status ${done ? 'done' : (isPlayed ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ เล่นแล้ว' : (isPlayed ? '📖 เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : '🔒 ล็อก'))}</span>`;
                 if (!isUnlocked) {
                     statusHtml = `<span class="status locked-status">🔒 ต้องผ่านด่านก่อน</span>`;
                 }
                 item.innerHTML = `
                     <span class="icon">${done ? '✅' : (isUnlocked ? '📘' : '🔒')}</span>
-                    <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'ผ่านแล้ว' : (played ? 'เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : 'ล็อก'))}</div></div>
+                    <div class="info"><div class="name">ด่าน ${dan}</div><div class="desc">${done ? 'ผ่านแล้ว' : (isPlayed ? 'เล่นแล้ว' : (isUnlocked ? 'พร้อมฝึก' : 'ล็อก'))}</div></div>
                     ${statusHtml}
                 `;
                 if (isUnlocked) {
@@ -1520,7 +1517,6 @@
             sentenceTotalQuestions = sentenceQuestions.length;
             sentenceGameCompleted = false;
             renderSentenceOverlay();
-            // บันทึก played = TRUE
             callAPI('progress', 'POST', {
                 email: userEmail,
                 game: 'sentence',
@@ -1656,7 +1652,7 @@
                 playWrongSound();
                 vibrate([50, 100, 50]);
                 sentenceConsecutiveCorrect = 0;
-                sentencePerfect = false;   // มีผิด -> ไม่ Perfect
+                sentencePerfect = false;
                 $('sentenceStreakDisplay').textContent = `🔥 0 ติด`;
                 result.innerHTML = `<p class="text-red-600 font-bold">❌ ยังไม่ถูกต้อง ลองใหม่ หรือใช้เฉลย</p>`;
                 $('sentenceRevealBtn').classList.remove('hidden');
@@ -1744,7 +1740,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (ปรับปรุง)
+        //  GAME 3: READING (ปรับปรุงการแสดง played)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1822,16 +1818,17 @@
                 const progress = readingProgress[key];
                 const done = progress ? progress.done : false;
                 const played = progress ? progress.played : false;
+                // 🔥 ใช้ played หรือ done
+                const isPlayed = played || done;
                 const isFirstDan = dan === readingDans[0];
                 const prevDanKey = `${currentReadingLevel}_${dan-1}`;
                 const prevPassed = readingProgress[prevDanKey] && readingProgress[prevDanKey].done === true;
                 const isUnlocked = isLevelUnlocked || isFirstDan || prevPassed;
-                const cost = 0; // ไม่ใช้แล้ว
                 const isSelected = currentReadingDan === dan;
 
                 const item = document.createElement('div');
                 item.className = 'dan-item' + (done ? ' completed' : '') + (!isUnlocked ? ' locked' : '') + (isSelected ? ' selected' : '');
-                let statusHtml = `<span class="status ${done ? 'done' : (played ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ อ่านแล้ว' : (played ? '📖 อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : '🔒 ล็อก'))}</span>`;
+                let statusHtml = `<span class="status ${done ? 'done' : (isPlayed ? 'played' : (isUnlocked ? 'pending' : 'locked-status'))}">${done ? '✅ อ่านแล้ว' : (isPlayed ? '📖 อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : '🔒 ล็อก'))}</span>`;
                 if (!isUnlocked) {
                     statusHtml = `<span class="status locked-status">🔒 ต้องอ่านด่านก่อน</span>`;
                 }
@@ -1839,7 +1836,7 @@
                     <span class="icon">${done ? '✅' : (isUnlocked ? '📖' : '🔒')}</span>
                     <div class="info">
                         <div class="name">ด่าน ${dan}</div>
-                        <div class="desc">${done ? 'อ่านแล้ว' : (played ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : 'ล็อก'))}</div>
+                        <div class="desc">${done ? 'อ่านแล้ว' : (isPlayed ? 'อ่านแล้ว' : (isUnlocked ? 'พร้อมอ่าน' : 'ล็อก'))}</div>
                         ${articleTitlesMap[dan] && articleTitlesMap[dan].length > 0 ? `<div class="sub-desc">📄 ${articleTitlesMap[dan].slice(0, 2).join(', ')}${articleTitlesMap[dan].length > 2 ? '…' : ''}</div>` : ''}
                     </div>
                     ${statusHtml}
@@ -1894,7 +1891,6 @@
             readingIndex = 0;
             readingTotalArticles = readingArticles.length;
             renderReadingOverlay();
-            // บันทึก played = TRUE
             callAPI('progress', 'POST', {
                 email: userEmail,
                 game: 'reading',
@@ -2219,8 +2215,8 @@
         // ==============================================================
         //  EXPORT CSV & PDF
         // ==============================================================
-        function exportCSV() { /* ... (เหมือนเดิม) */ }
-        function exportPDF() { /* ... (เหมือนเดิม) */ }
+        function exportCSV() { /* ... */ }
+        function exportPDF() { /* ... */ }
 
         // ==============================================================
         //  LEADERBOARD
@@ -2354,15 +2350,9 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.7 — ครบทุกฟีเจอร์');
-        console.log('✅ แสดง extra info (جمع, ماض, مضارع, أمر)');
-        console.log('✅ บันทึก "เล่นแล้ว" ทันที');
-        console.log('✅ เปิด Level = 120⭐ (เปิดทุกด่าน)');
-        console.log('✅ Level 1-3 ฟรี');
-        console.log('✅ เพชร = Perfect (100%)');
-        console.log('✅ บทความ: อ่านจบได้ 1 ดาว');
-        console.log('✅ ไปด่านถัดไปพร้อมถาม');
-        console.log('✅ Side menu และ Header สวยงาม');
+        console.log('🚀 ศึกษา ต่างถิ่น v5.7 — แก้ไขการแสดง "เล่นแล้ว"');
+        console.log('✅ ใช้ percent > 0 เป็นตัวบ่งชี้ว่าเคยเล่นแล้ว');
+        console.log('✅ แสดง "📖 เล่นแล้ว" สำหรับด่านที่เล่นแล้วแต่ยังไม่ผ่าน');
     </script>
 </body>
 </html>

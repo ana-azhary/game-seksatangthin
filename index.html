@@ -507,7 +507,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v6.3 — ปรับปรุงตามที่ขอ: Unlock Level 16+ ด้วย 10 ดาว, Level 1-15 ฟรี, Reading ได้ 1 ดาวครั้งแรก -->
+    <!-- JAVASCRIPT v7.0 — ปรับตามที่ขอ: Level 4+ ใช้ 120 ดาว ทุกเกม -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -521,11 +521,11 @@
             TIME_LIMIT: 20,
             PAGE_URL: 'https://www.facebook.com/profile.php?id=100064382094369',
             HINT_COST: 1,
-            UNLOCK_LEVEL_COST: 10,        // 🔥 เปลี่ยนจาก 120 เป็น 10 (Level 16+ ใช้ 10 ดาว)
+            UNLOCK_LEVEL_COST: 120,        // 🔥 120 ดาว สำหรับ Level 4+
             DIAMONDS_TO_STARS_RATE: 12,
             STREAK_STARS: 3,
             DIAMOND_THRESHOLD: 100,
-            FREE_LEVELS: 15,               // 🔥 Level 1-15 ฟรี
+            FREE_LEVELS: 3,                // 🔥 Level 1-3 ฟรี
         };
 
         // ==============================================================
@@ -839,16 +839,16 @@
         }
 
         // ==============================================================
-        //  🔥 UNLOCK LEVEL (Level 16+ ใช้ 10 ดาว, Level 1-15 ฟรี)
+        //  🔥 UNLOCK LEVEL (Level 1-3 ฟรี, Level 4+ ใช้ 120 ดาว)
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
-            // Level 1-15 ฟรี
+            // Level 1-3 ฟรี
             if (level <= CONFIG.FREE_LEVELS) {
                 alert(`Level ${level} เป็น Level ฟรี เปิดให้เล่นอยู่แล้ว!`);
                 return;
             }
-            const cost = CONFIG.UNLOCK_LEVEL_COST; // 10 ดาว
+            const cost = CONFIG.UNLOCK_LEVEL_COST; // 120 ดาว
             if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
             if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level} ทุกด่าน?`)) { return; }
             try {
@@ -1043,7 +1043,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY — ปรับ Unlock Logic ตามที่ขอ
+        //  GAME 1: VOCABULARY — ปรับ Unlock Logic ตามที่ขอ (Level 1-3 ฟรี, Level 4+ 120 ดาว)
         // ==============================================================
         function renderDans() {
             const container = $('danList');
@@ -1057,7 +1057,7 @@
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
                 const levelNum = parseInt(level);
-                // 🔥 Level 1-15 ฟรี, Level 16+ ต้องใช้ 10 ดาว
+                // 🔥 Level 1-3 ฟรี, Level 4+ ใช้ 120 ดาว
                 const isFree = levelNum <= CONFIG.FREE_LEVELS;
                 const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || isFree;
                 const allPassed = levelData.every(d => {
@@ -1158,7 +1158,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: CORE
+        //  GAME 1: CORE (ไม่ต้องปรับ)
         // ==============================================================
         async function startGame() {
             playKeyboardSound();
@@ -1610,7 +1610,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE
+        //  GAME 2: SENTENCE — ปรับ Unlock Logic (Level 1-3 ฟรี, Level 4+ 120 ดาว)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1994,7 +1994,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING — 🔥 ได้ 1 ดาวเฉพาะครั้งแรก
+        //  GAME 3: READING — ปรับ Unlock Logic (Level 1-3 ฟรี, Level 4+ 120 ดาว)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -2784,9 +2784,9 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v6.3 — Unlock Level 16+ ด้วย 10 ดาว, Level 1-15 ฟรี, Reading ได้ 1 ดาวครั้งแรก');
-        console.log('✅ CONFIG.FREE_LEVELS = 15 (Level 1-15 ฟรี)');
-        console.log('✅ CONFIG.UNLOCK_LEVEL_COST = 10 (Level 16+ ใช้ 10 ดาว)');
+        console.log('🚀 ศึกษา ต่างถิ่น v7.0 — Unlock Level 4+ ด้วย 120 ดาว, Level 1-3 ฟรี (ทุกเกม)');
+        console.log('✅ CONFIG.FREE_LEVELS = 3');
+        console.log('✅ CONFIG.UNLOCK_LEVEL_COST = 120');
         console.log('✅ อ่านบทความจบ ได้ 1 ดาวเฉพาะครั้งแรกเท่านั้น');
     </script>
 </body>

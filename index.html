@@ -507,7 +507,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v6.2 — แก้ไข unlockLevelWithStars และ readingEndGame -->
+    <!-- JAVASCRIPT v6.3 — แก้ไขตามที่ขอ: unlock level ฟรี/10 ดาว, แจ้งเตือน reading star -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -549,7 +549,7 @@
         }
 
         // ==============================================================
-        //  LOADING OVERLAY
+        //  🌀 LOADING OVERLAY FUNCTIONS
         // ==============================================================
         function showLoading(message) {
             const overlay = document.getElementById('loadingOverlay');
@@ -771,7 +771,7 @@
         function toggleSettings() { $('settingsPopup').classList.toggle('show'); if ($('settingsPopup').classList.contains('show')) { $('soundToggle').checked = soundEnabled; $('vibrationToggle').checked = vibrationEnabled; } }
 
         // ==============================================================
-        //  SUPPORT / EXCHANGE
+        //  SUPPORT / EXCHANGE (ATM)
         // ==============================================================
         function toggleSupport() { $('supportPopup').classList.toggle('show'); if ($('supportPopup').classList.contains('show')) { $('supportStarDisplay').textContent = stars; } }
         function openSupport(amount) {
@@ -839,17 +839,25 @@
         }
 
         // ==============================================================
-        //  🔥 UNLOCK LEVEL (แก้ไขแล้ว: โหลด progress และรีเฟรช UI ทันที)
+        //  🔥 UNLOCK LEVEL (ปรับใหม่: ฟรีทุก Level แต่ Level 5+ ใช้ 10 ดวง)
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
-            if (level <= CONFIG.FREE_LEVELS) {
+            
+            // เกมท่องศัพท์: เปิดฟรีทุก Level แต่ Level 5+ ใช้ 10 ดาว
+            let cost = CONFIG.UNLOCK_LEVEL_COST; // ค่าเริ่มต้น 120
+            if (game === 'vocab') {
+                cost = parseInt(level) >= 5 ? 10 : 0;
+            }
+            
+            if (cost === 0) {
                 alert(`Level ${level} เป็น Level ฟรี เปิดให้เล่นอยู่แล้ว!`);
                 return;
             }
-            const cost = CONFIG.UNLOCK_LEVEL_COST;
+            
             if (stars < cost) { alert(`⭐ ไม่พอ! ต้องใช้ ${cost} ดาว (มี ${stars} ดาว)`); return; }
             if (!confirm(`ใช้ ${cost} ⭐ เพื่อปลดล็อก Level ${level} ทุกด่าน?`)) { return; }
+            
             try {
                 const res = await callAPI('unlock-level', 'POST', { email: userEmail, game: game, level: level });
                 if (res.success) {
@@ -858,28 +866,14 @@
                     playStarSound();
                     vibrate([50, 80, 50]);
                     alert(`✅ ปลดล็อก Level ${level} ทุกด่านแล้ว!`);
-
-                    // 🔥 โหลด progress ใหม่จากเซิร์ฟเวอร์ทันที
-                    await loadProgressFromBackend();
-
-                    // รีเฟรช UI เฉพาะส่วนที่เกี่ยวข้อง
-                    if (game === 'vocab') {
-                        renderDans();
-                    } else if (game === 'sentence') {
-                        await loadSentenceLevels();
-                        renderSentenceLevels();
-                        renderSentenceDans();
-                    } else if (game === 'reading') {
-                        await loadReadingLevels();
-                        renderReadingLevels();
-                        renderReadingDans();
-                    }
-                } else {
-                    alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้'));
-                }
-            } catch(e) {
-                alert('❌ เกิดข้อผิดพลาด: ' + e.message);
-            }
+                    // โหลดข้อมูลทั้งหมดใหม่เพื่อให้สถานะอัปเดตทันที
+                    await loadAllData();
+                    // บังคับสลับแท็บเพื่อให้ UI รีเฟรช
+                    if (game === 'vocab') switchTab('gameTab');
+                    else if (game === 'sentence') switchTab('sentenceTab');
+                    else if (game === 'reading') switchTab('readingTab');
+                } else { alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้')); }
+            } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
         }
 
         // ==============================================================
@@ -1058,7 +1052,7 @@
         }
 
         // ==============================================================
-        //  GAME 1: VOCABULARY
+        //  GAME 1: VOCABULARY — แก้ไข renderDans ตามที่ต้องการ
         // ==============================================================
         function renderDans() {
             const container = $('danList');
@@ -1071,23 +1065,42 @@
 
             sortedLevels.forEach(level => {
                 const levelData = grouped[level];
-                const isFree = parseInt(level) <= CONFIG.FREE_LEVELS;
-                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || isFree;
+                const levelNum = parseInt(level);
+                // ท่องศัพท์: เปิดฟรีทุก Level แต่ถ้า Level >=5 ต้องจ่าย 10 ดาว
+                const isFree = levelNum <= CONFIG.FREE_LEVELS;
+                const isLevelUnlocked = vocabProgress[`${level}_1`] !== undefined || isFree || levelNum >= 5; // เปิด Level 5+ ฟรี
                 const allPassed = levelData.every(d => {
                     const key = `${level}_${d.dan}`;
                     return vocabProgress[key] && vocabProgress[key].percent >= CONFIG.PASSING_SCORE;
                 });
                 const isLevelCompleted = allPassed;
+                const unlockCost = levelNum >= 5 ? 10 : 0;
 
                 const levelDiv = document.createElement('div');
                 levelDiv.className = 'level-card' + (isLevelCompleted ? ' completed' : (isLevelUnlocked ? ' unlocked' : ' locked'));
 
                 const header = document.createElement('div');
                 header.className = 'flex items-center justify-between text-sm font-semibold text-gray-700';
+                let unlockHtml = '';
+                if (!isLevelUnlocked) {
+                    // ถ้ายังไม่ได้ปลดล็อก (แต่กรณีของเรา unlock ทุก Level ยกเว้น Level 1-4 ที่ไม่ต้องจ่าย)
+                    // ปรับให้แสดงปุ่มเฉพาะ Level >=5 และยังไม่ unlock
+                    if (levelNum >= 5 && !isLevelUnlocked) {
+                        unlockHtml = `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < unlockCost ? 'disabled' : ''}>🔓 ปลดล็อก (${unlockCost}⭐)</button>`;
+                    } else {
+                        unlockHtml = `<span class="text-xs text-green-600">🆓 ฟรี</span>`;
+                    }
+                } else {
+                    if (levelNum >= 5) {
+                        unlockHtml = `<span class="text-xs text-amber-600">🔓 ปลดล็อกแล้ว (${unlockCost}⭐)</span>`;
+                    } else {
+                        unlockHtml = `<span class="text-xs text-green-600">🆓 ฟรี</span>`;
+                    }
+                }
                 header.innerHTML = `
                     <span>🏰 Level ${level}</span>
                     <span class="text-xs font-normal text-gray-400">${levelData.filter(d => { const k = `${level}_${d.dan}`; return vocabProgress[k] && vocabProgress[k].percent >= CONFIG.PASSING_SCORE; }).length}/${levelData.length}</span>
-                    ${!isLevelUnlocked ? `<button class="btn-unlock-level" onclick="unlockLevelWithStars('vocab', ${level})" ${stars < CONFIG.UNLOCK_LEVEL_COST ? 'disabled' : ''}>🔓 ปลดล็อก Level (${CONFIG.UNLOCK_LEVEL_COST}⭐)</button>` : (isFree ? '<span class="text-xs text-green-600">🆓 ฟรี</span>' : '')}
+                    ${unlockHtml}
                     ${isLevelCompleted ? '<span class="text-xs text-green-600 font-medium">✅ ผ่านหมด</span>' : ''}
                 `;
                 levelDiv.appendChild(header);
@@ -1111,6 +1124,7 @@
                     const isFirstDan = d.dan === 1;
                     const prevDanKey = `${level}_${d.dan-1}`;
                     const prevPassed = vocabProgress[prevDanKey] && vocabProgress[prevDanKey].percent >= CONFIG.PASSING_SCORE;
+                    // unlock logic: Level 1-4 ฟรี, Level 5+ unlock เมื่อจ่ายดาวหรือมี progress แล้ว
                     const unlocked = isLevelUnlocked || (isFirstDan) || prevPassed;
                     const isSelected = currentDan === d.dan && currentLevel === d.level;
 
@@ -1162,25 +1176,25 @@
         }
 
         // ==============================================================
-        //  GAME START
+        //  GAME 1: CORE
         // ==============================================================
         async function startGame() {
             playKeyboardSound();
             vibrate(30);
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-
-            showLoading({
-                emoji: '⚔️',
-                text: 'เตรียมตัวหรือยัง?',
-                sub: 'อุสตะเฮงกำลังเตรียมด่านให้คุณ... 🕌'
+            
+            showLoading({ 
+                emoji: '⚔️', 
+                text: 'เตรียมตัวหรือยัง?', 
+                sub: 'อุสตะเฮงกำลังเตรียมด่านให้คุณ... 🕌' 
             });
 
             gameStarted = true;
             $('gameNotStarted').classList.add('hidden');
             $('startGameContainer').classList.add('hidden');
             showGameOverlay();
-
+            
             await loadDan(currentDan);
             hideLoading();
         }
@@ -1335,7 +1349,8 @@
                     clearInterval(timerInterval);
                     isAnswered = true;
                     setTeacherMessage('⏰ หมดเวลา!');
-                    if (currentFeature && currentFeature.lives > 0) { lives--; updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
+                    if (currentFeature && currentFeature.lives > 0) { lives--;
+                        updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
                             gameEnded = true;
                             setTimeout(() => endGame(), 1000); return; } }
                     highlightCorrect(q);
@@ -1369,15 +1384,14 @@
                 streak++;
                 combo = Math.min(combo + 0.5, 3);
                 consecutiveWrong = 0;
-
-                // ได้ดาวเมื่อตอบถูกติดต่อกัน 3 ครั้ง
+                
                 if (streak % 3 === 0) {
                     stars += 1;
                     updateStarDisplay();
                     playStarSound();
                     setTeacherMessage(`⭐ สุดยอด! ติด ${streak} ข้อ ได้ 1 ดาว!`);
                 }
-
+                
                 if (currentFeature && currentFeature.streakBonus && streak >= 5) { score += 5;
                     setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
                 showExtraInfo(q);
@@ -1390,7 +1404,8 @@
                 consecutiveWrong++;
                 isPerfectRun = false;
                 $('streakDisplay').textContent = `🔥 0`;
-                if (currentFeature && currentFeature.lives > 0) { lives--; updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
+                if (currentFeature && currentFeature.lives > 0) { lives--;
+                    updateLivesDisplay(); if (lives <= 0) { setTeacherMessage('💀 หมดชีวิต!');
                         gameEnded = true;
                         setTimeout(() => endGame(), 1500); return; } }
                 if (currentFeature && currentFeature.dangerMode && consecutiveWrong >= 2) {
@@ -1452,7 +1467,6 @@
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
-        // ===== endGame =====
         function endGame() {
             gameEnded = true;
             clearInterval(timerInterval);
@@ -1614,7 +1628,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (ไม่เปลี่ยนแปลง)
+        //  GAME 2: SENTENCE (ไม่มีการเปลี่ยนแปลง)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1731,13 +1745,13 @@
             vibrate(30);
             if (!currentSentenceDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-
+            
             showLoading({
                 emoji: '🧩',
                 text: 'เตรียมตัวต่อประโยคกัน!',
                 sub: 'อุสตะเฮงกำลังเตรียมคำศัพท์ให้คุณ 🧠'
             });
-
+            
             $('sentenceStartContainer').classList.add('hidden');
             showGameOverlay();
             await loadSentenceDan(currentSentenceLevel, currentSentenceDan);
@@ -1882,7 +1896,7 @@
                 vibrate([30, 50, 30]);
                 sentenceConsecutiveCorrect++;
                 const msg = getUstadhMessage();
-
+                
                 if (sentenceConsecutiveCorrect % 3 === 0) {
                     stars += 1;
                     updateStarDisplay();
@@ -1998,7 +2012,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING (แก้ไข: แจ้งดาวเฉพาะครั้งแรก)
+        //  GAME 3: READING — แก้ไข readingEndGame ให้แจ้งเตือนชัดเจน
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -2134,13 +2148,13 @@
             vibrate(30);
             if (!currentReadingDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
-
+            
             showLoading({
                 emoji: '📖',
                 text: 'กำลังเปิดบทความ...',
                 sub: 'อุสตะเฮงกำลังเตรียมบทอ่านให้คุณ 📜'
             });
-
+            
             $('readingStartContainer').classList.add('hidden');
             showGameOverlay();
             await loadReadingDan(currentReadingLevel, currentReadingDan);
@@ -2357,7 +2371,7 @@
         function resetReadingArticle() { readingIndex = 0;
             renderReadingArticle(); }
 
-        // ===== addStarToUser (ใช้ใน readingEndGame) =====
+        // 🔥 addStarToUser — เพิ่ม 1 ดาว (ใช้ใน readingEndGame)
         async function addStarToUser(email) {
             try {
                 const res = await callAPI('user/stars/add', 'POST', { email: email, amount: 1 });
@@ -2374,15 +2388,14 @@
             }
         }
 
-        // ===== readingEndGame (แก้ไข: แจ้งดาวครั้งแรกเท่านั้น) =====
+        // 🔥 readingEndGame — แสดงแจ้งเตือนเมื่อได้รับดาว + ตรวจสอบรอบสอง
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
 
-            // 🔥 ตรวจสอบว่าเคยอ่านด่านนี้แล้วหรือยัง (ได้ดาวไปแล้ว)
             const key = `${currentReadingLevel}_${currentReadingDan}`;
-            const alreadyDone = readingProgress[key] && readingProgress[key].done === true;
+            let alreadyDone = readingProgress[key] && readingProgress[key].done === true;
 
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
@@ -2394,16 +2407,16 @@
                     played: true
                 }).then(async () => {
                     await loadProgressFromBackend();
+                    alreadyDone = readingProgress[key] && readingProgress[key].done === true;
                     renderReadingDans();
                     renderReadingLevels();
-
-                    // 🔥 เพิ่มดาวเฉพาะครั้งแรกที่อ่านจบเท่านั้น
+                    
                     if (!alreadyDone) {
                         await addStarToUser(userEmail);
                         alert('⭐ อ่านจบแล้ว! คุณได้รับ 1 ดาว (ครั้งแรก)');
                         updateStarDisplay();
                     } else {
-                        alert('📖 อ่านจบแล้ว! (คุณได้รับดาวไปแล้ว)');
+                        alert('📖 อ่านจบแล้ว! (แต่คุณได้รับดาวไปแล้ว)');
                     }
                 }).catch(console.error);
             }
@@ -2790,9 +2803,9 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v6.2 — แก้ไข unlockLevelWithStars และ readingEndGame');
-        console.log('✅ ปลดล็อก Level แล้วโหลด progress ทันที');
-        console.log('✅ อ่านบทความจบได้ 1 ดาวเฉพาะครั้งแรก');
+        console.log('🚀 ศึกษา ต่างถิ่น v6.3 — แก้ไขตามที่ขอ: unlock level ฟรี/10 ดาว, แจ้งเตือน reading star');
+        console.log('✅ ท่องศัพท์: Level 1-4 ฟรี, Level 5+ ใช้ 10 ดาว (ไม่ต้องใช้ 120)');
+        console.log('✅ อ่านบทความ: ได้ 1 ดาวเฉพาะครั้งแรก และแจ้งเตือนชัดเจน');
     </script>
 </body>
 </html>

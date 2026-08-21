@@ -26,6 +26,68 @@
         .app-header .actions .btn-icon.active { background: rgba(255,255,255,0.3); }
         .app-header .actions .btn-icon .badge { background: #f59e0b; color: #1e293b; font-size: 0.6rem; padding: 1px 6px; border-radius: 20px; margin-left: 2px; }
 
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-overlay .spinner {
+            width: 70px;
+            height: 70px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #fbbf24;
+            border-radius: 50%;
+            animation: spin 0.9s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+        }
+        .loading-overlay .spinner .inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .loading-overlay .loading-text {
+            color: #fef3c7;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            max-width: 80%;
+            animation: fadeInUp 0.6s ease;
+        }
+        .loading-overlay .loading-sub {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            animation: fadeInUp 0.8s ease;
+            text-align: center;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .loading-overlay .loading-emoji {
+            font-size: 3rem;
+            animation: float 2s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ===== SIDE MENU ===== */
         .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: #fff; z-index: 9999; box-shadow: 4px 0 30px rgba(0,0,0,0.1); transition: left 0.3s ease; padding: 20px 16px; overflow-y: auto; }
         .side-menu.open { left: 0; }
         .side-menu .close-btn { float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; border: none; background: none; }
@@ -39,6 +101,7 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 9998; display: none; }
         .overlay.show { display: block; }
 
+        /* Buttons */
         .btn-start { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; padding: 14px 32px; border-radius: 40px; border: none; font-size: 1.1rem; width: 100%; transition: 0.2s; cursor: pointer; }
         .btn-start:active { transform: scale(0.97); }
         .btn-primary { background: #065f46; color: #fff; font-weight: 600; padding: 10px 24px; border-radius: 40px; border: none; font-size: 0.95rem; transition: 0.2s; cursor: pointer; }
@@ -84,19 +147,23 @@
         .ustadh-card .avatar { font-size: 2rem; flex-shrink: 0; }
         .ustadh-card .msg { font-size: 0.85rem; line-height: 1.5; }
 
+        /* Sentence game */
         .sentence-word { display: inline-block; padding: 6px 14px; margin: 3px; background: #fff; border-radius: 10px; border: 2px solid #d1d5db; cursor: pointer; transition: 0.2s; font-size: 1rem; direction: rtl; unicode-bidi: plaintext; }
         .sentence-word:hover:not(.placed) { border-color: #0d9488; background: #f0fdfa; }
         .sentence-word.placed { border-color: #16a34a; background: #dcfce7; cursor: default; opacity: 0.7; }
 
+        /* Reading game */
         .reading-word { cursor: pointer; transition: 0.2s; padding: 0 2px; border-radius: 4px; }
         .reading-word:hover { background: #fef3c7; }
         .reading-word.active-word { background: #fbbf24; color: #1e293b; font-weight: 700; }
 
+        /* Overlay game */
         .game-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 999; display: none; flex-direction: column; overflow-y: auto; padding: 16px 20px 100px; }
         .game-overlay.show { display: flex; }
         .game-overlay .close-btn { position: sticky; top: 0; background: white; padding: 8px 0; margin-bottom: 12px; font-size: 1.2rem; font-weight: 600; color: #1e293b; border-bottom: 1px solid #e5e7eb; cursor: pointer; display: flex; align-items: center; gap: 8px; z-index: 10; }
         .game-overlay .close-btn span { font-size: 1.5rem; }
 
+        /* Dictionary popup */
         .dictionary-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); width: 92%; max-width: 480px; background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 20px; z-index: 9999; transition: 0.4s ease; opacity: 0; pointer-events: none; max-height: 85vh; overflow-y: auto; }
         .dictionary-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
         .dictionary-popup .close-btn { position: sticky; top: 0; float: right; font-size: 1.5rem; cursor: pointer; color: #6b7280; background: #fff; padding: 0 4px; z-index: 10; }
@@ -111,6 +178,7 @@
 
         .extra-info { background: #f0fdf4; border: 1px solid #16a34a; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 0.85rem; color: #14532d; display: flex; flex-wrap: wrap; gap: 4px 12px; }
 
+        /* Vocab table */
         #vocabTable { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
         #vocabTable thead th { padding: 8px 6px; text-align: left; font-weight: 700; color: #fff; position: sticky; top: 0; z-index: 5; font-size: 0.75rem; white-space: nowrap; }
         #vocabTable thead th:nth-child(1) { background: #1e293b; min-width: 32px; text-align: center; }
@@ -150,12 +218,21 @@
             .game-overlay { padding: 12px 16px 80px; }
             .sentence-word { padding: 4px 10px; font-size: 0.9rem; }
             .dan-item .info .sub-desc { font-size: 0.6rem; }
+            .loading-overlay .loading-text { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="app-container" id="app">
+
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-emoji" id="loadingEmoji">📚</div>
+        <div class="spinner"><div class="inner"></div></div>
+        <div class="loading-text" id="loadingText">กำลังเตรียมบทเรียน...</div>
+        <div class="loading-sub" id="loadingSub">อุสตะเฮงกำลังจัดเตรียมให้คุณ 🕌</div>
+    </div>
 
     <!-- Side Menu -->
     <div class="overlay" id="sideOverlay" onclick="closeSideMenu()"></div>
@@ -266,7 +343,7 @@
         <div class="ustadh-card"><span class="avatar">👳</span><div class="msg" id="readingUstadhMessage">ฝึกอ่านภาษาอาหรับผ่านบทความครับ 📖</div></div>
         <div class="card-modern">
             <h2 class="font-bold text-gray-700 mb-2">📖 อ่านบทความ</h2>
-            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • อ่านจบได้ 1 ดาว ⭐</p>
+            <p class="text-xs text-gray-400">แตะคำเพื่อดูพจนานุกรม • อ่านจบได้ 1 ดาว (เฉพาะครั้งแรก) ⭐</p>
             <div id="readingLevelContainer" class="flex flex-wrap gap-2 mt-3"></div>
         </div>
         <div id="readingDanContainer" class="card-modern hidden">
@@ -430,7 +507,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v6.0 — ครบทุกฟีเจอร์ พร้อมระบบแลกเพชร -->
+    <!-- JAVASCRIPT v6.1 — ปรับปรุง Loading, Unlock Level, Reading Star -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -450,6 +527,43 @@
             DIAMOND_THRESHOLD: 100,
             FREE_LEVELS: 3,
         };
+
+        // ==============================================================
+        //  LOADING MESSAGES (Ready / Motivational)
+        // ==============================================================
+        const LOADING_MESSAGES = [
+            { emoji: '📚', text: 'กำลังเตรียมบทเรียน...', sub: 'อุสตะเฮงกำลังจัดเตรียมให้คุณ 🕌' },
+            { emoji: '⚔️', text: 'เตรียมตัวหรือยัง?', sub: 'การผจญภัยทางภาษาเริ่มต้นแล้ว! 🚀' },
+            { emoji: '🧠', text: 'พร้อมที่จะเรียนรู้หรือยัง?', sub: 'สมองของคุณพร้อมแล้ว! 💪' },
+            { emoji: '🌟', text: 'กำลังโหลดด่านต่อไป...', sub: 'อุสตะเฮงรอคุณอยู่! 👳' },
+            { emoji: '🔥', text: 'มาเริ่มกันเลย!', sub: 'ความมุ่งมั่นของคุณคือกุญแจสู่ความสำเร็จ 🗝️' },
+            { emoji: '🏃', text: 'เตรียมพร้อมไปกัน!', sub: 'ทุกก้าวคือการเรียนรู้ใหม่ 📖' },
+            { emoji: '✨', text: 'จดจ่อและสนุกไปกับมัน!', sub: 'ภาษาจะกลายเป็นเรื่องง่ายเมื่อคุณสนุก 🌈' },
+            { emoji: '💪', text: 'คุณทำได้!', sub: 'อุสตะเฮงเชื่อมั่นในตัวคุณ 🙏' },
+            { emoji: '🌙', text: 'อีกนิดเดียว...', sub: 'ความอดทนคือหัวใจของความสำเร็จ 💎' },
+            { emoji: '🎯', text: 'เล็งเป้าหมายแล้ว!', sub: 'โฟกัสและพิชิตมันให้ได้ 🔥' },
+        ];
+
+        function getRandomLoadingMessage() {
+            return LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)];
+        }
+
+        // ==============================================================
+        //  🌀 LOADING OVERLAY FUNCTIONS
+        // ==============================================================
+        function showLoading(message) {
+            const overlay = document.getElementById('loadingOverlay');
+            const msg = message || getRandomLoadingMessage();
+            document.getElementById('loadingEmoji').textContent = msg.emoji;
+            document.getElementById('loadingText').textContent = msg.text;
+            document.getElementById('loadingSub').textContent = msg.sub;
+            overlay.classList.add('show');
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('show');
+        }
 
         // ==============================================================
         //  USTADH MESSAGES
@@ -665,9 +779,6 @@
             if (confirm(msg)) { window.open('https://m.me/548132778932419', '_blank'); alert('✅ ขอบคุณที่สนับสนุน!\nกรุณาพูดคุยกับแอดมินเพื่อยืนยันและรับดาวครับ 🙏'); }
         }
 
-        // ==============================================================
-        //  🔥 EXCHANGE SYSTEM (ATM) - ระบบแลกเพชร
-        // ==============================================================
         function toggleExchange() {
             const popup = $('exchangePopup');
             popup.classList.toggle('show');
@@ -695,7 +806,6 @@
             }
             if (!confirm(`💎 แลก 12 เพชร เป็น 100 ดาว?`)) return;
 
-            // แสดงสถานะกำลังดำเนินการ
             const btn = $('exchangeConfirmBtn');
             btn.textContent = '⏳ กำลังแลก...';
             btn.disabled = true;
@@ -714,7 +824,7 @@
                     alert(`✅ แลกสำเร็จ!\n💎 เหลือ ${diamonds} เพชร\n⭐ ได้รับ 100 ดาว (รวม ${stars} ดาว)`);
                     updateExchangeUI();
                     renderLeaderboard();
-                    toggleExchange(); // ปิดป๊อปอัป
+                    toggleExchange();
                 } else {
                     alert('❌ ' + (res.error || 'แลกไม่สำเร็จ กรุณาลองใหม่'));
                     updateExchangeUI();
@@ -729,7 +839,7 @@
         }
 
         // ==============================================================
-        //  UNLOCK LEVEL
+        //  🔥 UNLOCK LEVEL (แก้ไข: ปลดล็อก Level ใหม่)
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
@@ -861,7 +971,7 @@
             let n = w;
             n = n.replace(/[ًٌٍَُِّْ]/g, '');
             n = n.replace(/^ال/g, '').replace(/^وَال/g, '').replace(/^فَال/g, '').replace(/^بِال/g, '');
-            n = n.replace(/^(و|ف|ب|ล|ك)/, '');
+            n = n.replace(/^(و|ف|ب|ل|ك)/, '');
             n = n.replace(/ي$/g, '').replace(/كَ$/g, '').replace(/كِ$/g, '').replace(/هُ$/g, '').replace(/هَا$/g, '');
             n = n.replace(/نَا$/g, '').replace(/كُمْ$/g, '').replace(/هُمْ$/g, '').replace(/هِنَّ$/g, '');
             n = n.replace(/^أ/g, '').replace(/^ن/g, '').replace(/^ت/g, '').replace(/^ي/g, '');
@@ -878,7 +988,7 @@
         // ==============================================================
         async function loadAllData() {
             try {
-                setStatus('⏳ โหลดข้อมูล...');
+                showLoading({ emoji: '📚', text: 'กำลังโหลดข้อมูล...', sub: 'อุสตะเฮงกำลังเตรียมบทเรียนให้คุณ 🕌' });
                 const [q, v, l, p] = await Promise.all([
                     callAPI('questions', 'GET', null, { all: 'true' }),
                     callAPI('vocab', 'GET'),
@@ -906,7 +1016,8 @@
                 await loadReadingLevels();
                 setStatus('📚 พร้อมเรียน');
                 updateUstadhMessage('สวัสดีครับ! เลือกด่านที่ต้องการเรียนได้เลย');
-            } catch(e) { setStatus('⚠️ โหลดล้มเหลว'); console.error(e); }
+                hideLoading();
+            } catch(e) { setStatus('⚠️ โหลดล้มเหลว'); console.error(e); hideLoading(); }
         }
 
         async function loadProgressFromBackend() {
@@ -1035,18 +1146,28 @@
         }
 
         // ==============================================================
-        //  🔥 CORE: loadDan() — บันทึก played = TRUE แบบถาวร
+        //  🔥 CORE: loadDan() — พร้อม Loading Animation
         // ==============================================================
         async function startGame() {
             playKeyboardSound();
             vibrate(30);
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
+            
+            // 🔥 แสดง Loading
+            showLoading({ 
+                emoji: '⚔️', 
+                text: 'เตรียมตัวหรือยัง?', 
+                sub: 'อุสตะเฮงกำลังเตรียมด่านให้คุณ... 🕌' 
+            });
+
             gameStarted = true;
             $('gameNotStarted').classList.add('hidden');
             $('startGameContainer').classList.add('hidden');
             showGameOverlay();
+            
             await loadDan(currentDan);
+            hideLoading();
         }
 
         async function loadDan(dan) {
@@ -1363,7 +1484,6 @@
                 alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
                 if (!vocabProgress[key]) vocabProgress[key] = {};
                 vocabProgress[key].gotDiamond = true;
-                // อัปเดต UI เพชร
                 loadDiamondsFromBackend();
             }
 
@@ -1482,7 +1602,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE
+        //  GAME 2: SENTENCE (พร้อม Loading)
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1599,9 +1719,17 @@
             vibrate(30);
             if (!currentSentenceDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
+            
+            showLoading({
+                emoji: '🧩',
+                text: 'เตรียมตัวต่อประโยคกัน!',
+                sub: 'อุสตะเฮงกำลังเตรียมคำศัพท์ให้คุณ 🧠'
+            });
+            
             $('sentenceStartContainer').classList.add('hidden');
             showGameOverlay();
             await loadSentenceDan(currentSentenceLevel, currentSentenceDan);
+            hideLoading();
         }
 
         async function loadSentenceDan(level, dan) {
@@ -1860,7 +1988,7 @@
         }
 
         // ==============================================================
-        //  GAME 3: READING
+        //  GAME 3: READING (พร้อม Loading + Star ครั้งแรกเท่านั้น)
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -1996,9 +2124,17 @@
             vibrate(30);
             if (!currentReadingDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
+            
+            showLoading({
+                emoji: '📖',
+                text: 'กำลังเปิดบทความ...',
+                sub: 'อุสตะเฮงกำลังเตรียมบทอ่านให้คุณ 📜'
+            });
+            
             $('readingStartContainer').classList.add('hidden');
             showGameOverlay();
             await loadReadingDan(currentReadingLevel, currentReadingDan);
+            hideLoading();
         }
 
         async function loadReadingDan(level, dan) {
@@ -2228,11 +2364,15 @@
             }
         }
 
-        // 🔥 readingEndGame — มีปุ่มไปด่านถัดไป + ได้ 1 ดาว
+        // 🔥 readingEndGame — มีปุ่มไปด่านถัดไป + ได้ 1 ดาว (เฉพาะครั้งแรก)
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
+
+            // 🔥 ตรวจสอบว่าเคยอ่านด่านนี้แล้วหรือยัง (ได้ดาวไปแล้ว)
+            const key = `${currentReadingLevel}_${currentReadingDan}`;
+            const alreadyDone = readingProgress[key] && readingProgress[key].done === true;
 
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
@@ -2243,12 +2383,18 @@
                     passed: true,
                     played: true
                 }).then(async () => {
-                    await addStarToUser(userEmail);
                     await loadProgressFromBackend();
                     renderReadingDans();
                     renderReadingLevels();
-                    updateStarDisplay();
-                    alert('⭐ อ่านจบแล้ว! คุณได้รับ 1 ดาว!');
+                    
+                    // 🔥 เพิ่มดาวเฉพาะครั้งแรกที่อ่านจบเท่านั้น
+                    if (!alreadyDone) {
+                        await addStarToUser(userEmail);
+                        alert('⭐ อ่านจบแล้ว! คุณได้รับ 1 ดาว (ครั้งแรก)');
+                        updateStarDisplay();
+                    } else {
+                        alert('📖 อ่านจบแล้ว! (แต่คุณได้รับดาวไปแล้ว)');
+                    }
                 }).catch(console.error);
             }
 
@@ -2634,12 +2780,10 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v6.0 — ระบบแลกเพชร (ATM) ครบถ้วน');
-        console.log('✅ แลก 12 เพชร → 100 ดาว');
-        console.log('✅ ตรวจสอบเพชรพอ, อัปเดตทันที');
-        console.log('✅ Perfect ได้เพชรครั้งแรก');
-        console.log('✅ ถูกติดต่อกัน 3 ครั้ง ได้ดาว');
-        console.log('✅ อ่านบทความจบได้ 1 ดาว');
+        console.log('🚀 ศึกษา ต่างถิ่น v6.1 — Loading Animation + Unlock Fix + Reading Star Once');
+        console.log('✅ เปิดเกมใหม่มี Loading สวยงาม');
+        console.log('✅ Level ที่ปลดล็อกแล้วเปิดใช้งานได้');
+        console.log('✅ อ่านบทความจบได้ 1 ดาว (ครั้งแรกเท่านั้น)');
     </script>
 </body>
 </html>

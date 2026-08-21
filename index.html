@@ -507,7 +507,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v6.1 — ปรับปรุง Loading, Unlock Level, Reading Star -->
+    <!-- JAVASCRIPT v6.2 — แก้ไข unlock level + reading star notification -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -839,7 +839,7 @@
         }
 
         // ==============================================================
-        //  🔥 UNLOCK LEVEL (แก้ไข: ปลดล็อก Level ใหม่)
+        //  🔥 UNLOCK LEVEL (แก้ไขแล้ว: โหลดข้อมูลใหม่ + รีเฟรช UI ทันที)
         // ==============================================================
         async function unlockLevelWithStars(game, level) {
             if (!isLoggedIn || !userEmail) { alert('กรุณาเข้าสู่ระบบก่อน'); return; }
@@ -858,10 +858,12 @@
                     playStarSound();
                     vibrate([50, 80, 50]);
                     alert(`✅ ปลดล็อก Level ${level} ทุกด่านแล้ว!`);
-                    await loadProgressFromBackend();
-                    if (game === 'vocab') renderDans();
-                    else if (game === 'sentence') { await loadSentenceLevels(); renderSentenceLevels(); renderSentenceDans(); }
-                    else if (game === 'reading') { await loadReadingLevels(); renderReadingLevels(); renderReadingDans(); }
+                    // 🔥 โหลดข้อมูลทั้งหมดใหม่ เพื่อให้สถานะปลดล็อกอัปเดตทันที
+                    await loadAllData();
+                    // บังคับสลับแท็บเพื่อให้ UI รีเฟรช
+                    if (game === 'vocab') switchTab('gameTab');
+                    else if (game === 'sentence') switchTab('sentenceTab');
+                    else if (game === 'reading') switchTab('readingTab');
                 } else { alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้')); }
             } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
         }
@@ -1154,7 +1156,6 @@
             if (!currentDan) { alert('กรุณาเลือกด่านก่อน'); return; }
             if (!isLoggedIn) { alert('กรุณาเข้าสู่ระบบ'); return; }
             
-            // 🔥 แสดง Loading
             showLoading({ 
                 emoji: '⚔️', 
                 text: 'เตรียมตัวหรือยัง?', 
@@ -2364,15 +2365,14 @@
             }
         }
 
-        // 🔥 readingEndGame — มีปุ่มไปด่านถัดไป + ได้ 1 ดาว (เฉพาะครั้งแรก)
+        // 🔥 readingEndGame — แสดงแจ้งเตือนเมื่อได้รับดาว + ตรวจสอบรอบสอง
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
 
-            // 🔥 ตรวจสอบว่าเคยอ่านด่านนี้แล้วหรือยัง (ได้ดาวไปแล้ว)
             const key = `${currentReadingLevel}_${currentReadingDan}`;
-            const alreadyDone = readingProgress[key] && readingProgress[key].done === true;
+            let alreadyDone = readingProgress[key] && readingProgress[key].done === true;
 
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
@@ -2384,10 +2384,10 @@
                     played: true
                 }).then(async () => {
                     await loadProgressFromBackend();
+                    alreadyDone = readingProgress[key] && readingProgress[key].done === true;
                     renderReadingDans();
                     renderReadingLevels();
                     
-                    // 🔥 เพิ่มดาวเฉพาะครั้งแรกที่อ่านจบเท่านั้น
                     if (!alreadyDone) {
                         await addStarToUser(userEmail);
                         alert('⭐ อ่านจบแล้ว! คุณได้รับ 1 ดาว (ครั้งแรก)');
@@ -2780,10 +2780,9 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v6.1 — Loading Animation + Unlock Fix + Reading Star Once');
-        console.log('✅ เปิดเกมใหม่มี Loading สวยงาม');
-        console.log('✅ Level ที่ปลดล็อกแล้วเปิดใช้งานได้');
-        console.log('✅ อ่านบทความจบได้ 1 ดาว (ครั้งแรกเท่านั้น)');
+        console.log('🚀 ศึกษา ต่างถิ่น v6.2 — แก้ไข unlock level + reading star notification');
+        console.log('✅ ปลดล็อก Level: โหลดข้อมูลใหม่และรีเฟรช UI ทันที');
+        console.log('✅ อ่านบทความจบ: แจ้งเตือนเมื่อได้ดาว + ตรวจสอบรอบสอง');
     </script>
 </body>
 </html>

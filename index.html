@@ -426,7 +426,7 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- JAVASCRIPT v5.9 — ครบทุกฟีเจอร์ พร้อมบันทึก "เล่นแล้ว" แบบถาวร -->
+    <!-- JAVASCRIPT v6.0 — ปรับปรุงตามข้อกำหนด 5 ข้อ -->
     <!-- ============================================================== -->
     <script>
         // ==============================================================
@@ -605,11 +605,6 @@
                     else if (game === 'reading') { await loadReadingLevels(); renderReadingLevels(); renderReadingDans(); }
                 } else { alert('❌ ' + (res.error || 'ไม่สามารถปลดล็อกได้')); }
             } catch(e) { alert('❌ เกิดข้อผิดพลาด: ' + e.message); }
-        }
-
-        async function unlockDanWithStars(game, level, dan) {
-            alert('❌ ไม่สามารถเปิดด่านด้วยดาวได้ กรุณาเล่นด่านก่อนหน้าให้ผ่าน');
-            return;
         }
 
         // ==============================================================
@@ -1067,6 +1062,7 @@
             updatePowerUI();
         }
 
+        // 🔥 แก้ไข selectAnswer — เพิ่มดาวเมื่อถูกติดต่อกัน 3 ครั้ง
         function selectAnswer(selectedIdx, q) {
             if (isAnswered || gameEnded) return;
             isAnswered = true;
@@ -1088,7 +1084,16 @@
                 streak++;
                 combo = Math.min(combo + 0.5, 3);
                 consecutiveWrong = 0;
-                if (currentFeature && currentFeature.streakBonus && streak >= 3) { score += 5;
+                
+                // 🔥 NEW: ติดต่อกัน 3 ครั้ง → ได้ดาว
+                if (streak % 3 === 0) {
+                    stars += 1;
+                    updateStarDisplay();
+                    playStarSound();
+                    setTeacherMessage(`⭐ สุดยอด! ติด ${streak} ข้อ ได้ 1 ดาว!`);
+                }
+                
+                if (currentFeature && currentFeature.streakBonus && streak >= 5) { score += 5;
                     setTeacherMessage(`⭐ สเตรค! +5 แต้ม (ติด ${streak} ข้อ)`); }
                 showExtraInfo(q);
                 $('streakDisplay').textContent = `🔥 ${streak}`;
@@ -1163,6 +1168,7 @@
             if (!mistakes.some(m => m.thai === entry.thai)) mistakes.push(entry);
         }
 
+        // 🔥 แก้ไข endGame — ผ่าน 60% ถึงจะ TRUE, perfect ได้เพชรครั้งแรก
         function endGame() {
             gameEnded = true;
             clearInterval(timerInterval);
@@ -1177,7 +1183,12 @@
             const passed = percent >= passingScore;
             $('finalMessage').textContent = passed ? `🎉 ผ่าน! (${percent}%)` :
                 `😅 ยังไม่ผ่าน (${percent}%) ต้อง ${passingScore}%`;
-            const perfect = isPerfectRun && mistakes.length === 0 && percent === 100;
+            const perfect = isPerfectRun && mistakes.length === 0;
+
+            // 🔥 NEW: ตรวจสอบว่าเคยได้เพชรจากด่านนี้หรือยัง
+            const key = `${currentLevel}_${currentDan}`;
+            const alreadyGotDiamond = vocabProgress[key] && vocabProgress[key].gotDiamond;
+
             if (isLoggedIn) {
                 callAPI('scores', 'POST', {
                     email: userEmail,
@@ -1186,7 +1197,8 @@
                     score: score,
                     time: Math.round((currentFeature?.timeLimit || CONFIG.TIME_LIMIT) * currentRound.length - timeLeft || 0),
                     streak: streak,
-                    isPerfect: perfect
+                    isPerfect: perfect,
+                    passed: passed,  // 🔥 ส่ง passed ไปด้วย
                 }).then(() => {
                     loadStarsFromBackend();
                     loadDiamondsFromBackend();
@@ -1196,6 +1208,14 @@
                     updateShareCard();
                 }).catch(console.error);
             }
+
+            // 🔥 NEW: แจ้งเตือนเพชร (ถ้ายังไม่เคยได้และ perfect)
+            if (perfect && !alreadyGotDiamond) {
+                alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
+                if (!vocabProgress[key]) vocabProgress[key] = {};
+                vocabProgress[key].gotDiamond = true;
+            }
+
             const nextBtn = $('nextDanBtn');
             if (passed) {
                 const next = availableDans.find(d => d.dan === currentDan + 1 && d.level === currentLevel);
@@ -1214,9 +1234,6 @@
                         `<span class="flex-1">${m.thai} = ${m.arabic}</span><button onclick="reportMistake(${idx})" class="text-xs text-red-500 hover:underline">🚨 รายงาน</button>`;
                     list.appendChild(li);
                 });
-            }
-            if (perfect) {
-                alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
             }
         }
 
@@ -1314,7 +1331,7 @@
         }
 
         // ==============================================================
-        //  GAME 2: SENTENCE (ปรับปรุงเหมือนกัน)
+        //  GAME 2: SENTENCE
         // ==============================================================
         async function loadSentenceLevels() {
             try {
@@ -1562,6 +1579,7 @@
             vibrate(10);
             playKeyboardSound(); }
 
+        // 🔥 แก้ไข sentenceCheck — เพิ่มดาวเมื่อถูกติดต่อกัน 3 ครั้ง
         function sentenceCheck() {
             if (sentenceGameCompleted) return;
             if (placedWords.length === 0) { alert('กรุณาเรียงคำให้ครบ'); return; }
@@ -1575,14 +1593,13 @@
                 vibrate([30, 50, 30]);
                 sentenceConsecutiveCorrect++;
                 const msg = getUstadhMessage();
-                if (sentenceConsecutiveCorrect >= 3) {
-                    result.innerHTML = `<p class="text-green-600 font-bold">✅ ${msg} (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
-                    if (sentenceConsecutiveCorrect % CONFIG.STREAK_STARS === 0) {
-                        stars += 1;
-                        updateStarDisplay();
-                        playStarSound();
-                        result.innerHTML += `<br><span class="text-amber-600">⭐ ได้ 1 ดาว! (ติด ${sentenceConsecutiveCorrect} ข้อ)</span>`;
-                    }
+                
+                // 🔥 NEW: ติดต่อกัน 3 ครั้ง → ได้ดาว
+                if (sentenceConsecutiveCorrect % 3 === 0) {
+                    stars += 1;
+                    updateStarDisplay();
+                    playStarSound();
+                    result.innerHTML = `<p class="text-green-600 font-bold">✅ ${msg} (ติด ${sentenceConsecutiveCorrect} ข้อ) ⭐ ได้ 1 ดาว!</p>`;
                 } else {
                     result.innerHTML = `<p class="text-green-600 font-bold">✅ ${msg} (ติด ${sentenceConsecutiveCorrect} ข้อ)</p>`;
                 }
@@ -1638,12 +1655,18 @@
             }
         }
 
+        // 🔥 แก้ไข sentenceEndGame — perfect ได้เพชรครั้งแรก
         function sentenceEndGame() {
             sentenceGameCompleted = true;
             $('sentenceQuestionArea').classList.add('hidden');
             $('sentenceGameOver').classList.remove('hidden');
             $('sentenceFinalStreak').textContent = sentenceConsecutiveCorrect;
             const perfect = sentencePerfect && sentenceConsecutiveCorrect === sentenceTotalQuestions;
+
+            // 🔥 NEW: ตรวจสอบว่าเคยได้เพชรจากด่านนี้หรือยัง
+            const key = `${currentSentenceLevel}_${currentSentenceDan}`;
+            const alreadyGotDiamond = sentenceProgress[key] && sentenceProgress[key].gotDiamond;
+
             if (isLoggedIn) {
                 callAPI('progress', 'POST', {
                     email: userEmail,
@@ -1661,28 +1684,35 @@
                     renderSentenceLevels();
                 }).catch(console.error);
             }
-            if (perfect) {
+
+            // 🔥 NEW: แจ้งเตือนเพชร (ถ้ายังไม่เคยได้และ perfect)
+            if (perfect && !alreadyGotDiamond) {
                 alert('🎉 Perfect! คุณตอบถูกทุกข้อ! ได้รับ 1 เพชร! 💎');
+                if (!sentenceProgress[key]) sentenceProgress[key] = {};
+                sentenceProgress[key].gotDiamond = true;
             }
+
             const nextBtn = $('sentenceNextDanBtn');
             const next = sentenceDans.find(d => d === currentSentenceDan + 1);
             if (next || (sentenceLevels.find(l => l.level === currentSentenceLevel + 1)?.dans?.length)) {
                 nextBtn.classList.remove('hidden');
                 nextBtn.textContent = next ? '➡️ ด่านถัดไป' : '➡️ Level ถัดไป';
                 nextBtn.onclick = () => {
-                    if (next) { currentSentenceDan = next;
-                        loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else {
-                        const nextLevel = sentenceLevels.find(l => l.level === currentSentenceLevel + 1);
-                        if (nextLevel && nextLevel.dans.length) { currentSentenceLevel = nextLevel.level;
-                            currentSentenceDan = nextLevel.dans[0];
-                            loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else alert('🎉 คุณผ่านทุกด่านแล้ว!');
+                    if (confirm('คุณเล่นจบแล้ว! ไปด่านถัดไปเลยไหม?')) {
+                        if (next) { currentSentenceDan = next;
+                            loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else {
+                            const nextLevel = sentenceLevels.find(l => l.level === currentSentenceLevel + 1);
+                            if (nextLevel && nextLevel.dans.length) { currentSentenceLevel = nextLevel.level;
+                                currentSentenceDan = nextLevel.dans[0];
+                                loadSentenceDan(currentSentenceLevel, currentSentenceDan); } else alert('🎉 คุณผ่านทุกด่านแล้ว!');
+                        }
                     }
                 };
             } else { nextBtn.classList.add('hidden'); }
         }
 
         // ==============================================================
-        //  GAME 3: READING (ปรับปรุงเหมือนกัน)
+        //  GAME 3: READING
         // ==============================================================
         async function loadReadingLevels() {
             try {
@@ -2034,25 +2064,54 @@
         function resetReadingArticle() { readingIndex = 0;
             renderReadingArticle(); }
 
+        // ==============================================================
+        //  🔥 NEW: addStarToUser — เพิ่ม 1 ดาวให้ผู้ใช้ (ใช้ใน readingEndGame)
+        // ==============================================================
+        async function addStarToUser(email) {
+            try {
+                const res = await callAPI('user/stars/add', 'POST', { email: email, amount: 1 });
+                if (res.success) {
+                    stars = res.newStars || stars + 1;
+                    updateStarDisplay();
+                    playStarSound();
+                    debugLog('STAR', '⭐ เพิ่ม 1 ดาวให้ ' + email);
+                }
+            } catch(e) {
+                debugLog('STAR', '❌ เพิ่มดาวล้มเหลว:', e);
+                // fallback: เพิ่มใน local
+                stars += 1;
+                updateStarDisplay();
+            }
+        }
+
+        // 🔥 แก้ไข readingEndGame — มีปุ่มไปด่านถัดไป + ได้ 1 ดาว
         function readingEndGame() {
             $('readingArticleContent').classList.add('hidden');
             $('readingGameOver').classList.remove('hidden');
             $('readingTotalArticles').textContent = readingTotalArticles;
- if (isLoggedIn) {
-        callAPI('progress', 'POST', {
-            email: userEmail,
-            game: 'reading',
-            level: currentReadingLevel,
-            dan: currentReadingDan,
-            passed: true,
-            played: true
-        }).then(async () => {
-            await loadProgressFromBackend();
-            renderReadingDans();
-            renderReadingLevels();
-        }).catch(console.error);
-    }
 
+            // 🔥 NEW: อ่านจบ → ได้ 1 ดาว
+            if (isLoggedIn) {
+                // บันทึก progress
+                callAPI('progress', 'POST', {
+                    email: userEmail,
+                    game: 'reading',
+                    level: currentReadingLevel,
+                    dan: currentReadingDan,
+                    passed: true,
+                    played: true
+                }).then(async () => {
+                    // 🔥 ได้ 1 ดาว
+                    await addStarToUser(userEmail);
+                    await loadProgressFromBackend();
+                    renderReadingDans();
+                    renderReadingLevels();
+                    updateStarDisplay();
+                    alert('⭐ อ่านจบแล้ว! คุณได้รับ 1 ดาว!');
+                }).catch(console.error);
+            }
+
+            // 🔥 NEW: ปุ่มไปด่านถัดไป (แสดงทันที)
             const nextBtn = $('readingNextDanBtn');
             const next = readingDans.find(d => d === currentReadingDan + 1);
             if (next || (readingLevels.find(l => l.level === currentReadingLevel + 1)?.dans?.length)) {
@@ -2301,9 +2360,11 @@
             });
         });
 
-        console.log('🚀 ศึกษา ต่างถิ่น v5.9 — บันทึก "เล่นแล้ว" แบบถาวร');
-        console.log('✅ ใช้ await ใน loadDan / loadSentenceDan / loadReadingDan');
-        console.log('✅ ข้อมูล "เล่นแล้ว" อยู่รอแม้รีเฟรชหน้า');
+        console.log('🚀 ศึกษา ต่างถิ่น v6.0 — ปรับปรุงตามข้อกำหนด 5 ข้อ');
+        console.log('✅ ถูกติดต่อกัน 3 ครั้ง ได้ดาว');
+        console.log('✅ Perfect ได้เพชรครั้งแรก');
+        console.log('✅ อ่านบทความจบได้ 1 ดาวและมีปุ่มไปด่านถัดไป');
+        console.log('✅ เกมที่ 1 ต้องผ่าน 60% ถึงจะเป็น TRUE');
     </script>
 </body>
 </html>
